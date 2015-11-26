@@ -1,0 +1,13 @@
+syntax: glob
+
+.settings/*
+target/*
+*.orig
+*.class
+*.iml
+.classpath
+.project
+bin/
+.idea/
+/target
+nb-configuration.xml
