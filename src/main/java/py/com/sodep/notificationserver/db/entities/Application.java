@@ -8,7 +8,12 @@ import javax.persistence.*;
 @Table
 public class Application implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6163667597446187934L;
+
+	@Id
     @GeneratedValue
     private Long id;
 

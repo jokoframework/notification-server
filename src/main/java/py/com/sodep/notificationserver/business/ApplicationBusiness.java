@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package py.com.sodep.notificationserver.bussines;
+package py.com.sodep.notificationserver.business;
 
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Response;
@@ -15,7 +15,7 @@ import py.com.sodep.notificationserver.db.entities.Application;
  * @author Vanessa
  */
 @RequestScoped
-public class ApplicationBussines {
+public class ApplicationBusiness {
 
     
 
