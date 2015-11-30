@@ -46,6 +46,12 @@ public class BaseDAO<T, PK extends Serializable> extends GenericDAOImpl<T, PK> {
         return HibernateSessionLocal.sessionFactory.getCurrentSession();
     }
 
+    @Override
+    public boolean save(T entity) {
+        boolean a = super.save(entity);
+        getSession().getTransaction().commit();
+        return a;
+    }
     /*private Class<T> type;
 
      @SuppressWarnings("unchecked")

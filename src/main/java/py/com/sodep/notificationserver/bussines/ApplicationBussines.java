@@ -27,8 +27,6 @@ public class ApplicationBussines {
         System.out.println(HibernateSessionLocal.sessionFactory.getCurrentSession().isDirty());
         a.setName("HOLA");
         applicationDao.save(a);
-        HibernateSessionLocal.sessionFactory.getCurrentSession().getTransaction().commit();
-//        System.out.println("Application encontrado:" + a);
         return Response.ok().build();
     }
     
