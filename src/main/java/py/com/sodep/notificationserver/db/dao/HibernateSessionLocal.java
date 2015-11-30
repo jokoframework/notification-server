@@ -5,12 +5,16 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
-import py.com.sodep.notificationserver.db.entities.Application;
+import javax.enterprise.context.ApplicationScoped;
+import org.hibernate.SessionFactory;
 
 /**
  *
  * @author Vanessa
  */
-public class ApplicationDao extends BaseDAO<Application, Long> {
-
+@ApplicationScoped
+public class HibernateSessionLocal {
+    public static SessionFactory sessionFactory;
+    
+    
 }

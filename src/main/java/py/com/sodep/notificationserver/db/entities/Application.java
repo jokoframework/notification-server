@@ -11,11 +11,16 @@ public class Application implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-
+    
+    @Column
     private String name;
+    @Column
     private String apiKeyDev;
+    @Column
     private String apiKeyProd;
+    @Column
     private String certificadoDev;
+    @Column
     private String certificadoProd;
     
     public Application() {

@@ -29,7 +29,7 @@ public class ApplicationService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response newApplication(@PathParam("id") String id) {
         System.out.println("Application/id " + id);
-        return appBussines.getApplication(id);
+        return appBussines.newApplication(id);
 
     }
     

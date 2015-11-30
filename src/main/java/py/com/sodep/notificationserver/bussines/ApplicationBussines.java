@@ -8,6 +8,7 @@ package py.com.sodep.notificationserver.bussines;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Response;
 import py.com.sodep.notificationserver.db.dao.ApplicationDao;
+import py.com.sodep.notificationserver.db.dao.HibernateSessionLocal;
 import py.com.sodep.notificationserver.db.entities.Application;
 
 /**
@@ -23,8 +24,10 @@ public class ApplicationBussines {
         System.out.println("Recibido " + id);
         ApplicationDao applicationDao = new ApplicationDao();
         Application a = new Application();
+        System.out.println(HibernateSessionLocal.sessionFactory.getCurrentSession().isDirty());
         a.setName("HOLA");
-        applicationDao.create(a);
+        applicationDao.save(a);
+        HibernateSessionLocal.sessionFactory.getCurrentSession().getTransaction().commit();
 //        System.out.println("Application encontrado:" + a);
         return Response.ok().build();
     }
@@ -32,7 +35,7 @@ public class ApplicationBussines {
     public Response getApplication(String id) {
         System.out.println("Recibido " + id);
         ApplicationDao applicationDao = new ApplicationDao();
-        Application a = applicationDao.findById(Long.valueOf(id));
+        Object a = applicationDao.find(Long.valueOf(id));
         System.out.println("Application encontrado:" + a);
         return Response.ok(a).build();
     }

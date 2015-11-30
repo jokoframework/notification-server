@@ -5,79 +5,39 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import com.googlecode.genericdao.dao.hibernate.GenericDAOImpl;
+import java.io.Serializable;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 /**
  *
  * @author Vanessa
+ * @param <T>
  */
-public class GenericDao<T> {
+public class GenericDao<T, PK extends Serializable> extends GenericDAOImpl {
 
-    private static final String PERSISTENCE_UNIT_NAME = "notification-server";
-    private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+    /*private final Class<T> type;
+     private static final String PERSISTENCE_UNIT_NAME = "notification-server";
+     private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+     */
+    private SessionFactory sf;
+    private Session session;
 
-    public EntityManager getEntityManager() {
-        return factory.createEntityManager();
+    public void init() {
+        sf = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+        this.setSessionFactory(sf);
+        this.setSession(sf.getCurrentSession());
     }
 
-    private Class<T> type;
-
-    public GenericDao(Class<T> type) {
-        this.type = type;
+    @Override
+    protected Session getSession() {
+        return session;
     }
 
-    public void create(T o) {
-        EntityManager em = getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.persist(o);
-            em.getTransaction().commit();
-
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void update(T o) {
-        EntityManager em = getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.merge(o);
-            em.getTransaction().commit();
-
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public void delete(T o) {
-        EntityManager em = getEntityManager();
-        try {
-            em.getTransaction().begin();
-            em.remove(o);
-            em.getTransaction().commit();
-
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
-    }
-
-    public T findById(Object primaryKey) {
-        EntityManager em = getEntityManager();
-        try {
-            return em.find(type, primaryKey);
-        } finally {
-            if (em != null) {
-                em.close();
-            }
-        }
+    public void setSession(Session session) {
+        this.session = session;
+        setSessionFactory(session.getSessionFactory());
     }
 }
