@@ -3,14 +3,12 @@ package py.com.sodep.notificationserver.interceptors;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.interception.DecoderPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.interception.*;
 import org.jboss.resteasy.util.InputStreamToByteArray;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -20,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 
 @Provider
 @ServerInterceptor
@@ -30,7 +29,6 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
     private HttpServletRequest servletRequest;
 
     private final Logger log = Logger.getLogger(LoggingInterceptor.class);
-
 
     @Override
     public Object read(MessageBodyReaderContext context) throws IOException, WebApplicationException {
@@ -50,12 +48,26 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
     }
 
     @Override
-    public ServerResponse preProcess(HttpRequest request,
-                                     ResourceMethod resourceMethod)
+    public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException {
+        OutputStream old = context.getOutputStream();
 
-            throws Failure, WebApplicationException {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            stream.writeTo(old);
+            context.setOutputStream(stream);
+            context.proceed();
+            byte[] body = stream.toByteArray();
+            log.info("Body request de salida: " + new String(body));
+            stream.close();
+        } finally {
+            context.setOutputStream(old);
+            context.proceed();
+        }
+    }
 
-        String methodName = resourceMethod.getMethod().getName();
+    @Override
+    public ServerResponse preProcess(HttpRequest hr, ResourceMethodInvoker rmi) throws Failure, WebApplicationException {
+        String methodName = rmi.getMethod().getName();
         String remoteAddress = servletRequest.getRemoteAddr();
         String requestUri = servletRequest.getRequestURI();
         String queryString = servletRequest.getQueryString();
@@ -91,23 +103,5 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
         }
 
         return null;
-    }
-
-    @Override
-    public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException {
-        OutputStream old = context.getOutputStream();
-
-        try {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            stream.writeTo(old);
-            context.setOutputStream(stream);
-            context.proceed();
-            byte[] body = stream.toByteArray();
-            log.info("Body request de salida: " + new String(body));
-            stream.close();
-        } finally {
-            context.setOutputStream(old);
-            context.proceed();
-        }
     }
 }

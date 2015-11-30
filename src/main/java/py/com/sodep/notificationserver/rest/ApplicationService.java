@@ -12,7 +12,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import py.com.sodep.notificationserver.bussines.ApplicationBussines;
+
+import py.com.sodep.notificationserver.business.ApplicationBusiness;
 
 /**
  *
@@ -22,7 +23,7 @@ import py.com.sodep.notificationserver.bussines.ApplicationBussines;
 @RequestScoped
 public class ApplicationService {
 
-    ApplicationBussines appBussines = new ApplicationBussines();
+    ApplicationBusiness appBussines = new ApplicationBusiness();
 
     @GET
     @Path("/new/{id}")

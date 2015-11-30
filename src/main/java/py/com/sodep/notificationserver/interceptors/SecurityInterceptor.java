@@ -3,7 +3,6 @@ package py.com.sodep.notificationserver.interceptors;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.BadRequestException;
 import org.jboss.resteasy.spi.Failure;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
+import org.jboss.resteasy.core.ResourceMethodInvoker;
 
 /**
  * @author duartm
@@ -33,8 +33,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
     private RequestParams requestParams;
 
     @Override
-    public ServerResponse preProcess(HttpRequest request,
-                                     ResourceMethod resourceMethod) throws Failure, WebApplicationException {
+    public ServerResponse preProcess(HttpRequest hr, ResourceMethodInvoker rmi) throws Failure, WebApplicationException {
         String transactionId = servletRequest.getHeader("transaction-id");
 
         return null;
