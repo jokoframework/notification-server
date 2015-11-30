@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
+import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import com.googlecode.genericdao.dao.hibernate.GenericDAOImpl;
 import java.io.Serializable;
 import java.util.List;

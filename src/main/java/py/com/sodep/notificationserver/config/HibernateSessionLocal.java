@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package py.com.sodep.notificationserver.db.dao;
+package py.com.sodep.notificationserver.config;
 
 import javax.enterprise.context.ApplicationScoped;
 import org.hibernate.SessionFactory;

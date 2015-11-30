@@ -34,7 +34,7 @@ public class NotificationBusiness {
 		GcmFacade service = new GcmFacade();
 		
 		AndroidNotification notification = new AndroidNotification();
-		notification.setRegistration_ids(evento.getAndroidDevices());
+		notification.setRegistration_ids(evento.getAndroidDevicesList());
 		notification.setData(evento.getPayload());
 		
 		service.send(apiKey,notification);

@@ -8,7 +8,7 @@ package py.com.sodep.notificationserver.business;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Response;
 import py.com.sodep.notificationserver.db.dao.ApplicationDao;
-import py.com.sodep.notificationserver.db.dao.HibernateSessionLocal;
+import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import py.com.sodep.notificationserver.db.entities.Application;
 
 /**
