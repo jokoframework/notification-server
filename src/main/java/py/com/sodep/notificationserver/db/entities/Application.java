@@ -1,4 +1,3 @@
-
 package py.com.sodep.notificationserver.db.entities;
 
 import java.io.Serializable;
@@ -9,27 +8,28 @@ import javax.persistence.*;
 public class Application implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6163667597446187934L;
+     *
+     */
+    private static final long serialVersionUID = 6163667597446187934L;
 
-	@Id
+    @Id
     @GeneratedValue
+    @Column(name = "application_id")
     private Long id;
-    
-    @Column
+
+    @Column(name = "name")
     private String name;
-    @Column
+    @Column(name = "api_key_dev")
     private String apiKeyDev;
-    @Column
+    @Column(name = "api_key_prod")
     private String apiKeyProd;
-    @Column
+    @Column(name = "certificado_dev")
     private String certificadoDev;
-    @Column
+    @Column(name = "certificado_prod")
     private String certificadoProd;
-    
+
     public Application() {
-        
+
     }
 
     public Long getId() {
@@ -84,7 +84,5 @@ public class Application implements Serializable {
     public String toString() {
         return "Application{" + "id=" + id + ", name=" + name + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + '}';
     }
-    
-    
-    
+
 }
