@@ -66,12 +66,7 @@
             <artifactId>resteasy-client</artifactId>
             <version>${resteasy.version}</version>
         </dependency>
-        <!-- CDI -->
-        <dependency>
-            <groupId>org.jboss.weld.servlet</groupId>
-            <artifactId>weld-servlet</artifactId>
-            <version>2.2.9.Final</version>
-        </dependency>
+
     </dependencies>
 
     <build>
