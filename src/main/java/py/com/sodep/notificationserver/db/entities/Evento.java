@@ -27,11 +27,15 @@ public class Evento implements Serializable {
     private boolean sendToSync;
     private String estado;
     private boolean productionMode;
-    private String payload;
+    
+    private Payload payload;
+    
     @Transient
     private List<String> androidDevicesList;
+    
     @Transient
     private List<String> iosDevicesList;
+    
     @Transient
     private String applicationName;
 
@@ -94,11 +98,11 @@ public class Evento implements Serializable {
         this.productionMode = productionMode;
     }
 
-    public String getPayload() {
+    public Payload getPayload() {
         return payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(Payload payload) {
         this.payload = payload;
     }
 

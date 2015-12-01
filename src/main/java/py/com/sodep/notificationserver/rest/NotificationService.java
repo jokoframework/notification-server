@@ -26,6 +26,9 @@ public class NotificationService {
 	public Response newNotification(Evento evento) {
 		System.out.println("Evento " + evento.getApplicationName()
 				+ " Payload:" + evento.getPayload());
+		System.out.println("business: " + business);
+		business = new NotificationBusiness();
+		business.notificar(evento);
 		return Response.ok().build();
 
 	}

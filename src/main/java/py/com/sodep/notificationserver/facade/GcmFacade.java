@@ -39,6 +39,7 @@ public class GcmFacade {
 		request.header("Authorization", "key=" + apiKey);
 
 		try {
+			map = new ObjectMapper();
 			String jsonInString = map.writeValueAsString(notification);
 			System.out.println("Json a enviar: " + jsonInString);
 			request.body("application/json", jsonInString);
