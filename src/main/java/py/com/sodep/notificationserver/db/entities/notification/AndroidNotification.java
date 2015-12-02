@@ -14,14 +14,15 @@ public class AndroidNotification {
     private String collapse_key = "payload";
   
     private List<String> registration_ids;
-    private String data;
+    
+    private Object data;
 
    
-    public String getData() {
+    public Object getData() {
 		return data;
 	}
 
-	public void setData(String data) {
+	public void setData(Object data) {
 		this.data = data;
 	}
 
