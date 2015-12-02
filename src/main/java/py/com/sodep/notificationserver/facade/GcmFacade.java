@@ -34,6 +34,7 @@ public class GcmFacade {
 	ObjectMapper map;
 
 	public void send(String apiKey, AndroidNotification notification) {
+		System.out.println("API KEY: " + apiKey);
 		ClientRequest request = new ClientRequest(Parametro.URL_GCM);
 		request.accept("application/json");
 		request.header("Authorization", "key=" + apiKey);
@@ -46,8 +47,9 @@ public class GcmFacade {
 
 			ClientResponse<String> response = request.post(String.class);
 
-			if (response.getStatus() != 201) {
-				throw new RuntimeException("Failed : HTTP error code : "
+			if (response.getStatus() != 200) {
+				System.out.println("Error en la respuesta : HTTP error code :" + response.getStatus());
+				throw new RuntimeException("Error en la respuesta : HTTP error code : "
 						+ response.getStatus());
 			}
 
@@ -55,7 +57,7 @@ public class GcmFacade {
 					new ByteArrayInputStream(response.getEntity().getBytes())));
 
 			String output;
-			System.out.println("Output from Server .... \n");
+			System.out.println("Salida del servidor .... \n");
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}

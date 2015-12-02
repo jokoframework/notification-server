@@ -4,8 +4,6 @@ package py.com.sodep.notificationserver.db.entities.notification;
 import java.util.ArrayList;
 import java.util.List;
 
-import py.com.sodep.notificationserver.db.entities.Payload;
-
 /**
  * Utilizado para generar JSon de notificaciones tipo Payload
  * que contienen información a mostrar en los dispositivos
@@ -16,14 +14,15 @@ public class AndroidNotification {
     private String collapse_key = "payload";
   
     private List<String> registration_ids;
-    private Payload data;
+    
+    private Object data;
 
    
-    public Payload getData() {
+    public Object getData() {
 		return data;
 	}
 
-	public void setData(Payload data) {
+	public void setData(Object data) {
 		this.data = data;
 	}
 

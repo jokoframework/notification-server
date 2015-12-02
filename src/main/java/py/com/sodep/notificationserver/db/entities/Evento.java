@@ -1,6 +1,7 @@
 package py.com.sodep.notificationserver.db.entities;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,11 +12,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 @Entity
 @Table
 public class Evento implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6055960223584022815L;
+
+	@Id
     @GeneratedValue
     private Long id;
 
@@ -28,9 +37,10 @@ public class Evento implements Serializable {
     private String estado;
     private boolean productionMode;
     
-    private Payload payload;
-    
     @Transient
+    private String payload;
+    
+	@Transient
     private List<String> androidDevicesList;
     
     @Transient
@@ -98,12 +108,15 @@ public class Evento implements Serializable {
         this.productionMode = productionMode;
     }
 
-    public Payload getPayload() {
-        return payload;
+    public Object getPayload() {
+    	HashMap<String,String> map = new Gson().fromJson(this.payload, new TypeToken<HashMap<String, String>>(){}.getType());
+
+    	return map;
     }
 
-    public void setPayload(Payload payload) {
-        this.payload = payload;
+    public void setPayload(Object payload) {
+        this.payload = payload.toString();
+        System.out.println("PAYLOAD STRING: " + this.payload);
     }
 
     public List<String> getAndroidDevicesList() {
