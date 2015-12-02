@@ -8,9 +8,10 @@
     <property name="hibernate.connection.datasource">java:comp/env/jdbc/notification-server</property>
     <property name="hibernate.current_session_context_class">thread</property>
     <property name="hibernate.show_sql">true</property>
-    <property name="hibernate.hbm2ddl.auto">update</property>
+    <property name="hibernate.hbm2ddl.auto">create</property>
     <mapping class="py.com.sodep.notificationserver.db.entities.Application"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
+    <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
 <!--    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidNotification"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.notification.Data"/>-->
   </session-factory>
