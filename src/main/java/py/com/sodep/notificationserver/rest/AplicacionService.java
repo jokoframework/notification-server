@@ -14,22 +14,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import py.com.sodep.notificationserver.db.entities.*;
-import py.com.sodep.notificationserver.business.ApplicationBusiness;
+import py.com.sodep.notificationserver.business.AplicacionBusiness;
 
 /**
  *
  * @author Vanessa
  */
-@Path("/application")
+@Path("/aplicacion")
 @RequestScoped
-public class ApplicationService {
+public class AplicacionService {
 
-    ApplicationBusiness appBussines = new ApplicationBusiness();
+    AplicacionBusiness appBussines = new AplicacionBusiness();
 
     @POST
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newApplication(Application a) throws Exception {
+    public Response newApplication(Aplicacion a) throws Exception {
         System.out.println("Application/id " + a);
         appBussines.newApplication(a);
         return Response.ok().build();
@@ -39,7 +39,7 @@ public class ApplicationService {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationById(@PathParam("id") String id) {
+    public Response getApplicationById(@PathParam("id") String id) throws Exception {
         System.out.println("Application/id " + id);
         return appBussines.getApplication(id);
 

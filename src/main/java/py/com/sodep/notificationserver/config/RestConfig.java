@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import py.com.sodep.notificationserver.rest.ApplicationService;
+import py.com.sodep.notificationserver.rest.AplicacionService;
 import py.com.sodep.notificationserver.rest.UploadFileService;
 
 @ApplicationPath("/api")
@@ -21,6 +21,6 @@ public class RestConfig extends Application {
      */
     @Override
     public Set<Class<?>> getClasses() {
-        return new HashSet<>(Arrays.asList(UploadFileService.class, ApplicationService.class));
+        return new HashSet<>(Arrays.asList(UploadFileService.class, AplicacionService.class));
     }
 }

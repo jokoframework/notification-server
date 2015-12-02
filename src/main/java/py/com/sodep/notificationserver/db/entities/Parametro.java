@@ -26,7 +26,7 @@ public class Parametro  implements Serializable {
     @Column(name = "parametro_id")
     private Long id;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", unique = true)
     private String nombre;
     @Column(name = "valor")
     private String valor;

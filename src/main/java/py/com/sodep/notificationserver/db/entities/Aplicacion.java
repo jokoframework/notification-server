@@ -5,7 +5,7 @@ import javax.persistence.*;
 
 @Entity
 @Table
-public class Application implements Serializable {
+public class Aplicacion implements Serializable {
 
     /**
      *
@@ -17,8 +17,8 @@ public class Application implements Serializable {
     @Column(name = "application_id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "nombre")
+    private String nombre;
     @Column(name = "api_key_dev")
     private String apiKeyDev;
     @Column(name = "api_key_prod")
@@ -28,7 +28,7 @@ public class Application implements Serializable {
     @Column(name = "certificado_prod")
     private String certificadoProd;
 
-    public Application() {
+    public Aplicacion() {
 
     }
 
@@ -40,12 +40,12 @@ public class Application implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNombre(String name) {
+        this.nombre = name;
     }
 
     public String getApiKeyDev() {
@@ -82,7 +82,7 @@ public class Application implements Serializable {
 
     @Override
     public String toString() {
-        return "Application{" + "id=" + id + ", name=" + name + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + '}';
+        return "Application{" + "id=" + id + ", name=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + '}';
     }
 
 }

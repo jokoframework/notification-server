@@ -35,44 +35,76 @@ public class BaseDAO<T, PK extends Serializable> {
         try {
             getSession().beginTransaction();
             getSession().persist(entity);
-            getSession().getTransaction().commit();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("Error al crear registro: " + e.getMessage());
+        } finally {
+            getSession().getTransaction().commit();
         }
     }
 
-    public T findById(long id, Class<T> objectClass) {
-        T result = (T) getSession().load(objectClass, id);
-        if (result != null) {
-            Hibernate.initialize(result);
-            return result;
-        } else {
-            return null;
+    public T findById(long id, Class<T> objectClass) throws Exception{
+        try {
+            getSession().beginTransaction();
+            T result = (T) getSession().load(objectClass, id);
+            if (result != null) {
+                Hibernate.initialize(result);
+                return result;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
         }
     }
 
     public boolean create(T newInstance) {
-        if (newInstance == null) {
-            return false;
+        try {
+            getSession().beginTransaction();
+            if (newInstance == null) {
+                return false;
+            }
+            getSession().saveOrUpdate(newInstance);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
         }
-        getSession().saveOrUpdate(newInstance);
-        return true;
     }
 
     public boolean updpate(T updateInstance) {
-        if (updateInstance == null) {
-            return false;
+        try {
+            if (updateInstance == null) {
+                return false;
+            }
+            getSession().update(updateInstance);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
         }
-        getSession().update(updateInstance);
-        return true;
     }
 
     public boolean delete(T entity) {
-        if (entity == null) {
-            return false;
+        try {
+            if (entity == null) {
+                return false;
+            }
+            getSession().delete(entity);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
         }
-        getSession().delete(entity);
-        return true;
     }
 
     /*private Class<T> type;

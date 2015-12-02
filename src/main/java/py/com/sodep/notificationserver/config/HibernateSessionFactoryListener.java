@@ -41,9 +41,11 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
         System.out.println("Hibernate SessionFactory Configured successfully");
         System.out.println("Released Hibernate sessionFactory resource");
         ParametroDao pdao = new ParametroDao();
-        
+
         try {
             System.out.println("Creando Parametro: PATH_CERTIFICADOS");
+            //pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\vanessa\\repositorios\\codium\\testfile", "String"));
+
             pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
             System.out.println("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));

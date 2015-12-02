@@ -2,8 +2,8 @@ package py.com.sodep.notificationserver.business;
 
 import javax.enterprise.context.RequestScoped;
 
-import py.com.sodep.notificationserver.db.dao.ApplicationDao;
-import py.com.sodep.notificationserver.db.entities.Application;
+import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
 import py.com.sodep.notificationserver.facade.GcmFacade;
@@ -13,8 +13,8 @@ public class NotificationBusiness {
 
 	public boolean notificar(Evento evento){
 		
-		ApplicationDao appDao = new ApplicationDao();
-		Application app = appDao.getByName(evento.getApplicationName());
+		AplicacionDao appDao = new AplicacionDao();
+		Aplicacion app = appDao.getByName(evento.getApplicationName());
 		if(app != null){
 			if(evento.isProductionMode()){
 				notificarAndroid(app.getApiKeyProd(), evento);

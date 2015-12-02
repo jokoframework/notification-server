@@ -10,53 +10,53 @@ import java.io.IOException;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
-import py.com.sodep.notificationserver.db.dao.ApplicationDao;
+import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
-import py.com.sodep.notificationserver.db.entities.Application;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 
 /**
  *
  * @author Vanessa
  */
 @RequestScoped
-public class ApplicationBusiness {
+public class AplicacionBusiness {
 
-    public void newApplication(Application a) throws Exception {
+    public void newApplication(Aplicacion a) throws Exception {
         System.out.println("Recibido " + a);
-        ApplicationDao applicationDao = new ApplicationDao();
+        AplicacionDao applicationDao = new AplicacionDao();
         ParametroDao paramDao = new ParametroDao();
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
         System.out.println("ALMACENANDO EN: " + base);
         try {
             byte[] desarrollo = Base64.decodeBase64(a.getCertificadoDev().getBytes());
             byte[] produccion = Base64.decodeBase64(a.getCertificadoProd().getBytes());
-            System.out.println("Decoded value is " + new String(desarrollo));
-            String fileNameDev = base + "/" + a.getName() + "-develop" + ".p12";
-            String fileNameProd = base + "/" + a.getName() + "-production" + ".p12";
+            String fileNameDev = base + "/" + a.getNombre()+ "-develop" + ".p12";
+            String fileNameProd = base + "/" + a.getNombre() + "-production" + ".p12";
             try (FileOutputStream fos = new FileOutputStream(fileNameDev)) {
                 fos.write(desarrollo);
                 fos.close();
             } catch (IOException io) {
                 throw new Exception("Error al guardar certificado de desarrollo: " + io.getMessage());
             }
-            /*try (FileOutputStream fos = new FileOutputStream(fileNameProd)) {
+            try (FileOutputStream fos = new FileOutputStream(fileNameProd)) {
                 fos.write(produccion);
                 fos.close();
             } catch (IOException io) {
                 throw new Exception("Error al guardar certificado de produccion: " + io.getMessage());
-            }*/
+            }
             a.setCertificadoDev(fileNameDev);
-            a.setCertificadoDev(fileNameProd);
+            a.setCertificadoProd(fileNameProd);
+            System.out.println(a);
             applicationDao.save(a);
         } catch (Exception e) {
             throw new Exception("Error al crear aplicación, " + e.getMessage());
         }
     }
 
-    public Response getApplication(String id) {
+    public Response getApplication(String id) throws Exception {
         System.out.println("Recibido " + id);
-        ApplicationDao applicationDao = new ApplicationDao();
-        Object a = applicationDao.findById(Long.valueOf(id), Application.class);
+        AplicacionDao applicationDao = new AplicacionDao();
+        Object a = applicationDao.findById(Long.valueOf(id), Aplicacion.class);
         System.out.println("Application encontrado:" + a);
         return Response.ok(a).build();
     }

@@ -6,7 +6,7 @@
 package py.com.sodep.notificationserver.db.dao;
 
 import org.hibernate.criterion.Restrictions;
-import py.com.sodep.notificationserver.db.entities.Application;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Parametro;
 
 /**
