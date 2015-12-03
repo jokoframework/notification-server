@@ -8,6 +8,7 @@ package py.com.sodep.notificationserver.db.dao;
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import java.io.Serializable;
 import org.hibernate.Hibernate;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -46,16 +47,16 @@ public class BaseDAO<T, PK extends Serializable> {
     public T findById(long id, Class<T> objectClass) throws Exception{
         try {
             getSession().beginTransaction();
-            T result = (T) getSession().load(objectClass, id);
+            T result = (T) getSession().get(objectClass, id);
             if (result != null) {
-                Hibernate.initialize(result);
+                Hibernate.initialize(result);                
                 return result;
             } else {
-                return null;
+                throw new ObjectNotFoundException(id, objectClass.getName());
             }
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
             e.printStackTrace();
-            throw e;
+            throw new Exception("No se encontraron registros con id: " + id);
         } finally {
             getSession().getTransaction().commit();
         }

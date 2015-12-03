@@ -17,26 +17,32 @@ public class FileUploadForm {
     public FileUploadForm() {
     }
 
+    @FormParam("uploadedFile")
+    @PartType("application/octet-stream")
     private byte[] data;
+    
+    @FormParam("uploadedFile")
+    @PartType("application/text")
     private String name;
 
     public byte[] getData() {
         return data;
     }
 
-    @FormParam("uploadedFile")
-    @PartType("application/octet-stream")
     public void setData(byte[] data) {
         this.data = data;
     }
-
+    
     public String getName() {
         return name;
     }
-    @FormParam("uploadedFile")
-    @PartType("application/text")
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "FileUploadForm{" + "data=" + data + ", name=" + name + '}';
     }
 
     

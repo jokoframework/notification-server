@@ -4,11 +4,9 @@ import com.google.common.base.Throwables;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.Failure;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import org.hibernate.ObjectNotFoundException;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.DEFAULT_RESPONSE_CODE;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.isInErrorCodes;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.mapErrorCode;
@@ -36,7 +34,6 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
         //Errores de Resteasy
         if (cause instanceof Failure) {
             Failure failure = (Failure) cause;
-
             // Si ya se construyó una respuesta para la excepción,
             // usarla solo en caso que el objeto a retornar sea un Error
             if (failure.getResponse() != null) {
@@ -77,7 +74,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
         log.info("No se puede encontrar un mapper para la excepción, se maneja como una excepción general", exception);
 
         // Cualquier otro tipo de excepcion.
-        Error error = new Error(mapErrorCode(DEFAULT_RESPONSE_CODE), "Error en el servidor");
+        Error error = new Error(mapErrorCode(DEFAULT_RESPONSE_CODE), exception.getMessage());
         return helper.toResponse(error, Response.Status.INTERNAL_SERVER_ERROR);
     }
 }

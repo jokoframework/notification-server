@@ -49,6 +49,7 @@ public class AplicacionBusiness {
             System.out.println(a);
             applicationDao.save(a);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("Error al crear aplicación, " + e.getMessage());
         }
     }

@@ -2,7 +2,6 @@ package py.com.sodep.notificationserver.db.entities;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
 @Entity
 @Table
 public class Aplicacion implements Serializable {

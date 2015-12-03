@@ -36,6 +36,7 @@ public class AplicacionService {
 
     }
 
+    
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
