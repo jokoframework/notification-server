@@ -30,7 +30,7 @@ public class AplicacionBusiness {
         try {
             byte[] desarrollo = Base64.decodeBase64(a.getCertificadoDev().getBytes());
             byte[] produccion = Base64.decodeBase64(a.getCertificadoProd().getBytes());
-            String fileNameDev = base + "/" + a.getNombre()+ "-develop" + ".p12";
+            String fileNameDev = base + "/" + a.getNombre() + "-develop" + ".p12";
             String fileNameProd = base + "/" + a.getNombre() + "-production" + ".p12";
             try (FileOutputStream fos = new FileOutputStream(fileNameDev)) {
                 fos.write(desarrollo);
@@ -53,11 +53,11 @@ public class AplicacionBusiness {
         }
     }
 
-    public Response getApplication(String id) throws Exception {
+    public Aplicacion getApplication(String id) throws Exception {
         System.out.println("Recibido " + id);
         AplicacionDao applicationDao = new AplicacionDao();
         Object a = applicationDao.findById(Long.valueOf(id), Aplicacion.class);
         System.out.println("Application encontrado:" + a);
-        return Response.ok(a).build();
+        return (Aplicacion) a;
     }
 }

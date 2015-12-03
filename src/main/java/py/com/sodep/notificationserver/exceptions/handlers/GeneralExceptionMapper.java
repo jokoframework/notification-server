@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.hibernate.ObjectNotFoundException;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.DEFAULT_RESPONSE_CODE;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.isInErrorCodes;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.mapErrorCode;
@@ -22,13 +23,14 @@ import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMappe
 
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
-    private static Logger log = Logger.getLogger(GeneralExceptionMapper.class);
+    private static final Logger log = Logger.getLogger(GeneralExceptionMapper.class);
 
-    @Inject
-    private ExceptionMapperHelper helper;
+    //@Inject
+    private final ExceptionMapperHelper helper = new ExceptionMapperHelper();
 
     @Override
     public Response toResponse(Exception exception) {
+        System.out.println("EN EL MAPPER" + exception.getMessage());
         Throwable cause = Throwables.getRootCause(exception);
 
         //Errores de Resteasy

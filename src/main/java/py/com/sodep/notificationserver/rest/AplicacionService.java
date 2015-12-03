@@ -35,13 +35,14 @@ public class AplicacionService {
         return Response.ok().build();
 
     }
-    
+
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getApplicationById(@PathParam("id") String id) throws Exception {
         System.out.println("Application/id " + id);
-        return appBussines.getApplication(id);
+        Aplicacion a = appBussines.getApplication(id);
+        return Response.ok(a).build();
 
     }
 }
