@@ -2,6 +2,7 @@ package py.com.sodep.notificationserver.db.entities;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
 @Entity
 @Table
 public class Aplicacion implements Serializable {
@@ -27,9 +28,11 @@ public class Aplicacion implements Serializable {
     @Column(name = "certificado_prod")
     private String certificadoProd;
 
-    public Aplicacion() {
+    @Column(name = "key_file_prod")
+    private String keyFileProd;
 
-    }
+    @Column(name = "key_file_dev")
+    private String keyFileDev;
 
     public Long getId() {
         return id;
@@ -43,8 +46,8 @@ public class Aplicacion implements Serializable {
         return nombre;
     }
 
-    public void setNombre(String name) {
-        this.nombre = name;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getApiKeyDev() {
@@ -79,9 +82,25 @@ public class Aplicacion implements Serializable {
         this.certificadoProd = certificadoProd;
     }
 
+    public String getKeyFileProd() {
+        return keyFileProd;
+    }
+
+    public void setKeyFileProd(String keyFileProd) {
+        this.keyFileProd = keyFileProd;
+    }
+
+    public String getKeyFileDev() {
+        return keyFileDev;
+    }
+
+    public void setKeyFileDev(String keyFileDev) {
+        this.keyFileDev = keyFileDev;
+    }
+
     @Override
     public String toString() {
-        return "Application{" + "id=" + id + ", name=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + '}';
+        return "Aplicacion{" + "id=" + id + ", nombre=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + ", keyFileProd=" + keyFileProd + ", keyFileDev=" + keyFileDev + '}';
     }
 
 }

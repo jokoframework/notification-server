@@ -40,6 +40,8 @@ public class Evento implements Serializable {
     @Transient
     private String payload;
     
+    private String descripcion;
+    
 	@Transient
     private List<String> androidDevicesList;
     
@@ -108,7 +110,7 @@ public class Evento implements Serializable {
         this.productionMode = productionMode;
     }
 
-    public Object getPayload() {
+    public HashMap<String,String> getPayload() {
     	HashMap<String,String> map = new Gson().fromJson(this.payload, new TypeToken<HashMap<String, String>>(){}.getType());
 
     	return map;
@@ -143,5 +145,13 @@ public class Evento implements Serializable {
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
     }
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 
 }
