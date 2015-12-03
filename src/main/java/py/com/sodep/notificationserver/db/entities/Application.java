@@ -27,8 +27,32 @@ public class Application implements Serializable {
     private String certificadoDev;
     @Column(name = "certificado_prod")
     private String certificadoProd;
+    
+    @Column(name = "key_file_prod")
+    private String keyFileProd;
+    
+    @Column(name = "key_file_dev")
+    private String keyFileDev;
 
-    public Application() {
+    
+
+    public String getKeyFileProd() {
+		return keyFileProd;
+	}
+
+	public void setKeyFileProd(String keyFileProd) {
+		this.keyFileProd = keyFileProd;
+	}
+
+	public String getKeyFileDev() {
+		return keyFileDev;
+	}
+
+	public void setKeyFileDev(String keyFileDev) {
+		this.keyFileDev = keyFileDev;
+	}
+
+	public Application() {
 
     }
 
