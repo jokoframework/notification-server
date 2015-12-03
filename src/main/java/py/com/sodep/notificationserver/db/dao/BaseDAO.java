@@ -36,46 +36,42 @@ public class BaseDAO<T, PK extends Serializable> {
         try {
             getSession().beginTransaction();
             getSession().persist(entity);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error al crear registro: " + e.getMessage());
-        } finally {
             getSession().getTransaction().commit();
+        } catch (Exception e) {
+            if (getSession().getTransaction() != null) {
+                getSession().getTransaction().rollback();
+            }
+            throw new Exception("Error al crear registro: " + e.getMessage());
         }
     }
 
-    public T findById(long id, Class<T> objectClass) throws Exception{
+    public T findById(long id, Class<T> objectClass) throws Exception {
         try {
             getSession().beginTransaction();
             T result = (T) getSession().get(objectClass, id);
             if (result != null) {
-                Hibernate.initialize(result);                
+                Hibernate.initialize(result);
                 return result;
             } else {
                 throw new ObjectNotFoundException(id, objectClass.getName());
             }
-        } catch (ObjectNotFoundException e) {
-            e.printStackTrace();
-            throw new Exception("No se encontraron registros con id: " + id);
         } finally {
             getSession().getTransaction().commit();
         }
     }
 
-    public boolean create(T newInstance) {
+    public T create(T newInstance) {
         try {
             getSession().beginTransaction();
-            if (newInstance == null) {
-                return false;
-            }
             getSession().saveOrUpdate(newInstance);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        } finally {
             getSession().getTransaction().commit();
+        } catch (Exception e) {
+            if (getSession().getTransaction() != null) {
+                getSession().getTransaction().rollback();
+            }
+            throw e;
         }
+        return newInstance;
     }
 
     public boolean updpate(T updateInstance) {

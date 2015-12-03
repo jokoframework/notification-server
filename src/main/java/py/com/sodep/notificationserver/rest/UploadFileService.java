@@ -26,7 +26,7 @@ import py.com.sodep.notificationserver.db.entities.FileUploadForm;
 @Path("/file")
 public class UploadFileService {
 
-    private final String UPLOADED_FILE_PATH = "C:\\Users\\Vanessa\\Documents\\work\\";
+    private final String UPLOADED_FILE_PATH = "C:\\Users\\canetev\\Documents\\test";
 
     @POST
     @Path("/upload")

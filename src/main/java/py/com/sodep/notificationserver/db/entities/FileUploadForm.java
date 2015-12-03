@@ -21,7 +21,7 @@ public class FileUploadForm {
     @PartType("application/octet-stream")
     private byte[] data;
     
-    @FormParam("uploadedFile")
+    @FormParam("name")
     @PartType("application/text")
     private String name;
 
