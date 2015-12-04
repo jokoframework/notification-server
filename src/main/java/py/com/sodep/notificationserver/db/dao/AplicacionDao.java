@@ -18,7 +18,7 @@ public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
 		getSession().beginTransaction();
 		Aplicacion a = (Aplicacion) getSession()
 				.createCriteria(Aplicacion.class)
-				.add(Restrictions.like("name", name)).uniqueResult();
+				.add(Restrictions.like("nombre", name)).uniqueResult();
 		getSession().getTransaction().commit();
 		return a;
 	}
