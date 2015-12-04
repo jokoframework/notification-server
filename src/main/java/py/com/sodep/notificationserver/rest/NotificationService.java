@@ -8,6 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
 import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
@@ -16,11 +18,13 @@ import py.com.sodep.notificationserver.db.entities.Evento;
 public class NotificationService {
 
 	NotificationBusiness business;
+	
+	final static Logger logger = Logger.getLogger(NotificationService.class);
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response newNotification(Evento evento) {
-		System.out.println("Evento " + evento.getApplicationName());
+		logger.info("Evento " + evento.getApplicationName());
 		//		+ " Payload:" + evento.getPayload());
 		//System.out.println("business: " + business);
 		business = new NotificationBusiness();
