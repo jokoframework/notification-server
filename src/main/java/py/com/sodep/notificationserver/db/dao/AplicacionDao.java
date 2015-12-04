@@ -14,10 +14,12 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
  */
 public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
 
-    public Aplicacion getByName(String name) {
-        Aplicacion a = (Aplicacion) getSession().createCriteria(Aplicacion.class)
-                .add(Restrictions.like("name", name))
-                .uniqueResult();
-        return a;
-    }
+	public Aplicacion getByName(String name) {
+		getSession().beginTransaction();
+		Aplicacion a = (Aplicacion) getSession()
+				.createCriteria(Aplicacion.class)
+				.add(Restrictions.like("name", name)).uniqueResult();
+		getSession().getTransaction().commit();
+		return a;
+	}
 }
