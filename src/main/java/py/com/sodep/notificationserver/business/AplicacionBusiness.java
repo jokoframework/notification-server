@@ -21,13 +21,13 @@ import py.com.sodep.notificationserver.db.entities.AplicacionFile;
 @RequestScoped
 public class AplicacionBusiness {
 
-    public Aplicacion createAplicacionJson(Aplicacion nuevo, String mode) throws Exception {
+    public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
         System.out.println("Recibido " + nuevo);
         Aplicacion a;
         AplicacionDao applicationDao = new AplicacionDao();
         ParametroDao paramDao = new ParametroDao();
-        if (mode.equals("PUT")) {
-            a = applicationDao.findById(nuevo.getId(), Aplicacion.class);
+        if (id != null) {
+            a = applicationDao.findById(id, Aplicacion.class);
         } else {
             a = nuevo;
         }
@@ -74,12 +74,12 @@ public class AplicacionBusiness {
         return a;
     }
 
-    public Aplicacion newAplicacionFileUpload(AplicacionFile b) throws Exception {
+    public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws Exception {
         Aplicacion a;
         AplicacionDao applicationDao = new AplicacionDao();
         ParametroDao paramDao = new ParametroDao();
-        if (b.getId() != null) {
-            a = applicationDao.findById(b.getId(), Aplicacion.class);
+        if (id != null) {
+            a = applicationDao.findById(id, Aplicacion.class);
         } else {
             a = b.getAplicacion();
         }

@@ -37,7 +37,7 @@ public class AplicacionService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response newApplication(Aplicacion a) throws Exception {
         System.out.println("Application/id " + a);
-        appBussines.createAplicacionJson(a, "POST");
+        appBussines.createAplicacionJson(a, null);
         return Response.ok(a).build();
 
     }
@@ -48,26 +48,26 @@ public class AplicacionService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response uploadFile(@MultipartForm AplicacionFile form) throws Exception {
         System.out.println("Recibido: " + form);
-        Aplicacion a = appBussines.newAplicacionFileUpload(form);
+        Aplicacion a = appBussines.newAplicacionFileUpload(form, null);
         return Response.ok(a).build();
     }
 
     @PUT
-    @Path("")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateApplication(Aplicacion b) throws Exception {
+    public Response updateApplication(Aplicacion b, @PathParam(value = "id") String id) throws Exception {
         System.out.println("Application/id " + b);
-        Aplicacion a = appBussines.createAplicacionJson(b, "PUT");
+        Aplicacion a = appBussines.createAplicacionJson(b, Long.valueOf(id));
         return Response.ok(a).build();
 
     }
 
     @PUT
-    @Path("/upload")
+    @Path("/upload/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadFileUpdate(@MultipartForm AplicacionFile form) throws Exception {
-        Aplicacion a = appBussines.newAplicacionFileUpload(form);
+    public Response uploadFileUpdate(@MultipartForm AplicacionFile form, @PathParam(value = "id") String id) throws Exception {
+        Aplicacion a = appBussines.newAplicacionFileUpload(form, Long.valueOf(id));
         return Response.ok(a).build();
     }
 
@@ -75,8 +75,8 @@ public class AplicacionService {
     @Path("/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAplicacion(@MultipartForm AplicacionFile form) throws Exception {
-        Aplicacion a = appBussines.newAplicacionFileUpload(form);
+    public Response deleteAplicacion(@MultipartForm AplicacionFile form, Long id) throws Exception {
+        Aplicacion a = appBussines.newAplicacionFileUpload(form,id);
         return Response.ok(a).build();
     }
 

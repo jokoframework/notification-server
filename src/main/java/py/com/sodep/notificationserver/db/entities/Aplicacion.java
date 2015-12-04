@@ -6,7 +6,7 @@ import javax.ws.rs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 @Entity
-@Table
+@Table(name = "aplicacion")
 public class Aplicacion implements Serializable {
 
     /**
