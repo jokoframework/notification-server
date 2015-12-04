@@ -21,7 +21,7 @@ public class Aplicacion implements Serializable {
     @Column(name = "application_id")
     private Long id;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", unique = true)
     @FormParam("nombre")
     @PartType("application/text")
     private String nombre;
