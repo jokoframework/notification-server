@@ -6,15 +6,11 @@
 package py.com.sodep.notificationserver.db.dao;
 
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
-import com.googlecode.genericdao.dao.hibernate.GenericDAOImpl;
 import java.io.Serializable;
-import java.util.List;
-import javax.transaction.Transactional;
-import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
 
 /**
  *
@@ -22,7 +18,7 @@ import org.hibernate.criterion.Criterion;
  * @param <T>
  * @param <PK>
  */
-public class BaseDAO<T, PK extends Serializable> extends GenericDAOImpl<T, PK> {
+public class BaseDAO<T, PK extends Serializable> {
 
     /*public SessionFactory sessionFactory = new AnnotationConfiguration().configure().buildSessionFactory();
      public Session session = sessionFactory.getCurrentSession();
@@ -30,29 +26,84 @@ public class BaseDAO<T, PK extends Serializable> extends GenericDAOImpl<T, PK> {
     public Transaction tx;
 
     public BaseDAO() {
-        super();
-        System.out.println("CREANDO SESSION Y ESO");
-        super.setSessionFactory(HibernateSessionLocal.sessionFactory);
-        tx = HibernateSessionLocal.sessionFactory.getCurrentSession().beginTransaction();
     }
 
-    @Override
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        super.setSessionFactory(sessionFactory);
-
-    }
-
-    @Override
     public Session getSession() {
         return HibernateSessionLocal.sessionFactory.getCurrentSession();
     }
 
-    @Override
-    public boolean save(T entity) {
-        boolean a = super.save(entity);
-        getSession().getTransaction().commit();
-        return a;
+    public void save(T entity) throws Exception {
+        try {
+            getSession().beginTransaction();
+            getSession().persist(entity);
+            getSession().getTransaction().commit();
+        } catch (Exception e) {
+            if (getSession().getTransaction() != null) {
+                getSession().getTransaction().rollback();
+            }
+            throw new Exception("Error al crear registro: " + e.getMessage());
+        }
     }
+
+    public T findById(long id, Class<T> objectClass) throws Exception {
+        try {
+            getSession().beginTransaction();
+            T result = (T) getSession().get(objectClass, id);
+            if (result != null) {
+                Hibernate.initialize(result);
+                return result;
+            } else {
+                throw new ObjectNotFoundException(id, objectClass.getName());
+            }
+        } finally {
+            getSession().getTransaction().commit();
+        }
+    }
+
+    public T create(T newInstance) {
+        try {
+            getSession().beginTransaction();
+            getSession().saveOrUpdate(newInstance);
+            getSession().getTransaction().commit();
+        } catch (Exception e) {
+            if (getSession().getTransaction() != null) {
+                getSession().getTransaction().rollback();
+            }
+            throw e;
+        }
+        return newInstance;
+    }
+
+    public boolean updpate(T updateInstance) {
+        try {
+            if (updateInstance == null) {
+                return false;
+            }
+            getSession().update(updateInstance);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
+        }
+    }
+
+    public boolean delete(T entity) {
+        try {
+            if (entity == null) {
+                return false;
+            }
+            getSession().delete(entity);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            getSession().getTransaction().commit();
+        }
+    }
+
     /*private Class<T> type;
 
      @SuppressWarnings("unchecked")
@@ -87,5 +138,4 @@ public class BaseDAO<T, PK extends Serializable> extends GenericDAOImpl<T, PK> {
      public void delete(T object) {
      getSession().delete(object);
      }*/
-
 }

@@ -13,8 +13,8 @@ import javax.enterprise.context.RequestScoped;
 
 import org.apache.log4j.Logger;
 
-import py.com.sodep.notificationserver.db.dao.ApplicationDao;
-import py.com.sodep.notificationserver.db.entities.Application;
+import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
@@ -23,15 +23,16 @@ import py.com.sodep.notificationserver.facade.GcmFacade;
 @RequestScoped
 public class NotificationBusiness {
 
+
 	final static Logger logger = Logger.getLogger(NotificationBusiness.class);
 
-	public boolean notificar(Evento evento) {
 
-		logger.info("----NOTIFICAR A DISPOSITIVOS-----");
-		ApplicationDao appDao = new ApplicationDao();
-		Application app = appDao.getByName(evento.getApplicationName());
-		if (app != null) {
-			if (evento.isProductionMode()) {
+	public boolean notificar(Evento evento){
+		
+		AplicacionDao appDao = new AplicacionDao();
+		Aplicacion app = appDao.getByName(evento.getApplicationName());
+		if(app != null){
+			if(evento.isProductionMode()){
 				notificarAndroid(app.getApiKeyProd(), evento);
 				notificarIos(app.getCertificadoProd(), app.getKeyFileProd(),
 						evento, true);

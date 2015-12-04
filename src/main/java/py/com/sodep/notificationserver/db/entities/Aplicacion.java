@@ -2,10 +2,12 @@ package py.com.sodep.notificationserver.db.entities;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.ws.rs.FormParam;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 @Entity
 @Table
-public class Application implements Serializable {
+public class Aplicacion implements Serializable {
 
     /**
      *
@@ -14,47 +16,45 @@ public class Application implements Serializable {
 
     @Id
     @GeneratedValue
+    @FormParam("id")
+    @PartType("application/text")
     @Column(name = "application_id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "nombre")
+    @FormParam("nombre")
+    @PartType("application/text")
+    private String nombre;
+
     @Column(name = "api_key_dev")
+    @FormParam("apiKeyDev")
+    @PartType("application/text")
     private String apiKeyDev;
+
     @Column(name = "api_key_prod")
+    @FormParam("apiKeyProd")
+    @PartType("application/text")
     private String apiKeyProd;
+
     @Column(name = "certificado_dev")
+    @FormParam("certificadoDev")
+    @PartType("application/text")
     private String certificadoDev;
+
     @Column(name = "certificado_prod")
+    @FormParam("certificadoProd")
+    @PartType("application/text")
     private String certificadoProd;
-    
+
     @Column(name = "key_file_prod")
+    @FormParam("keyFileProd")
+    @PartType("application/text")
     private String keyFileProd;
-    
+
     @Column(name = "key_file_dev")
+    @FormParam("keyFileDev")
+    @PartType("application/text")
     private String keyFileDev;
-
-    
-
-    public String getKeyFileProd() {
-		return keyFileProd;
-	}
-
-	public void setKeyFileProd(String keyFileProd) {
-		this.keyFileProd = keyFileProd;
-	}
-
-	public String getKeyFileDev() {
-		return keyFileDev;
-	}
-
-	public void setKeyFileDev(String keyFileDev) {
-		this.keyFileDev = keyFileDev;
-	}
-
-	public Application() {
-
-    }
 
     public Long getId() {
         return id;
@@ -64,12 +64,12 @@ public class Application implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getApiKeyDev() {
@@ -104,9 +104,25 @@ public class Application implements Serializable {
         this.certificadoProd = certificadoProd;
     }
 
+    public String getKeyFileProd() {
+        return keyFileProd;
+    }
+
+    public void setKeyFileProd(String keyFileProd) {
+        this.keyFileProd = keyFileProd;
+    }
+
+    public String getKeyFileDev() {
+        return keyFileDev;
+    }
+
+    public void setKeyFileDev(String keyFileDev) {
+        this.keyFileDev = keyFileDev;
+    }
+
     @Override
     public String toString() {
-        return "Application{" + "id=" + id + ", name=" + name + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + '}';
+        return "Aplicacion{" + "id=" + id + ", nombre=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + ", keyFileProd=" + keyFileProd + ", keyFileDev=" + keyFileDev + '}';
     }
 
 }

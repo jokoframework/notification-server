@@ -30,7 +30,7 @@ public class Evento implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "application_id")
-    private Application application;
+    private Aplicacion application;
     private String androidDevices;
     private String iosDevices;
     private boolean sendToSync;
@@ -62,11 +62,11 @@ public class Evento implements Serializable {
         this.id = id;
     }
 
-    public Application getApplication() {
+    public Aplicacion getApplication() {
         return application;
     }
 
-    public void setApplication(Application application) {
+    public void setApplication(Aplicacion application) {
         this.application = application;
     }
 

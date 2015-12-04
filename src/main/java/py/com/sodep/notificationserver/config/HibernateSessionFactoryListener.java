@@ -5,12 +5,16 @@
  */
 package py.com.sodep.notificationserver.config;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import py.com.sodep.notificationserver.db.dao.ParametroDao;
+import py.com.sodep.notificationserver.db.entities.Parametro;
 
 @WebListener
 public class HibernateSessionFactoryListener implements ServletContextListener {
@@ -23,7 +27,6 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
             System.out.println("Closing sessionFactory");
             sessionFactory.close();
         }
-        System.out.println("Released Hibernate sessionFactory resource");
     }
 
     @Override
@@ -31,16 +34,25 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
         System.out.println("Hibernate Configuration created successfully");
-
-//        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-//        System.out.println("ServiceRegistry created successfully");
         SessionFactory sessionFactory = configuration
                 .buildSessionFactory();
         System.out.println("SessionFactory created successfully");
-
-        //servletContextEvent.getServletContext().setAttribute("SessionFactory", sessionFactory);
         HibernateSessionLocal.sessionFactory = sessionFactory;
         System.out.println("Hibernate SessionFactory Configured successfully");
+        System.out.println("Released Hibernate sessionFactory resource");
+        ParametroDao pdao = new ParametroDao();
+
+        try {
+            System.out.println("Creando Parametro: PATH_CERTIFICADOS");
+            //pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\vanessa\\repositorios\\codium\\testfile", "String"));
+
+            pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
+            System.out.println("Creando Parametro: URL_GCM");
+            pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
+        } catch (Exception ex) {
+            Logger.getLogger(HibernateSessionFactoryListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }
