@@ -1,4 +1,4 @@
-package models.notificaciones;
+package py.com.sodep.notificationserver.db.entities.notification;
 
 /**
  * Resultado de enviar una notificacion por cada dispositivo
