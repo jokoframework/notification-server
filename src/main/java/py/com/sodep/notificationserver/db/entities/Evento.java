@@ -1,5 +1,8 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -14,17 +17,18 @@ import javax.persistence.Transient;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import java.util.Map;
 
 @Entity
 @Table
 public class Evento implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6055960223584022815L;
+     *
+     */
+    private static final long serialVersionUID = 6055960223584022815L;
 
-	@Id
+    @Id
     @GeneratedValue
     private Long id;
 
@@ -36,18 +40,18 @@ public class Evento implements Serializable {
     private boolean sendToSync;
     private String estado;
     private boolean productionMode;
-    
+
     @Transient
-    private String payload;
-    
+    private HashMap<String, String> payload;
+
     private String descripcion;
-    
-	@Transient
+
+    @Transient
     private List<String> androidDevicesList;
-    
+
     @Transient
     private List<String> iosDevicesList;
-    
+
     @Transient
     private String applicationName;
 
@@ -110,15 +114,24 @@ public class Evento implements Serializable {
         this.productionMode = productionMode;
     }
 
-    public HashMap<String,String> getPayload() {
-    	HashMap<String,String> map = new Gson().fromJson(this.payload, new TypeToken<HashMap<String, String>>(){}.getType());
-
-    	return map;
-    }
+    /*public HashMap<String, String> getPayload() {
+        return (HashMap<String, String>)this.payload;
+    }*/
 
     public void setPayload(Object payload) {
-        this.payload = payload.toString();
-        System.out.println("PAYLOAD STRING: " + this.payload);
+        this.payload = (HashMap)payload;
+        System.out.println("PAYLOAD STRING: " + this.payload.toString());
+    }
+
+    public ObjectNode getPayload() {
+        JsonNodeFactory factory = JsonNodeFactory.instance;
+        ObjectNode jn = new ObjectNode(factory);
+        HashMap<String, String> map = (HashMap<String, String>)this.payload;
+        for (String s : map.keySet()) {
+            jn.put(s, String.valueOf(map.get(s)));
+        }
+        System.out.println("ANDROID PAYLOAD: " + jn.toString());
+        return jn;
     }
 
     public List<String> getAndroidDevicesList() {
@@ -146,12 +159,12 @@ public class Evento implements Serializable {
         this.applicationName = applicationName;
     }
 
-	public String getDescripcion() {
-		return descripcion;
-	}
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
 }

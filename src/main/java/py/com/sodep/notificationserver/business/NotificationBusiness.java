@@ -1,7 +1,7 @@
 package py.com.sodep.notificationserver.business;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class NotificationBusiness {
 		ApnsFacade facade = new ApnsFacade();
 		File certificado = new File(certifadoPath);
 		Payload payload = PushNotificationPayload.complex();
-		HashMap<String, String> pay = evento.getPayload();
+		ObjectNode pay = evento.getPayload();
 
 		try {
 			((PushNotificationPayload) payload).addAlert(evento
@@ -64,12 +64,12 @@ public class NotificationBusiness {
 
 			((PushNotificationPayload) payload).addSound("default");
 
-			Iterator it = pay.entrySet().iterator();
+			Iterator it = pay.fieldNames();
 			while (it.hasNext()) {
-				Map.Entry pair = (Map.Entry) it.next();
-				logger.info(pair.getKey() + " = " + pair.getValue());
-				payload.addCustomDictionary((String) pair.getKey(),
-						(String) pair.getValue());
+				String pair = (String)it.next();
+				logger.info(pair + " = " + pay.get(pair));
+				payload.addCustomDictionary((String) pair,
+						pay.get(pair).asText());
 			}
 
 			facade.send(payload, certificado, keyFile, productionMode,
