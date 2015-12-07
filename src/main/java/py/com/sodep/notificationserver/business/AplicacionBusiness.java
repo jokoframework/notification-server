@@ -19,7 +19,6 @@ import py.com.sodep.notificationserver.db.entities.AplicacionFile;
  *
  * @author Vanessa
  */
-@RequestScoped
 public class AplicacionBusiness {
     @Inject
     AplicacionDao applicationDao;

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/notification-server" reloadable="true">
     <Resource auth="Container" factory="org.jboss.weld.resources.ManagerObjectFactory" name="BeanManager" type="javax.enterprise.inject.spi.BeanManager"/>
-    <!-- Uncomment to enable injection into Servlets, Servlet Listeners and Filters in Tomcat -->
-    <Listener className="org.jboss.weld.environment.tomcat.WeldLifecycleListener"/>
     <ResourceLink auth="Container" global="jdbc/notification-server" name="jdbc/notification-server" type="javax.sql.DataSource"/>
 </Context>

@@ -5,16 +5,6 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
 	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>Notification Server</display-name>
-    <servlet>
-        <servlet-name>py.com.sodep.notificationserver.config.RestConfig</servlet-name>
-    </servlet>
-    <context-param>
-        <param-name>resteasy.providers</param-name>
-        <param-value>py.com.sodep.notificationserver.exceptions.handlers.GeneralExceptionMapper</param-value>        
-    </context-param>
-<!--    <listener>
-        <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
-    </listener>-->
     <resource-env-ref>
         <description>Object factory for the CDI Bean Manager</description>
         <resource-env-ref-name>BeanManager</resource-env-ref-name>
