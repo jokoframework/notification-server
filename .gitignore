@@ -11,3 +11,4 @@ bin/
 .idea/
 /target
 nb-configuration.xml
+notification-server.log

@@ -50,7 +50,7 @@ public class GcmFacade {
         request.header("Authorization", "key=" + apiKey);
 
         try {
-            map = new ObjectMapper();
+            //map = new ObjectMapper();
             String jsonInString = map.writeValueAsString(notification);
             System.out.println("Json a enviar: " + jsonInString);
             request.body("application/json", jsonInString);
@@ -96,7 +96,7 @@ public class GcmFacade {
         target.request().header("Authorization", "key=" + apiKey);
 
         try {
-            map = new ObjectMapper();
+            //map = new ObjectMapper();
             String jsonInString = map.writeValueAsString(notification);
             System.out.println("Json a enviar: " + jsonInString);
             Response response = target.request().post(Entity.entity(jsonInString, MediaType.APPLICATION_JSON));

@@ -20,11 +20,6 @@ import org.hibernate.Transaction;
  */
 public class BaseDAO<T, PK extends Serializable> {
 
-    /*public SessionFactory sessionFactory = new AnnotationConfiguration().configure().buildSessionFactory();
-     public Session session = sessionFactory.getCurrentSession();
-     public Transaction tx = session.beginTransaction();*/
-    public Transaction tx;
-
     public BaseDAO() {
     }
 

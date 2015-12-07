@@ -8,6 +8,7 @@ package py.com.sodep.notificationserver.business;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
@@ -20,11 +21,13 @@ import py.com.sodep.notificationserver.db.entities.AplicacionFile;
  */
 @RequestScoped
 public class AplicacionBusiness {
-
+    @Inject
+    AplicacionDao applicationDao;
+    
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
         System.out.println("Recibido " + nuevo);
         Aplicacion a;
-        AplicacionDao applicationDao = new AplicacionDao();
+        //AplicacionDao applicationDao = new AplicacionDao();
         ParametroDao paramDao = new ParametroDao();
         if (id != null) {
             a = applicationDao.findById(id, Aplicacion.class);
@@ -76,7 +79,10 @@ public class AplicacionBusiness {
 
     public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws Exception {
         Aplicacion a;
-        AplicacionDao applicationDao = new AplicacionDao();
+        //AplicacionDao applicationDao = new AplicacionDao();
+        if(applicationDao!=null){
+            System.out.println("**************** DAO NO ES NULL ****************");
+        }
         ParametroDao paramDao = new ParametroDao();
         if (id != null) {
             a = applicationDao.findById(id, Aplicacion.class);
@@ -126,7 +132,7 @@ public class AplicacionBusiness {
 
     public Aplicacion getApplication(String id) throws Exception {
         System.out.println("Recibido " + id);
-        AplicacionDao applicationDao = new AplicacionDao();
+        //AplicacionDao applicationDao = new AplicacionDao();
         Object a = applicationDao.findById(Long.valueOf(id), Aplicacion.class);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
@@ -134,7 +140,7 @@ public class AplicacionBusiness {
 
     public Aplicacion findAplicacion(String nombre) throws Exception {
         System.out.println("Buscando " + nombre);
-        AplicacionDao applicationDao = new AplicacionDao();
+        //AplicacionDao applicationDao = new AplicacionDao();
         Object a = applicationDao.getByName(nombre);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;

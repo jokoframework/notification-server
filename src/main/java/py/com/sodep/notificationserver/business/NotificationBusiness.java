@@ -1,18 +1,13 @@
 package py.com.sodep.notificationserver.business;
 
+import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.util.Iterator;
-import java.util.Map;
-
 import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
-
 import javax.enterprise.context.RequestScoped;
-
-import org.apache.log4j.Logger;
-
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
