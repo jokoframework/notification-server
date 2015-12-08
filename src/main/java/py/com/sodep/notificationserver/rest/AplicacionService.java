@@ -18,6 +18,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import py.com.sodep.notificationserver.db.entities.*;
 import py.com.sodep.notificationserver.business.AplicacionBusiness;
@@ -29,6 +30,10 @@ import py.com.sodep.notificationserver.business.AplicacionBusiness;
 @Path("/aplicacion")
 @RequestScoped
 public class AplicacionService {
+
+    @Inject
+    Logger logger;
+
     @Inject
     AplicacionBusiness appBussines;
 
@@ -36,7 +41,7 @@ public class AplicacionService {
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public Response newApplication(Aplicacion a) throws Exception {
-        System.out.println("Application/id " + a);
+        logger.info("Application/id " + a);
         appBussines.createAplicacionJson(a, null);
         return Response.ok(a).build();
 
@@ -47,7 +52,7 @@ public class AplicacionService {
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
     public Response uploadFile(@MultipartForm AplicacionFile form) throws Exception {
-        System.out.println("Recibido: " + form);
+        logger.info("Recibido: " + form);
         Aplicacion a = appBussines.newAplicacionFileUpload(form, null);
         return Response.ok(a).build();
     }
@@ -56,7 +61,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateApplication(Aplicacion b, @PathParam(value = "id") String id) throws Exception {
-        System.out.println("Application/id " + b);
+        logger.info("Application/id " + b);
         Aplicacion a = appBussines.createAplicacionJson(b, Long.valueOf(id));
         return Response.ok(a).build();
 
@@ -76,7 +81,7 @@ public class AplicacionService {
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteAplicacion(@MultipartForm AplicacionFile form, Long id) throws Exception {
-        Aplicacion a = appBussines.newAplicacionFileUpload(form,id);
+        Aplicacion a = appBussines.newAplicacionFileUpload(form, id);
         return Response.ok(a).build();
     }
 
@@ -84,7 +89,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getApplicationById(@PathParam("id") String id) throws Exception {
-        System.out.println("Application/id " + id);
+        logger.info("Application/id " + id);
         Aplicacion a = appBussines.getApplication(id);
         return Response.ok(a).build();
 
@@ -94,7 +99,7 @@ public class AplicacionService {
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAplicacion(@QueryParam(value = "nombre") String nombre) throws Exception {
-        System.out.println("Application/nombre " + nombre);
+        logger.info("Application/nombre " + nombre);
         Aplicacion a = appBussines.findAplicacion(nombre);
         return Response.ok(a).build();
 

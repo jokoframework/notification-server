@@ -1,6 +1,7 @@
 package py.com.sodep.notificationserver.rest;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -17,27 +18,28 @@ import py.com.sodep.notificationserver.db.entities.Evento;
 @RequestScoped
 public class NotificationService {
 
-	NotificationBusiness business;
-	
-	final static Logger logger = Logger.getLogger(NotificationService.class);
+    @Inject
+    NotificationBusiness business;
 
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response newNotification(Evento evento) {
-		logger.info("Evento " + evento.getApplicationName());
-		//		+ " Payload:" + evento.getPayload());
-		//System.out.println("business: " + business);
-		business = new NotificationBusiness();
-		business.notificar(evento);
-		return Response.ok().build();
+    final static Logger logger = Logger.getLogger(NotificationService.class);
 
-	}
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response newNotification(Evento evento) {
+        logger.info("Evento " + evento.getApplicationName());
+        //		+ " Payload:" + evento.getPayload());
+        //System.out.println("business: " + business);
+        //business = new NotificationBusiness();
+        business.notificar(evento);
+        return Response.ok().build();
 
-	@GET
-	public Response newApplication() {
+    }
 
-		return Response.ok().build();
+    @GET
+    public Response newApplication() {
 
-	}
+        return Response.ok().build();
+
+    }
 
 }

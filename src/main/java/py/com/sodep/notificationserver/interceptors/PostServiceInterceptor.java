@@ -1,7 +1,5 @@
 package py.com.sodep.notificationserver.interceptors;
 
-import org.jboss.logging.Logger;
-import org.jboss.logging.MDC;
 import org.jboss.resteasy.annotations.interception.EncoderPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ServerResponse;
@@ -15,14 +13,14 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import org.apache.log4j.Logger;
 
 @Provider
 @ServerInterceptor
 @EncoderPrecedence
 public class PostServiceInterceptor implements PostProcessInterceptor, MessageBodyWriterInterceptor {
-
-    private Logger log = Logger.getLogger(PostServiceInterceptor.class);
-
+    @Inject
+    private Logger log;
     @Inject
     private RequestParams requestParams;
 

@@ -84,7 +84,7 @@
             <artifactId>javaPNS</artifactId>
             <version>2.3</version>
         </dependency>
-
+        <!-- Log 4 j-->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>

@@ -14,12 +14,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Parametro;
-import py.com.sodep.notificationserver.facade.ApnsFacade;
 
 @WebListener
 @ApplicationScoped
 public class HibernateSessionFactoryListener implements ServletContextListener {
-    
     final static Logger logger = Logger.getLogger(HibernateSessionFactoryListener.class);
     
     @Override

@@ -7,7 +7,6 @@ package py.com.sodep.notificationserver.business;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;

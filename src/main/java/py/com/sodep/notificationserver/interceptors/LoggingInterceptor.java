@@ -1,6 +1,5 @@
 package py.com.sodep.notificationserver.interceptors;
 
-import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.interception.DecoderPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ServerResponse;
@@ -18,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 
 @Provider
@@ -28,7 +29,8 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
     @Context
     private HttpServletRequest servletRequest;
 
-    private final Logger log = Logger.getLogger(LoggingInterceptor.class);
+    @Inject
+    private Logger log;
 
     @Override
     public Object read(MessageBodyReaderContext context) throws IOException, WebApplicationException {
