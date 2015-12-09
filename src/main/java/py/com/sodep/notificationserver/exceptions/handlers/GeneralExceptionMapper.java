@@ -28,9 +28,12 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
-        System.out.println("EN EL MAPPER" + exception.getMessage());
         Throwable cause = Throwables.getRootCause(exception);
-
+        if (exception instanceof BusinessException){
+            System.out.println("Es un bussibesException");
+            Error error = ((BusinessException)exception).getError();
+            return helper.toResponse(error, mapErrorCode(Integer.valueOf(error.getCodigo())));
+        }
         //Errores de Resteasy
         if (cause instanceof Failure) {
             Failure failure = (Failure) cause;

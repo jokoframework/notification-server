@@ -10,9 +10,10 @@
     <property name="hibernate.show_sql">true</property>
     <property name="hibernate.cache.use_query_cache">false</property>
     <property name="hibernate.hbm2ddl.auto">update</property>
+    <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
+    <mapping class="py.com.sodep.notificationserver.db.entities.Payload"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.Aplicacion"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
 <!--    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidNotification"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.notification.Data"/>-->
   </session-factory>

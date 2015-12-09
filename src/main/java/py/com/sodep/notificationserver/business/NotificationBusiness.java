@@ -10,9 +10,12 @@ import javapns.notification.PushNotificationPayload;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
 
@@ -28,7 +31,25 @@ public class NotificationBusiness {
     @Inject
     AndroidNotification notification;
     @Inject
+    EventoDao eventoDao;
+    @Inject
     Logger logger;
+
+    public Evento crearEvento(Evento e) throws BusinessException {
+        Aplicacion a = appDao.getByName(e.getApplicationName());
+        if (a != null) {
+            e.setApplication(a);
+            e.setEstado("PENDIENTE");
+            eventoDao.create(e);
+            return e;
+        } else {
+            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getApplicationName() + " no existe.");
+        }
+    }
+
+    public Evento actualizarEvento(Evento e) {
+        return eventoDao.create(e);
+    }
 
     public boolean notificar(Evento evento) {
 

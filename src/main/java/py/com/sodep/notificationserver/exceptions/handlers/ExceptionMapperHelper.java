@@ -1,14 +1,12 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
 import com.google.common.base.Throwables;
-import org.jboss.logging.Logger;
-import org.jboss.logging.MDC;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * @author duartm
@@ -17,13 +15,19 @@ import java.util.Arrays;
 @RequestScoped
 public class ExceptionMapperHelper {
 
+    public static enum appError {
+
+        APLICACION_NOT_FOUND,
+        BAD_REQUEST,
+        UNKNOWN_ERROR
+    }
+
     private static final int httpErrorCodes[] = {400, 401, 402, 403, 404, 405,
         406, 407, 408, 409, 410, 411, 412, 413,
         414, 415, 416, 417, 422, 423, 424, 500,
         501, 502, 503, 504, 505, 506, 507, 510};
 
     protected static final int DEFAULT_RESPONSE_CODE = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-
 
     public Response toResponse(Object entity, int statusCode) {
         Response.ResponseBuilder response = Response.status(statusCode);
@@ -68,6 +72,9 @@ public class ExceptionMapperHelper {
 
     //TODO: Implementar función de mapeo
     public static int mapErrorCode(int code) {
+        if(code == appError.APLICACION_NOT_FOUND.ordinal()){
+            return Status.BAD_REQUEST.getStatusCode();
+        }
         return code;
     }
 }

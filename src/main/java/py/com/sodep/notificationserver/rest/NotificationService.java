@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -13,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.entities.Evento;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 @Path("/evento")
 @RequestScoped
@@ -25,13 +27,14 @@ public class NotificationService {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response newNotification(Evento evento) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response newNotification(Evento evento) throws BusinessException {
         logger.info("Evento " + evento.getApplicationName());
-        //		+ " Payload:" + evento.getPayload());
-        //System.out.println("business: " + business);
-        //business = new NotificationBusiness();
+        evento = business.crearEvento(evento);
         business.notificar(evento);
-        return Response.ok().build();
+        evento.setEstado("ENVIADO");
+        evento = business.actualizarEvento(evento);
+        return Response.ok().entity(evento).build();
 
     }
 

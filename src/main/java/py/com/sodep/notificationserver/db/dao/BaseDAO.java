@@ -70,17 +70,18 @@ public class BaseDAO<T, PK extends Serializable> {
     }
 
     public boolean updpate(T updateInstance) {
+
+        Transaction tx = getSession().beginTransaction();
         try {
             if (updateInstance == null) {
                 return false;
             }
             getSession().update(updateInstance);
+            tx.commit();
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            tx.rollback();
             throw e;
-        } finally {
-            getSession().getTransaction().commit();
         }
     }
 

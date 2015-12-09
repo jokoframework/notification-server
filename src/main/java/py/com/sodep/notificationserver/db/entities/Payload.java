@@ -1,43 +1,74 @@
 package py.com.sodep.notificationserver.db.entities;
 
-public class Payload {
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-	private String titulo;
-    private String detalle;
-    private String idLlamado;
+@Entity
+@Table
+public class Payload implements Serializable {
 
-    public Long getGrupoEvento() {
-        return grupoEvento;
+    private static final long serialVersionUID = 6055960223584022815L;
+    @Id
+    @GeneratedValue
+    @Column(name = "id")
+    private Long id;
+
+    private String clave;
+    private String valor;
+    
+    @ManyToOne
+    @JoinColumn(name = "evento_id")
+    private Evento evento;
+
+    public Payload() {
     }
 
-    public void setGrupoEvento(Long grupoEvento) {
-        this.grupoEvento = grupoEvento;
+    public Payload(String clave, String valor) {
+        this.clave = clave;
+        this.valor = valor;
     }
 
-    private Long grupoEvento;
-
-    public String getIdLlamado() {
-        return idLlamado;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdLlamado(String idLlamado) {
-        this.idLlamado = idLlamado;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getDetalle() {
-        return detalle;
+    public String getClave() {
+        return clave;
     }
 
-    public void setDetalle(String detalle) {
-        this.detalle = detalle;
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getValor() {
+        return valor;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setValor(String valor) {
+        this.valor = valor;
+    }
+
+    public Evento getEvento() {
+        return evento;
+    }
+
+    public void setEvento(Evento evento) {
+        this.evento = evento;
+    }
+
+    @Override
+    public String toString() {
+        return "Payload{" + "id=" + id + ", clave=" + clave + ", valor=" + valor + '}';
     }
 
 }
