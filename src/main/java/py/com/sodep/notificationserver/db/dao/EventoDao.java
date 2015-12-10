@@ -5,6 +5,8 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
+import java.util.List;
+import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
@@ -12,5 +14,14 @@ import py.com.sodep.notificationserver.db.entities.Evento;
  * @author Vanessa
  */
 public class EventoDao extends BaseDAO<Evento, Long> {
+
+    public List<Evento> getPendientes() {
+        getSession().beginTransaction();
+        List<Evento> eventos = getSession()
+                .createCriteria(Evento.class)
+                .add(Restrictions.like("estado", "PENDIENTE")).list();
+        getSession().getTransaction().commit();
+        return eventos;
+    }
 
 }

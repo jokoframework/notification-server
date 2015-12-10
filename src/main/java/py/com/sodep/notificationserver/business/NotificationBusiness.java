@@ -14,6 +14,7 @@ import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
+import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
@@ -51,26 +52,24 @@ public class NotificationBusiness {
         return eventoDao.create(e);
     }
 
-    public boolean notificar(Evento evento) {
-
-        //AplicacionDao appDao = new AplicacionDao();
-        Aplicacion app = appDao.getByName(evento.getApplicationName());
+    public boolean notificar(Evento e) throws BusinessException {
+        Aplicacion app = appDao.getByName(e.getApplicationName());
         if (app != null) {
-            if (evento.isProductionMode()) {
-                notificarAndroid(app.getApiKeyProd(), evento);
-                notificarIos(app.getCertificadoProd(), app.getKeyFileProd(),
-                        evento, true);
-            } else {
-                notificarAndroid(app.getApiKeyDev(), evento);
-                notificarIos(app.getCertificadoDev(), app.getKeyFileProd(),
-                        evento, false);
+            try {
+                if (e.isProductionMode()) {
+                    notificarAndroid(app.getApiKeyProd(), e);
+                    //notificarIos(app.getCertificadoProd(), app.getKeyFileProd(), e, true);
+                } else {
+                    notificarAndroid(app.getApiKeyDev(), e);
+                    //notificarIos(app.getCertificadoDev(), app.getKeyFileProd(), e, false);
+                }
+            } catch (Exception ex) {
+                logger.error("Error al enviar notificaciones: ", ex);
             }
         } else {
-            // Aplicación no encontrada
-            return false;
+            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getApplicationName() + " no existe.");
         }
         return true;
-
     }
 
     @SuppressWarnings("rawtypes")
@@ -106,14 +105,20 @@ public class NotificationBusiness {
 
     }
 
-    private void notificarAndroid(String apiKey, Evento evento) {
+    private Evento notificarAndroid(String apiKey, Evento evento) {
 
-        logger.info("notificando a Android");
-        //GcmFacade service = new GcmFacade();
-        //AndroidNotification notification = new AndroidNotification();
-        notification.setRegistration_ids(evento.getAndroidDevicesList());
+        logger.info("[Evento: " + evento.getId() + "]: notificación android");
+        if (evento.getAndroidDevicesList().size() == 1) {
+            notification.setTo(evento.getAndroidDevicesList().get(0));
+        } else {
+            notification.setRegistration_ids(evento.getAndroidDevicesList());
+        }
         notification.setData(evento.getPayload());
-
-        service.send(apiKey, notification);
+        AndroidResponse ar = service.send(apiKey, notification);
+        ar.setEvento(evento);
+        evento.setAndroidResponse(ar);
+        eventoDao.create(evento);
+        return evento;
     }
+    
 }

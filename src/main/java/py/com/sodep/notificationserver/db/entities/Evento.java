@@ -20,8 +20,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
 
 @Entity
 @Table
@@ -38,31 +40,37 @@ public class Evento implements Serializable {
     @JoinColumn(name = "aplicacion_id")
     @JsonIgnore
     private Aplicacion application;
-    
+
     @Column(name = "android_devices", length = 10240)
     @JsonIgnore
     private String androidDevices;
-    
+
     @Column(name = "ios_devices", length = 10240)
     @JsonIgnore
     private String iosDevices;
-    
+
     private boolean sendToSync;
     private String estado;
     private boolean productionMode;
     private String descripcion;
-    
+
     @OneToMany(targetEntity = Payload.class, fetch = FetchType.EAGER,
             mappedBy = "evento", cascade = CascadeType.ALL)
     private List<Payload> payloads;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "android_response_id")
+    private AndroidResponse androidResponse;
 
     @Transient
     private HashMap<String, String> payload;
 
     @Transient
+    @Column(length = 1)
     private List<String> androidDevicesList;
 
     @Transient
+    @Column(length = 1)
     private List<String> iosDevicesList;
 
     @Transient
@@ -94,7 +102,7 @@ public class Evento implements Serializable {
     public void setAndroidDevices(String androidDevices) {
         this.androidDevices = androidDevices;
     }
-    
+
     public String getIosDevices() {
         return iosDevices;
     }
@@ -204,6 +212,14 @@ public class Evento implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public AndroidResponse getAndroidResponse() {
+        return androidResponse;
+    }
+
+    public void setAndroidResponse(AndroidResponse androidResponse) {
+        this.androidResponse = androidResponse;
     }
 
 }

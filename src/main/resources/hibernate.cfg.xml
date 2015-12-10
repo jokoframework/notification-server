@@ -14,6 +14,8 @@
     <mapping class="py.com.sodep.notificationserver.db.entities.Payload"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.Aplicacion"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
+    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidResponse"/>
+    <mapping class="py.com.sodep.notificationserver.db.entities.notification.Result"/>
 <!--    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidNotification"/>
     <mapping class="py.com.sodep.notificationserver.db.entities.notification.Data"/>-->
   </session-factory>

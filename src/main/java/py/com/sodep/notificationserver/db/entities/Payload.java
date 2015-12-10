@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ public class Payload implements Serializable {
     
     @ManyToOne
     @JoinColumn(name = "evento_id")
+    @JsonIgnore
     private Evento evento;
 
     public Payload() {
