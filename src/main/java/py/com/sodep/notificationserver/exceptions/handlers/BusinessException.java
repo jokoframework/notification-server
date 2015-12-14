@@ -18,6 +18,11 @@ public class BusinessException extends Exception {
         this.errorCode = errorCode;
     }
 
+    public BusinessException(int errorCode, Throwable cause) {
+        super(cause);
+        this.errorCode = errorCode;
+    }
+
     public Error getError() {
         return new Error(errorCode, this.getMessage());
     }

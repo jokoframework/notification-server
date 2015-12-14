@@ -19,6 +19,7 @@ public class ExceptionMapperHelper {
 
         APLICACION_NOT_FOUND,
         BAD_REQUEST,
+        NOTIFICATION_ERROR,
         UNKNOWN_ERROR
     }
 

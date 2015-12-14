@@ -24,6 +24,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.notification.IosResponse;
 
 @Entity
 @Table
@@ -53,6 +54,7 @@ public class Evento implements Serializable {
     private String estado;
     private boolean productionMode;
     private String descripcion;
+    private String prioridad;
 
     @OneToMany(targetEntity = Payload.class, fetch = FetchType.EAGER,
             mappedBy = "evento", cascade = CascadeType.ALL)
@@ -61,6 +63,10 @@ public class Evento implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "android_response_id")
     private AndroidResponse androidResponse;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "ios_response_id")
+    private IosResponse iosResponse;
 
     @Transient
     private HashMap<String, String> payload;
@@ -220,6 +226,22 @@ public class Evento implements Serializable {
 
     public void setAndroidResponse(AndroidResponse androidResponse) {
         this.androidResponse = androidResponse;
+    }
+
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public IosResponse getIosResponse() {
+        return iosResponse;
+    }
+
+    public void setIosResponse(IosResponse iosResponse) {
+        this.iosResponse = iosResponse;
     }
 
 }

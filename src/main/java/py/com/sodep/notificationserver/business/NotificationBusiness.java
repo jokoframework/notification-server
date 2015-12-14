@@ -15,6 +15,7 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.notification.IosResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
@@ -52,35 +53,40 @@ public class NotificationBusiness {
         return eventoDao.create(e);
     }
 
-    public boolean notificar(Evento e) throws BusinessException {
+    public Evento notificar(Evento e) throws BusinessException {
         Aplicacion app = appDao.getByName(e.getApplicationName());
+        boolean error = false;
         if (app != null) {
-            try {
-                if (e.isProductionMode()) {
-                    notificarAndroid(app.getApiKeyProd(), e);
-                    //notificarIos(app.getCertificadoProd(), app.getKeyFileProd(), e, true);
-                } else {
-                    notificarAndroid(app.getApiKeyDev(), e);
-                    //notificarIos(app.getCertificadoDev(), app.getKeyFileProd(), e, false);
+            if (e.isProductionMode()) {
+                if (app.getApiKeyProd() != null) {
+                    e = notificarAndroid(app.getApiKeyProd(), e);
                 }
-            } catch (Exception ex) {
-                logger.error("Error al enviar notificaciones: ", ex);
+                if (app.getCertificadoProd() != null && app.getKeyFileProd() != null) {
+                    e = notificarIos(app.getCertificadoProd(), app.getKeyFileProd(), e, true);
+                }
+            } else {
+                if (app.getApiKeyDev() != null) {
+                    e = notificarAndroid(app.getApiKeyDev(), e);
+                }
+                if (app.getCertificadoDev() != null && app.getKeyFileDev() != null) {
+                    e = notificarIos(app.getCertificadoDev(), app.getKeyFileDev(), e, false);
+                }
             }
         } else {
             throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getApplicationName() + " no existe.");
         }
-        return true;
+        e.setEstado("ENVIADO");
+        eventoDao.create(e);
+        return e;
     }
 
     @SuppressWarnings("rawtypes")
-    private void notificarIos(String certifadoPath, String keyFile,
-            Evento evento, Boolean productionMode) {
-        logger.info("----NOTIFICAR IOS-----");
-        //ApnsFacade facade = new ApnsFacade();
+    private Evento notificarIos(String certifadoPath, String keyFile,
+            Evento evento, Boolean productionMode) throws BusinessException {
+        logger.info("[Evento: " + evento.getId() + "]: Notificando iOs");
         File certificado = new File(certifadoPath);
         Payload payload = PushNotificationPayload.complex();
         ObjectNode pay = evento.getPayload();
-
         try {
             ((PushNotificationPayload) payload).addAlert(evento
                     .getDescripcion());
@@ -94,23 +100,24 @@ public class NotificationBusiness {
                 payload.addCustomDictionary((String) pair,
                         pay.get(pair).asText());
             }
-
-            facade.send(payload, certificado, keyFile, productionMode,
-                    evento.getIosDevicesList());
-
         } catch (JSONException e) {
-            logger.error("[iOS] Error al parsear payload: " + e.getMessage());
-            e.printStackTrace();
+            throw new BusinessException(ExceptionMapperHelper.appError.BAD_REQUEST.ordinal(), "Error al parsear payload en notificacion iOs.");
         }
+        IosResponse response = facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
+        evento.setIosResponse(response);
+        eventoDao.create(evento);
+        return evento;
 
     }
 
-    private Evento notificarAndroid(String apiKey, Evento evento) {
+    private Evento notificarAndroid(String apiKey, Evento evento) throws BusinessException {
 
-        logger.info("[Evento: " + evento.getId() + "]: notificación android");
+        logger.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
+            logger.info("[Evento: " + evento.getId() + "]: Un solo device. Notificando android");
             notification.setTo(evento.getAndroidDevicesList().get(0));
         } else {
+            logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
             notification.setRegistration_ids(evento.getAndroidDevicesList());
         }
         notification.setData(evento.getPayload());
@@ -120,5 +127,5 @@ public class NotificationBusiness {
         eventoDao.create(evento);
         return evento;
     }
-    
+
 }

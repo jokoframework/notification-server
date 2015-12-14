@@ -6,7 +6,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
  * Resultado de enviar una notificacion por cada dispositivo Created by
@@ -18,13 +17,18 @@ public class Result implements Serializable {
 
     @Id
     String message_id;
-
     String error;
+    String originalRegistrationId;
     String registration_id;
+    Integer status;
 
     @ManyToOne
     @JoinColumn(name = "android_response_id")
     private AndroidResponse androidResponse;
+    
+    @ManyToOne
+    @JoinColumn(name = "ios_response_id")
+    private IosResponse iosResponse;
 
     public String getRegistration_id() {
         return registration_id;
@@ -48,6 +52,22 @@ public class Result implements Serializable {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getOriginalRegistrationId() {
+        return originalRegistrationId;
+    }
+
+    public void setOriginalRegistrationId(String originalRegistrationId) {
+        this.originalRegistrationId = originalRegistrationId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Override

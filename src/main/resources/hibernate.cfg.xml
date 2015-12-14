@@ -2,21 +2,21 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" 
 "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-  <session-factory>
-    <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-    <property name="hibernate.connection.datasource">java:comp/env/jdbc/notification-server</property>
-    <property name="hibernate.current_session_context_class">thread</property>
-    <property name="hibernate.show_sql">true</property>
-    <property name="hibernate.cache.use_query_cache">false</property>
-    <property name="hibernate.hbm2ddl.auto">update</property>
-    <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.Payload"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.Aplicacion"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidResponse"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.notification.Result"/>
-<!--    <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidNotification"/>
-    <mapping class="py.com.sodep.notificationserver.db.entities.notification.Data"/>-->
-  </session-factory>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.connection.datasource">java:comp/env/jdbc/notification-server</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
+        <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.Payload"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.Aplicacion"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidResponse"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.notification.Result"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.notification.AndroidResponse"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.notification.IosResponse"/>
+    </session-factory>
 </hibernate-configuration>

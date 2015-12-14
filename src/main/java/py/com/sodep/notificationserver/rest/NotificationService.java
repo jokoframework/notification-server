@@ -32,8 +32,6 @@ public class NotificationService {
         logger.info("Evento " + evento.getApplicationName());
         evento = business.crearEvento(evento);
         business.notificar(evento);
-        evento.setEstado("ENVIADO");
-        evento = business.actualizarEvento(evento);
         return Response.ok().entity(evento).build();
 
     }

@@ -18,8 +18,9 @@ import py.com.sodep.notificationserver.db.entities.Parametro;
 @WebListener
 @ApplicationScoped
 public class HibernateSessionFactoryListener implements ServletContextListener {
+
     final static Logger logger = Logger.getLogger(HibernateSessionFactoryListener.class);
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
@@ -29,7 +30,7 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
             sessionFactory.close();
         }
     }
-    
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         Configuration configuration = new Configuration();
@@ -42,16 +43,19 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
         System.out.println("Hibernate SessionFactory Configured successfully");
         System.out.println("Released Hibernate sessionFactory resource");
         ParametroDao pdao = new ParametroDao();
-        
+
         try {
             System.out.println("Creando Parametro: PATH_CERTIFICADOS");
             pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
             System.out.println("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
+            System.out.println("Creando Parametro: IOS_THREADS");
+            pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
+
         } catch (Exception ex) {
             logger.error("Error al crear los parámetros: " + ex.getMessage());
         }
-        
+
     }
-    
+
 }
