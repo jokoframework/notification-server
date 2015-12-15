@@ -1,6 +1,7 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
 import com.google.common.base.Throwables;
+import javax.inject.Inject;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.Failure;
 
@@ -23,8 +24,8 @@ import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMappe
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
     private static final Logger log = Logger.getLogger(GeneralExceptionMapper.class);
 
-    //@Inject
-    private final ExceptionMapperHelper helper = new ExceptionMapperHelper();
+    @Inject
+    private ExceptionMapperHelper helper;
 
     @Override
     public Response toResponse(Exception exception) {

@@ -1,21 +1,24 @@
 package py.com.sodep.notificationserver.db.entities.notification;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-/**
- * Resultado de enviar una notificacion por cada dispositivo Created by
- * gaby.lorely on 17/05/2015.
- */
-@Table(name = "android_result")
+@Table(name = "message_result")
 @Entity
 public class Result implements Serializable {
 
     @Id
+    @GeneratedValue
+    @Column(name = "id")
+    Long id;
+
     String message_id;
     String error;
     String originalRegistrationId;
@@ -24,11 +27,21 @@ public class Result implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "android_response_id")
+    @JsonIgnore
     private AndroidResponse androidResponse;
-    
+
     @ManyToOne
     @JoinColumn(name = "ios_response_id")
+    @JsonIgnore
     private IosResponse iosResponse;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getRegistration_id() {
         return registration_id;
@@ -68,6 +81,22 @@ public class Result implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public AndroidResponse getAndroidResponse() {
+        return androidResponse;
+    }
+
+    public void setAndroidResponse(AndroidResponse androidResponse) {
+        this.androidResponse = androidResponse;
+    }
+
+    public IosResponse getIosResponse() {
+        return iosResponse;
+    }
+
+    public void setIosResponse(IosResponse iosResponse) {
+        this.iosResponse = iosResponse;
     }
 
     @Override

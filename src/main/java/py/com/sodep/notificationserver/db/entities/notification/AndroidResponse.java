@@ -50,6 +50,9 @@ public class AndroidResponse implements Serializable {
     }
 
     public void setResults(List<Result> results) {
+        for (Result r: results){
+            r.setAndroidResponse(this);
+        }
         this.results = results;
     }
 

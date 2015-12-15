@@ -20,12 +20,12 @@ import py.com.sodep.notificationserver.db.entities.notification.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 public class ApnsFacade {
-
+    
     @Inject
     Logger logger;
     @Inject
     ParametroDao parametroDao;
-
+    
     public IosResponse send(Payload payload, File certificado, String keyFile,
             Boolean productionMode, List<String> devices) throws BusinessException {
         try {
@@ -44,9 +44,9 @@ public class ApnsFacade {
         } catch (Exception ex) {
             throw new BusinessException(500, ex);
         }
-
+        
     }
-
+    
     private IosResponse procesarResponse(PushedNotifications result, List<String> devices) {
         IosResponse ios = new IosResponse();
         ios.setFailure(result.getFailedNotifications().size());
@@ -57,9 +57,8 @@ public class ApnsFacade {
             PushedNotification notification = result.get(i);
             logger.info("[iOS] Divice: " + notification.getDevice().getToken());
             Result r = new Result();
-
+            
             String diviceToken = notification.getDevice().getToken();
-
             if (notification.isSuccessful()) {
                 r.setMessage_id("OK");
             } else {
@@ -75,22 +74,32 @@ public class ApnsFacade {
                  */
                 ResponsePacket theErrorResponse = notification.getResponse();
                 if (theErrorResponse != null) {
-                    if (theErrorResponse.getStatus() == 2 || theErrorResponse.getStatus() == 5) {
-                        r.setRegistration_id(diviceToken);
-                        r.setOriginalRegistrationId(devices.get(i));
-                        r.setStatus(theErrorResponse.getStatus());
+                    if (theErrorResponse.getStatus() == 2 || theErrorResponse.getStatus() == 5 || theErrorResponse.getStatus() == 8) {
+                        r.setOriginalRegistrationId(diviceToken);
                         canonicalIds++;
                     }
+                    r.setMessage_id(String.valueOf(theErrorResponse.getIdentifier()));
+                    r.setStatus(theErrorResponse.getStatus());
                     r.setError(theErrorResponse.getMessage());
-                    logger.error("[iOS]  ResponsePacket Error: "
-                            + theErrorResponse.getMessage());
-
                 }
             }
+            r.setIosResponse(ios);
             ios.getResults().add(r);
         }
         ios.setCanonical_ids(canonicalIds);
         return ios;
     }
-
+    /*
+     if (status == 0) return prefix + "No errors encountered";
+     if (status == 1) return prefix + "Processing error";
+     if (status == 2) return prefix + "Missing device token";
+     if (status == 3) return prefix + "Missing topic";
+     if (status == 4) return prefix + "Missing payload";
+     if (status == 5) return prefix + "Invalid token size";
+     if (status == 6) return prefix + "Invalid topic size";
+     if (status == 7) return prefix + "Invalid payload size";
+     if (status == 8) return prefix + "Invalid token";
+     if (status == 255) return prefix + "None (unknown)";
+     return prefix + "Undocumented status code: " + status;
+     */
 }

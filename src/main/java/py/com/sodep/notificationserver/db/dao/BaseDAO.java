@@ -7,10 +7,14 @@ package py.com.sodep.notificationserver.db.dao;
 
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import java.io.Serializable;
+import java.sql.SQLException;
+import javax.persistence.PersistenceException;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 
 /**
  *
@@ -55,16 +59,23 @@ public class BaseDAO<T, PK extends Serializable> {
         }
     }
 
-    public T create(T newInstance) {
+    public T create(T newInstance) throws HibernateException, SQLException {
         try {
             getSession().beginTransaction();
             getSession().saveOrUpdate(newInstance);
             getSession().getTransaction().commit();
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (getSession().getTransaction() != null) {
                 getSession().getTransaction().rollback();
             }
-            throw e;
+            System.out.println(e.getClass().toString());
+            e.printStackTrace();
+            if (e instanceof ConstraintViolationException) {
+                throw ((ConstraintViolationException) e).getSQLException();
+            } else {
+                throw e;
+            }
+
         }
         return newInstance;
     }
@@ -79,7 +90,7 @@ public class BaseDAO<T, PK extends Serializable> {
             getSession().update(updateInstance);
             tx.commit();
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             tx.rollback();
             throw e;
         }

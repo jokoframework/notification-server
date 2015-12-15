@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.rest;
 
+import java.sql.SQLException;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -40,7 +41,7 @@ public class AplicacionService {
     @POST
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newApplication(Aplicacion a) throws Exception {
+    public Response newApplication(Aplicacion a) throws SQLException, Exception {
         logger.info("Application/id " + a);
         appBussines.createAplicacionJson(a, null);
         return Response.ok(a).build();
@@ -51,7 +52,7 @@ public class AplicacionService {
     @Path("/upload")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadFile(@MultipartForm AplicacionFile form) throws Exception {
+    public Response uploadFile(@MultipartForm AplicacionFile form) throws SQLException, Exception {
         logger.info("Recibido: " + form);
         Aplicacion a = appBussines.newAplicacionFileUpload(form, null);
         return Response.ok(a).build();
@@ -60,7 +61,7 @@ public class AplicacionService {
     @PUT
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateApplication(Aplicacion b, @PathParam(value = "id") String id) throws Exception {
+    public Response updateApplication(Aplicacion b, @PathParam(value = "id") String id) throws SQLException, Exception {
         logger.info("Application/id " + b);
         Aplicacion a = appBussines.createAplicacionJson(b, Long.valueOf(id));
         return Response.ok(a).build();
@@ -71,7 +72,7 @@ public class AplicacionService {
     @Path("/upload/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response uploadFileUpdate(@MultipartForm AplicacionFile form, @PathParam(value = "id") String id) throws Exception {
+    public Response uploadFileUpdate(@MultipartForm AplicacionFile form, @PathParam(value = "id") String id) throws SQLException, Exception {
         Aplicacion a = appBussines.newAplicacionFileUpload(form, Long.valueOf(id));
         return Response.ok(a).build();
     }
@@ -80,7 +81,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAplicacion(@MultipartForm AplicacionFile form, Long id) throws Exception {
+    public Response deleteAplicacion(@MultipartForm AplicacionFile form, Long id) throws SQLException, Exception {
         Aplicacion a = appBussines.newAplicacionFileUpload(form, id);
         return Response.ok(a).build();
     }
@@ -88,7 +89,7 @@ public class AplicacionService {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationById(@PathParam("id") String id) throws Exception {
+    public Response getApplicationById(@PathParam("id") String id) throws SQLException, Exception {
         logger.info("Application/id " + id);
         Aplicacion a = appBussines.getApplication(id);
         return Response.ok(a).build();
@@ -98,7 +99,7 @@ public class AplicacionService {
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findAplicacion(@QueryParam(value = "nombre") String nombre) throws Exception {
+    public Response findAplicacion(@QueryParam(value = "nombre") String nombre) throws SQLException, Exception {
         logger.info("Application/nombre " + nombre);
         Aplicacion a = appBussines.findAplicacion(nombre);
         return Response.ok(a).build();

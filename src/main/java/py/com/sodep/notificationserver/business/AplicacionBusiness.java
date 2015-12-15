@@ -7,6 +7,7 @@ package py.com.sodep.notificationserver.business;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
@@ -19,9 +20,10 @@ import py.com.sodep.notificationserver.db.entities.AplicacionFile;
  * @author Vanessa
  */
 public class AplicacionBusiness {
+
     @Inject
     AplicacionDao applicationDao;
-    
+
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
         System.out.println("Recibido " + nuevo);
         Aplicacion a;
@@ -75,10 +77,10 @@ public class AplicacionBusiness {
         return a;
     }
 
-    public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws Exception {
+    public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws SQLException, Exception {
         Aplicacion a;
         //AplicacionDao applicationDao = new AplicacionDao();
-        if(applicationDao!=null){
+        if (applicationDao != null) {
             System.out.println("**************** DAO NO ES NULL ****************");
         }
         ParametroDao paramDao = new ParametroDao();
@@ -96,22 +98,20 @@ public class AplicacionBusiness {
 
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
         System.out.println("ALMACENANDO EN: " + base);
-        try {
-            if (b.getCertificadoDevFile() != null) {
-                String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
-                writeFile(fileNameDev, b.getCertificadoDevFile());
-                a.setCertificadoDev(fileNameDev);
-            }
-            if (b.getCertificadoProdFile() != null) {
-                String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
-                writeFile(fileNameProd, b.getCertificadoProdFile());
-                a.setCertificadoProd(fileNameProd);
-            }
-            System.out.println("CREANDO: " + a);
-            applicationDao.create(a);
-        } catch (Exception e) {
-            throw new Exception("Error al crear aplicación, " + e.getMessage());
+
+        if (b.getCertificadoDevFile() != null) {
+            String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
+            writeFile(fileNameDev, b.getCertificadoDevFile());
+            a.setCertificadoDev(fileNameDev);
         }
+        if (b.getCertificadoProdFile() != null) {
+            String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
+            writeFile(fileNameProd, b.getCertificadoProdFile());
+            a.setCertificadoProd(fileNameProd);
+        }
+        System.out.println("CREANDO: " + a);
+        applicationDao.create(a);
+
         return a;
     }
 

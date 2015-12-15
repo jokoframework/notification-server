@@ -3,12 +3,14 @@ package py.com.sodep.notificationserver.business;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
@@ -37,7 +39,7 @@ public class NotificationBusiness {
     @Inject
     Logger logger;
 
-    public Evento crearEvento(Evento e) throws BusinessException {
+    public Evento crearEvento(Evento e) throws BusinessException, HibernateException, SQLException {
         Aplicacion a = appDao.getByName(e.getApplicationName());
         if (a != null) {
             e.setApplication(a);
@@ -49,11 +51,11 @@ public class NotificationBusiness {
         }
     }
 
-    public Evento actualizarEvento(Evento e) {
+    public Evento actualizarEvento(Evento e) throws HibernateException, SQLException {
         return eventoDao.create(e);
     }
 
-    public Evento notificar(Evento e) throws BusinessException {
+    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException {
         Aplicacion app = appDao.getByName(e.getApplicationName());
         boolean error = false;
         if (app != null) {
@@ -82,7 +84,7 @@ public class NotificationBusiness {
 
     @SuppressWarnings("rawtypes")
     private Evento notificarIos(String certifadoPath, String keyFile,
-            Evento evento, Boolean productionMode) throws BusinessException {
+            Evento evento, Boolean productionMode) throws BusinessException, HibernateException, SQLException {
         logger.info("[Evento: " + evento.getId() + "]: Notificando iOs");
         File certificado = new File(certifadoPath);
         Payload payload = PushNotificationPayload.complex();
@@ -110,7 +112,7 @@ public class NotificationBusiness {
 
     }
 
-    private Evento notificarAndroid(String apiKey, Evento evento) throws BusinessException {
+    private Evento notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException {
 
         logger.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
