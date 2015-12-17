@@ -7,14 +7,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -56,7 +58,7 @@ public class Evento implements Serializable {
     private String descripcion;
     private String prioridad;
 
-    @OneToMany(targetEntity = Payload.class, fetch = FetchType.EAGER,
+    @OneToMany(targetEntity = Payload.class, //fetch = FetchType.EAGER,
             mappedBy = "evento", cascade = CascadeType.ALL)
     private List<Payload> payloads;
 
@@ -143,6 +145,15 @@ public class Evento implements Serializable {
 
     public void setPayload(Object payload) {
         this.payload = (HashMap) payload;
+        ArrayList<Payload> payloads = new ArrayList();
+        if (this.payload != null) {
+            for (Entry<String, String> e : this.payload.entrySet()) {
+                Payload p = new Payload(e.getKey(), e.getValue());
+                p.setEvento(this);
+                payloads.add(p);
+            }
+        }
+        this.payloads = payloads;
         System.out.println("PAYLOAD STRING: " + this.payload.toString());
     }
 
@@ -225,6 +236,7 @@ public class Evento implements Serializable {
     }
 
     public void setAndroidResponse(AndroidResponse androidResponse) {
+        androidResponse.setEvento(this);
         this.androidResponse = androidResponse;
     }
 
@@ -241,7 +253,25 @@ public class Evento implements Serializable {
     }
 
     public void setIosResponse(IosResponse iosResponse) {
+        iosResponse.setEvento(this);
         this.iosResponse = iosResponse;
     }
 
+    @JsonIgnore
+    public ObjectNode getObjectNodePayLoad() {
+        JsonNodeFactory factory = JsonNodeFactory.instance;
+        ObjectNode jn = new ObjectNode(factory);
+        for (Payload s : this.payloads) {
+            jn.put(s.getClave(), String.valueOf(s.getValor()));
+        }
+        System.out.println("ANDROID PAYLOAD: " + jn.toString());
+        return jn;
+    }
+
+    @Override
+    public String toString() {
+        return "Evento{" + "id=" + id + ", application=" + application + ", androidDevices=" + androidDevices + ", iosDevices=" + iosDevices + ", sendToSync=" + sendToSync + ", estado=" + estado + ", productionMode=" + productionMode + ", descripcion=" + descripcion + ", prioridad=" + prioridad + ", payloads=" + payloads + ", androidResponse=" + androidResponse + ", iosResponse=" + iosResponse + ", payload=" + payload + ", androidDevicesList=" + androidDevicesList + ", iosDevicesList=" + iosDevicesList + ", applicationName=" + applicationName + '}';
+    }
+    
+    
 }

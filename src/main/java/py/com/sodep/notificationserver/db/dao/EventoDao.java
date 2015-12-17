@@ -20,6 +20,7 @@ public class EventoDao extends BaseDAO<Evento, Long> {
         List<Evento> eventos = getSession()
                 .createCriteria(Evento.class)
                 .add(Restrictions.like("estado", "PENDIENTE")).list();
+        System.out.println("Encontrados: " + eventos.size());
         getSession().getTransaction().commit();
         return eventos;
     }

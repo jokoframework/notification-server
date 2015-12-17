@@ -5,17 +5,22 @@
  */
 package py.com.sodep.notificationserver.business;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.TimerTask;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Evento;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 /**
  *
  * @author Vanessa
  */
+@Singleton
 public class NotificationTimer extends TimerTask {
 
     @Inject
@@ -32,7 +37,8 @@ public class NotificationTimer extends TimerTask {
             log.info("Notificando evento: " + e);
             try {
                 business.notificar(e);
-            } catch (Exception ex) {
+                dao.create(e);
+            } catch (BusinessException | HibernateException | SQLException ex) {
                 log.error("[Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
         }

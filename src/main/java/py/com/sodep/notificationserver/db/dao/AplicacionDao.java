@@ -5,7 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
-import javax.enterprise.context.RequestScoped;
+
 import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 
@@ -13,7 +13,6 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
  *
  * @author Vanessa
  */
-@RequestScoped
 public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
 
     public Aplicacion getByName(String name) {

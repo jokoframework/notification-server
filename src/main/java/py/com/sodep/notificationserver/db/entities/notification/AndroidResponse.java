@@ -10,11 +10,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.GeneratorType;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
@@ -24,10 +26,12 @@ import py.com.sodep.notificationserver.db.entities.Evento;
 @Table(name = "android_response")
 @JsonAutoDetect
 public class AndroidResponse implements Serializable {
-
-    @JsonProperty("multicast_id")
     @Id
-    @Column(name = "id")
+    @GeneratedValue   
+    Long id;
+    
+    @JsonProperty("multicast_id")
+    @Column(name = "multicast_id")
     Long multicast_id;
     @JsonProperty("success")
     int success;
@@ -96,9 +100,20 @@ public class AndroidResponse implements Serializable {
         this.canonical_ids = canonical_ids;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    
+
     @Override
     public String toString() {
-        return "AndroidResponse{" + "multicast_id=" + multicast_id + ", success=" + success + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", evento=" + evento + ", results=" + results + '}';
+        return "AndroidResponse{" + "multicast_id=" + multicast_id + ", success=" + success 
+                + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + '}';
     }
 
 }

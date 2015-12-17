@@ -33,7 +33,7 @@ public class NotificationService {
     public Response newNotification(Evento evento) throws BusinessException, HibernateException, SQLException {
         logger.info("Evento " + evento.getApplicationName());
         evento = business.crearEvento(evento);
-        business.notificar(evento);
+        //business.notificar(evento);
         return Response.ok().entity(evento).build();
 
     }

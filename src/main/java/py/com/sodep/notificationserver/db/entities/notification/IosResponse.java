@@ -110,4 +110,10 @@ public class IosResponse implements Serializable {
         this.error = error;
     }
 
+    @Override
+    public String toString() {
+        return "IosResponse{" + "multicast_id=" + multicast_id + ", success=" + success + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + ", error=" + error + '}';
+    }
+    
+
 }

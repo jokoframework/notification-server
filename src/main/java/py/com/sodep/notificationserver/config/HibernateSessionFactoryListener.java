@@ -5,28 +5,35 @@
  */
 package py.com.sodep.notificationserver.config;
 
+import java.util.Timer;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import py.com.sodep.notificationserver.business.NotificationTimer;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Parametro;
 
 @WebListener
 @ApplicationScoped
 public class HibernateSessionFactoryListener implements ServletContextListener {
-
-    final static Logger logger = Logger.getLogger(HibernateSessionFactoryListener.class);
-
+    @Inject
+    Logger log;
+    @Inject
+    NotificationTimer notTimer;
+    @Inject
+    ParametroDao pdao;
+    
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
         SessionFactory sessionFactory = HibernateSessionLocal.sessionFactory;
         if (sessionFactory != null && !sessionFactory.isClosed()) {
-            System.out.println("Closing sessionFactory");
+            log.info("Closing sessionFactory");
             sessionFactory.close();
         }
     }
@@ -35,27 +42,33 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
-        System.out.println("Hibernate Configuration created successfully");
+        log.info("Hibernate Configuration created successfully");
         SessionFactory sessionFactory = configuration
                 .buildSessionFactory();
-        System.out.println("SessionFactory created successfully");
+        log.info("SessionFactory created successfully");
         HibernateSessionLocal.sessionFactory = sessionFactory;
-        System.out.println("Hibernate SessionFactory Configured successfully");
-        System.out.println("Released Hibernate sessionFactory resource");
-        ParametroDao pdao = new ParametroDao();
-
+        log.info("Hibernate SessionFactory Configured successfully");
+        log.info("Released Hibernate sessionFactory resource");
+        
         try {
-            System.out.println("Creando Parametro: PATH_CERTIFICADOS");
+            log.info("Creando Parametro: PATH_CERTIFICADOS");
             pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
-            System.out.println("Creando Parametro: URL_GCM");
+            log.info("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
-            System.out.println("Creando Parametro: IOS_THREADS");
+            log.info("Creando Parametro: IOS_THREADS");
             pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
 
         } catch (Exception ex) {
-            logger.error("Error al crear los parámetros: " + ex.getMessage());
+            log.error("Error al crear los parámetros: " + ex.getMessage());
         }
+        log.info("Inicializando timer");
+        initializeTimer(20);
 
+    }
+
+    public void initializeTimer(int seconds) {
+        Timer timer = new Timer();
+        timer.schedule(notTimer,1000, seconds*1000);
     }
 
 }

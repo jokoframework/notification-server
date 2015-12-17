@@ -8,7 +8,8 @@ package py.com.sodep.notificationserver.db.dao;
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import java.io.Serializable;
 import java.sql.SQLException;
-import javax.persistence.PersistenceException;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
@@ -23,6 +24,9 @@ import org.hibernate.exception.ConstraintViolationException;
  * @param <PK>
  */
 public class BaseDAO<T, PK extends Serializable> {
+
+    @Inject
+    Logger log;
 
     public BaseDAO() {
     }
@@ -61,14 +65,16 @@ public class BaseDAO<T, PK extends Serializable> {
 
     public T create(T newInstance) throws HibernateException, SQLException {
         try {
+            log.info("Persistiendo: " + newInstance.toString());
             getSession().beginTransaction();
+            //getSession().evict(newInstance);
             getSession().saveOrUpdate(newInstance);
             getSession().getTransaction().commit();
         } catch (HibernateException e) {
             if (getSession().getTransaction() != null) {
                 getSession().getTransaction().rollback();
             }
-            System.out.println(e.getClass().toString());
+            log.info(e.getClass().toString());
             e.printStackTrace();
             if (e instanceof ConstraintViolationException) {
                 throw ((ConstraintViolationException) e).getSQLException();
@@ -80,13 +86,14 @@ public class BaseDAO<T, PK extends Serializable> {
         return newInstance;
     }
 
-    public boolean updpate(T updateInstance) {
+    public boolean update(T updateInstance) {
 
         Transaction tx = getSession().beginTransaction();
         try {
             if (updateInstance == null) {
                 return false;
             }
+            getSession().evict(updateInstance);
             getSession().update(updateInstance);
             tx.commit();
             return true;
@@ -102,12 +109,13 @@ public class BaseDAO<T, PK extends Serializable> {
                 return false;
             }
             getSession().delete(entity);
+            getSession().getTransaction().commit();
             return true;
         } catch (Exception e) {
+            getSession().getTransaction().rollback();
             e.printStackTrace();
             throw e;
         } finally {
-            getSession().getTransaction().commit();
         }
     }
 
