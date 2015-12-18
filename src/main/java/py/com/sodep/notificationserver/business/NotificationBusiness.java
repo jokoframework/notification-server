@@ -90,17 +90,23 @@ public class NotificationBusiness {
         Payload payload = PushNotificationPayload.complex();
         ObjectNode pay = evento.getPayload();
         try {
-            ((PushNotificationPayload) payload).addAlert(evento
-                    .getDescripcion());
+            if (evento.isSendToSync()) {
+                ((PushNotificationPayload) payload).addCustomDictionary("content-available", "1");
+            } else {
+                ((PushNotificationPayload) payload).addAlert(evento
+                        .getDescripcion());
 
-            ((PushNotificationPayload) payload).addSound("default");
-
-            Iterator it = pay.fieldNames();
-            while (it.hasNext()) {
-                String pair = (String) it.next();
-                logger.info(pair + " = " + pay.get(pair));
-                payload.addCustomDictionary((String) pair,
-                        pay.get(pair).asText());
+                ((PushNotificationPayload) payload).addSound("default");
+                if (evento.isSendToSync()) {
+                    ((PushNotificationPayload) payload).addSound("default");
+                }
+                Iterator it = pay.fieldNames();
+                while (it.hasNext()) {
+                    String pair = (String) it.next();
+                    logger.info(pair + " = " + pay.get(pair));
+                    payload.addCustomDictionary((String) pair,
+                            pay.get(pair).asText());
+                }
             }
         } catch (JSONException e) {
             throw new BusinessException(ExceptionMapperHelper.appError.BAD_REQUEST.ordinal(), "Error al parsear payload en notificacion iOs.");
