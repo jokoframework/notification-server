@@ -38,7 +38,7 @@ public class NotificationTimer extends TimerTask {
             try {
                 business.notificar(e);
                 dao.create(e);
-            } catch (BusinessException | HibernateException | SQLException ex) {
+            } catch (RuntimeException | BusinessException | SQLException ex) {
                 log.error("[Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
         }

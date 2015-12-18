@@ -61,6 +61,7 @@ public class GcmFacade {
                         + response.getStatus());
             }
             AndroidResponse r = response.readEntity(AndroidResponse.class);
+            log.info("[Android/Response]: " + r);
             return r;
         } catch (JsonProcessingException ex) {
             log.error(ex);

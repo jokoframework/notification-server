@@ -193,7 +193,7 @@ public class Evento implements Serializable {
     }
 
     public List<String> getIosDevicesList() {
-        if (iosDevicesList == null || iosDevicesList.size() == 0) {
+        if ((iosDevicesList == null || iosDevicesList.size() == 0) && iosDevices!=null) {
             ObjectMapper ob = new ObjectMapper();
             try {
                 iosDevicesList
