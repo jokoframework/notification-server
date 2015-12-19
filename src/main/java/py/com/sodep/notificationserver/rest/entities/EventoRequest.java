@@ -20,7 +20,7 @@ public class EventoRequest {
     private Aplicacion application;
     private boolean sendToSync;
     private boolean productionMode;
-    private String descripcion;
+    private String alert;
     private String prioridad;
 
     private HashMap<String, String> payload;
@@ -67,12 +67,12 @@ public class EventoRequest {
         this.productionMode = productionMode;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getAlert() {
+        return alert;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setAlert(String alert) {
+        this.alert = alert;
     }
 
     public String getPrioridad() {

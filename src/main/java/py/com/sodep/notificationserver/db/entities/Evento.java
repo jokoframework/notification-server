@@ -51,7 +51,7 @@ public class Evento implements Serializable {
 
     private boolean sendToSync;
     private boolean productionMode;
-    private String descripcion;
+    private String alert;
     private String prioridad;
     @Column(name = "estado_android")
     private String estadoAndroid;
@@ -87,7 +87,7 @@ public class Evento implements Serializable {
         }
         this.sendToSync = e.isSendToSync();
         this.productionMode = e.isProductionMode();
-        this.descripcion = e.getDescripcion();
+        this.alert = e.getAlert();
         this.prioridad = e.getPrioridad();
         this.setPayload(e.getPayload());
         if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 0) {
@@ -190,12 +190,12 @@ public class Evento implements Serializable {
         return jn;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getAlert() {
+        return alert;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setAlert(String alert) {
+        this.alert = alert;
     }
 
     public AndroidResponse getAndroidResponse() {

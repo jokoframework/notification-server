@@ -1,8 +1,10 @@
 package py.com.sodep.notificationserver.business;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Iterator;
 import javapns.json.JSONException;
@@ -94,7 +96,7 @@ public class NotificationBusiness {
                 ((PushNotificationPayload) payload).addCustomDictionary("content-available", "1");
             } else {
                 ((PushNotificationPayload) payload).addAlert(evento
-                        .getDescripcion());
+                        .getAlert());
 
                 ((PushNotificationPayload) payload).addSound("default");
                 if (evento.isSendToSync()) {
@@ -125,12 +127,13 @@ public class NotificationBusiness {
             logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
             notification.setRegistration_ids(evento.getAndroidDevicesList());
         }
-        notification.setData(evento.getObjectNodePayLoad().put("descripcion", evento.getDescripcion()));
+
+        notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
         return service.send(apiKey, notification);
     }
 
     public void validate(Evento e) throws BusinessException {
-        String s = e.getDescripcion() + e.getPayload().asText();
+        String s = e.getAlert() + e.getPayload().asText();
         if (s.getBytes().length > e.getAplicacion().getPayloadSize()) {
             throw new BusinessException(500, "El tamaño del payload supera el configurado para la aplicación: " + e.getAplicacion().getPayloadSize());
         }
