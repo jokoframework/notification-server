@@ -33,7 +33,9 @@ public class IosNotificationTimer extends TimerTask {
     @Override
     public void run() {
         ArrayList<Evento> eventos = (ArrayList) dao.getPendientesIos();
+        log.info("[IOS]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
+            log.info("[IOS]: Notificando evento: " + e);
             try {
                 if (e.getAplicacion() != null) {
                     if (e.isProductionMode()) {
@@ -55,7 +57,7 @@ public class IosNotificationTimer extends TimerTask {
                 }
                 dao.create(e);
             } catch (RuntimeException | BusinessException | SQLException ex) {
-                log.error("[Evento: " + e.getId() + "]Error al notificar: ", ex);
+                log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
         }
     }

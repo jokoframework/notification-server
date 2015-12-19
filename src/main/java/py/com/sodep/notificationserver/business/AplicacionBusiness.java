@@ -14,7 +14,6 @@ import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
-import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 /**
  *

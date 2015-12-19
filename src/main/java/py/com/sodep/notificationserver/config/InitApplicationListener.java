@@ -44,11 +44,16 @@ public class InitApplicationListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
+        log.info("Cancelando tareas pendientes del timer android");
+        androidTimer.cancel();
+        log.info("Cancelando tareas pendientes del timer ios");
+        iosTimer.cancel();
         SessionFactory sessionFactory = HibernateSessionLocal.sessionFactory;
         if (sessionFactory != null && !sessionFactory.isClosed()) {
             log.info("Closing sessionFactory");
             sessionFactory.close();
         }
+        
     }
 
     @Override
@@ -88,7 +93,9 @@ public class InitApplicationListener implements ServletContextListener {
     }
 
     public void initializeTimer(int seconds) {
+        log.info("Iniciando Timer Android");
         androidTimer.schedule(androidTask, 1000, Integer.valueOf(pdao.getByName("ANDROID_TIMER").getValor()) * 1000);
+        log.info("Iniciando Timer Ios");
         iosTimer.schedule(iosTask, 1000, Integer.valueOf(pdao.getByName("IOS_TIMER").getValor()) * 1000);
     }
 

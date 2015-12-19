@@ -33,8 +33,9 @@ public class AndroidNotificationTimer extends TimerTask {
     @Override
     public void run() {
         ArrayList<Evento> eventos = (ArrayList) dao.getPendientesAndroid();
+        log.info("[ANDROID]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
-            log.info("Notificando evento: " + e);
+            log.info("[ANDROID]: Notificando evento: " + e);
             try {
                 if (e.getAplicacion() != null) {
                     if (e.isProductionMode()) {
@@ -56,7 +57,7 @@ public class AndroidNotificationTimer extends TimerTask {
                 }
                 dao.create(e);
             } catch (RuntimeException | BusinessException | SQLException ex) {
-                log.error("[Evento: " + e.getId() + "]Error al notificar: ", ex);
+                log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
         }
     }
