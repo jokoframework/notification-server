@@ -43,8 +43,7 @@ public class NotificationBusiness {
         Aplicacion a = appDao.getByName(appName);
         if (a != null) {
             e.setAplicacion(a);
-            e.setEstadoAndroid("PENDIENTE");
-            e.setEstadoIos("PENDIENTE");
+            validate(e);
             eventoDao.create(e);
             return e;
         } else {
@@ -124,4 +123,10 @@ public class NotificationBusiness {
         return service.send(apiKey, notification);
     }
 
+    public void validate(Evento e) throws BusinessException {
+        String s = e.getDescripcion() + e.getPayload().asText();
+        if(s.getBytes().length > e.getAplicacion().getPayloadSize()){
+            throw new BusinessException(500, "El tamaño del payload supera el configurado para la aplicación: " + e.getAplicacion().getPayloadSize());
+        }
+    }
 }

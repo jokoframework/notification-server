@@ -90,7 +90,6 @@ public class Evento implements Serializable {
         this.descripcion = e.getDescripcion();
         this.prioridad = e.getPrioridad();
         this.setPayload(e.getPayload());
-
         if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 0) {
             this.estadoAndroid = "PENDIENTE";
         } else {
@@ -99,7 +98,7 @@ public class Evento implements Serializable {
         if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 0) {
             this.estadoIos = "PENDIENTE";
         } else {
-            this.estadoAndroid = "NO APLICA";
+            this.estadoIos = "NO APLICA";
         }
 
     }

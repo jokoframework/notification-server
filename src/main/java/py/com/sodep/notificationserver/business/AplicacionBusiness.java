@@ -14,6 +14,7 @@ import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 /**
  *
@@ -67,6 +68,12 @@ public class AplicacionBusiness {
                     throw new Exception("Error al guardar certificado de produccion: " + io.getMessage());
                 }
             }
+            if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
+                a.setPayloadSize(4096);
+            }
+            if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
+                a.setPayloadSize(2048);
+            }
 
             System.out.println("ALMACENANDO: " + a);
             a = applicationDao.create(a);
@@ -94,11 +101,14 @@ public class AplicacionBusiness {
         a.setKeyFileDev(b.getKeyFileDev());
         a.setKeyFileProd(b.getKeyFileProd());
         a.setNombre(b.getNombre());
-        System.out.println("Recibido " + b);
-
+        if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
+            a.setPayloadSize(4096);
+        }
+        if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
+            a.setPayloadSize(2048);
+        }
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
-        System.out.println("ALMACENANDO EN: " + base);
-
+        
         if (b.getCertificadoDevFile() != null) {
             String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
             writeFile(fileNameDev, b.getCertificadoDevFile());
@@ -108,6 +118,12 @@ public class AplicacionBusiness {
             String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
             writeFile(fileNameProd, b.getCertificadoProdFile());
             a.setCertificadoProd(fileNameProd);
+        }
+        if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
+            a.setPayloadSize(4096);
+        }
+        if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
+            a.setPayloadSize(2048);
         }
         System.out.println("CREANDO: " + a);
         applicationDao.create(a);

@@ -14,6 +14,7 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
  * @author Vanessa
  */
 public class EventoRequest {
+
     private Long id;
 
     private Aplicacion application;
@@ -30,21 +31,9 @@ public class EventoRequest {
 
     private String applicationName;
 
-
     public void setPayload(Object payload) {
         this.payload = (HashMap) payload;
     }
-
-/*    public ObjectNode getPayload() {
-        JsonNodeFactory factory = JsonNodeFactory.instance;
-        ObjectNode jn = new ObjectNode(factory);
-        HashMap<String, String> map = (HashMap<String, String>) this.payload;
-        for (String s : map.keySet()) {
-            jn.put(s, String.valueOf(map.get(s)));
-        }
-        System.out.println("ANDROID PAYLOAD: " + jn.toString());
-        return jn;
-    }*/
 
     public Long getId() {
         return id;
@@ -126,5 +115,4 @@ public class EventoRequest {
         this.applicationName = applicationName;
     }
 
-    
-}    
+}

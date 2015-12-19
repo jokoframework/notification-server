@@ -56,6 +56,11 @@ public class Aplicacion implements Serializable {
     @PartType("application/text")
     private String keyFileDev;
 
+    @Column(name = "payload_size")
+    @FormParam("payloadSize")
+    @PartType("application/text")
+    private Integer payloadSize;
+
     public Long getId() {
         return id;
     }
@@ -118,6 +123,14 @@ public class Aplicacion implements Serializable {
 
     public void setKeyFileDev(String keyFileDev) {
         this.keyFileDev = keyFileDev;
+    }
+
+    public Integer getPayloadSize() {
+        return payloadSize;
+    }
+
+    public void setPayloadSize(Integer payloadSize) {
+        this.payloadSize = payloadSize;
     }
 
     @Override
