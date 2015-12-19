@@ -14,8 +14,8 @@ import javax.servlet.annotation.WebListener;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import py.com.sodep.notificationserver.business.AndroidNotificationTimer;
-import py.com.sodep.notificationserver.business.IosNotificationTimer;
+import py.com.sodep.notificationserver.timers.AndroidNotificationTimer;
+import py.com.sodep.notificationserver.timers.IosNotificationTimer;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Parametro;
 

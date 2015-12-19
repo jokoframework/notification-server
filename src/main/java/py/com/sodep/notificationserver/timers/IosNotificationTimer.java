@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package py.com.sodep.notificationserver.business;
+package py.com.sodep.notificationserver.timers;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
+import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;

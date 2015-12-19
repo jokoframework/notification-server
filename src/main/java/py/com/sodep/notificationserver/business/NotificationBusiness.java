@@ -119,13 +119,13 @@ public class NotificationBusiness {
             logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
             notification.setRegistration_ids(evento.getAndroidDevicesList());
         }
-        notification.setData(evento.getObjectNodePayLoad());
+        notification.setData(evento.getObjectNodePayLoad().put("descripcion", evento.getDescripcion()));
         return service.send(apiKey, notification);
     }
 
     public void validate(Evento e) throws BusinessException {
         String s = e.getDescripcion() + e.getPayload().asText();
-        if(s.getBytes().length > e.getAplicacion().getPayloadSize()){
+        if (s.getBytes().length > e.getAplicacion().getPayloadSize()) {
             throw new BusinessException(500, "El tamaño del payload supera el configurado para la aplicación: " + e.getAplicacion().getPayloadSize());
         }
     }
