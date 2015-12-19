@@ -1,4 +1,4 @@
-package py.com.sodep.notificationserver.db.entities.notification;
+package py.com.sodep.notificationserver.db.entities;
 
 /**
  * Created by gaby.lorely on 19/04/2015.

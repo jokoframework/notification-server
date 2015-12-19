@@ -15,8 +15,8 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
-import py.com.sodep.notificationserver.db.entities.notification.IosResponse;
-import py.com.sodep.notificationserver.db.entities.notification.Result;
+import py.com.sodep.notificationserver.db.entities.IosResponse;
+import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 public class ApnsFacade {

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package py.com.sodep.notificationserver.db.entities.notification;
+package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -109,5 +109,11 @@ public class IosResponse implements Serializable {
     public void setError(String error) {
         this.error = error;
     }
+
+    @Override
+    public String toString() {
+        return "IosResponse{" + "multicast_id=" + multicast_id + ", success=" + success + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + ", error=" + error + '}';
+    }
+    
 
 }

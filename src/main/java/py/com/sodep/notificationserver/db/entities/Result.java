@@ -1,4 +1,4 @@
-package py.com.sodep.notificationserver.db.entities.notification;
+package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;

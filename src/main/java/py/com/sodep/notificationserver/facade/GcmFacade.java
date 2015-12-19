@@ -13,9 +13,8 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
-import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
-import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
-import py.com.sodep.notificationserver.db.entities.notification.Result;
+import py.com.sodep.notificationserver.db.entities.AndroidNotification;
+import py.com.sodep.notificationserver.db.entities.AndroidResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.util.Parametro;
 
@@ -61,6 +60,7 @@ public class GcmFacade {
                         + response.getStatus());
             }
             AndroidResponse r = response.readEntity(AndroidResponse.class);
+            log.info("[Android/Response]: " + r);
             return r;
         } catch (JsonProcessingException ex) {
             log.error(ex);

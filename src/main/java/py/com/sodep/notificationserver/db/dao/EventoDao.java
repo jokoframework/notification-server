@@ -15,13 +15,22 @@ import py.com.sodep.notificationserver.db.entities.Evento;
  */
 public class EventoDao extends BaseDAO<Evento, Long> {
 
-    public List<Evento> getPendientes() {
+    public List<Evento> getPendientesAndroid() {
         getSession().beginTransaction();
         List<Evento> eventos = getSession()
                 .createCriteria(Evento.class)
-                .add(Restrictions.like("estado", "PENDIENTE")).list();
+                .add(Restrictions.like("estadoAndroid", "PENDIENTE")).list();
+        System.out.println("[EventoDao] Eventos ANDROID: " + eventos.size());
         getSession().getTransaction().commit();
         return eventos;
     }
-
+    public List<Evento> getPendientesIos() {
+        getSession().beginTransaction();
+        List<Evento> eventos = getSession()
+                .createCriteria(Evento.class)
+                .add(Restrictions.like("estadoIos", "PENDIENTE")).list();
+        System.out.println("[EventoDao] Eventos IOS: " + eventos.size());
+        getSession().getTransaction().commit();
+        return eventos;
+    }
 }

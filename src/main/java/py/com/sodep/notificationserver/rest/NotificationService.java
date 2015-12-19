@@ -17,6 +17,8 @@ import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.rest.entities.EventoRequest;
+import py.com.sodep.notificationserver.rest.entities.EventoResponse;
 
 @Path("/evento")
 @RequestScoped
@@ -30,12 +32,11 @@ public class NotificationService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newNotification(Evento evento) throws BusinessException, HibernateException, SQLException {
+    public Response newNotification(EventoRequest evento) throws BusinessException, HibernateException, SQLException {
         logger.info("Evento " + evento.getApplicationName());
-        evento = business.crearEvento(evento);
-        business.notificar(evento);
-        return Response.ok().entity(evento).build();
-
+        Evento e = new Evento(evento);
+        e = business.crearEvento(e, evento.getApplicationName());
+        return Response.ok().entity(new EventoResponse(e)).build();
     }
 
     @GET
