@@ -5,13 +5,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.IOException;
+import com.google.gson.Gson;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.CascadeType;
@@ -24,9 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
-import py.com.sodep.notificationserver.db.entities.notification.IosResponse;
+import py.com.sodep.notificationserver.rest.entities.EventoRequest;
 
 @Entity
 @Table
@@ -42,7 +39,7 @@ public class Evento implements Serializable {
     @ManyToOne
     @JoinColumn(name = "aplicacion_id")
     @JsonIgnore
-    private Aplicacion application;
+    private Aplicacion aplicacion;
 
     @Column(name = "android_devices", length = 10240)
     @JsonIgnore
@@ -53,10 +50,13 @@ public class Evento implements Serializable {
     private String iosDevices;
 
     private boolean sendToSync;
-    private String estado;
     private boolean productionMode;
     private String descripcion;
     private String prioridad;
+    @Column(name = "estado_android")
+    private String estadoAndroid;
+    @Column(name = "estado_ios")
+    private String estadoIos;
 
     @OneToMany(targetEntity = Payload.class, //fetch = FetchType.EAGER,
             mappedBy = "evento", cascade = CascadeType.ALL)
@@ -70,21 +70,38 @@ public class Evento implements Serializable {
     @JoinColumn(name = "ios_response_id")
     private IosResponse iosResponse;
 
-    @Transient
-    private HashMap<String, String> payload;
-
-    @Transient
-    @Column(length = 1)
-    private List<String> androidDevicesList;
-
-    @Transient
-    @Column(length = 1)
-    private List<String> iosDevicesList;
-
-    @Transient
-    private String applicationName;
-
     public Evento() {
+    }
+
+    public Evento(EventoRequest e) {
+        try {
+            this.androidDevices = new ObjectMapper().writeValueAsString(e.getAndroidDevicesList());
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            this.iosDevices = new ObjectMapper().writeValueAsString(e.getIosDevicesList());
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.sendToSync = e.isSendToSync();
+        this.productionMode = e.isProductionMode();
+        this.descripcion = e.getDescripcion();
+        this.prioridad = e.getPrioridad();
+        this.setPayload(e.getPayload());
+
+        if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 0) {
+            this.estadoAndroid = "PENDIENTE";
+        } else {
+            this.estadoAndroid = "NO APLICA";
+        }
+        if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 0) {
+            this.estadoIos = "PENDIENTE";
+        } else {
+            this.estadoAndroid = "NO APLICA";
+        }
+
     }
 
     public Long getId() {
@@ -95,12 +112,12 @@ public class Evento implements Serializable {
         this.id = id;
     }
 
-    public Aplicacion getApplication() {
-        return application;
+    public Aplicacion getAplicacion() {
+        return aplicacion;
     }
 
-    public void setApplication(Aplicacion application) {
-        this.application = application;
+    public void setAplicacion(Aplicacion aplicacion) {
+        this.aplicacion = aplicacion;
     }
 
     public String getAndroidDevices() {
@@ -127,12 +144,20 @@ public class Evento implements Serializable {
         this.sendToSync = sendToSync;
     }
 
-    public String getEstado() {
-        return estado;
+    public String getEstadoAndroid() {
+        return estadoAndroid;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setEstadoAndroid(String estadoAndroid) {
+        this.estadoAndroid = estadoAndroid;
+    }
+
+    public String getEstadoIos() {
+        return estadoIos;
+    }
+
+    public void setEstadoIos(String estadoIos) {
+        this.estadoIos = estadoIos;
     }
 
     public boolean isProductionMode() {
@@ -144,83 +169,26 @@ public class Evento implements Serializable {
     }
 
     public void setPayload(Object payload) {
-        this.payload = (HashMap) payload;
-        ArrayList<Payload> payloads = new ArrayList();
-        if (this.payload != null) {
-            for (Entry<String, String> e : this.payload.entrySet()) {
+        HashMap<String, String> pl = (HashMap<String, String>) payload;
+        this.payloads = new ArrayList();
+        if (pl != null) {
+            for (Entry<String, String> e : pl.entrySet()) {
                 Payload p = new Payload(e.getKey(), e.getValue());
                 p.setEvento(this);
                 payloads.add(p);
             }
         }
-        this.payloads = payloads;
-        System.out.println("PAYLOAD STRING: " + this.payload.toString());
+        System.out.println("PAYLOAD STRING: " + this.payloads.toString());
     }
 
     public ObjectNode getPayload() {
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode jn = new ObjectNode(factory);
-        HashMap<String, String> map = (HashMap<String, String>) this.payload;
-        for (String s : map.keySet()) {
-            jn.put(s, String.valueOf(map.get(s)));
+        for (Payload s : this.payloads) {
+            jn.put(s.getClave(), s.getValor());
         }
         System.out.println("ANDROID PAYLOAD: " + jn.toString());
         return jn;
-    }
-
-    public List<String> getAndroidDevicesList() {
-        //to-do: parsear lista de registration ids en el string de androidDevices
-        if (androidDevicesList == null || androidDevicesList.size() == 0) {
-            ObjectMapper ob = new ObjectMapper();
-            try {
-                androidDevicesList
-                        = ob.readValue(androidDevices, ob.getTypeFactory().constructCollectionType(List.class, String.class));
-            } catch (IOException ex) {
-                Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-        return androidDevicesList;
-    }
-
-    public void setAndroidDevicesList(List<String> androidDevicesList) {
-        this.androidDevicesList = androidDevicesList;
-        try {
-            this.androidDevices = new ObjectMapper().writeValueAsString(this.androidDevicesList);
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public List<String> getIosDevicesList() {
-        if ((iosDevicesList == null || iosDevicesList.size() == 0) && iosDevices!=null) {
-            ObjectMapper ob = new ObjectMapper();
-            try {
-                iosDevicesList
-                        = ob.readValue(iosDevices, ob.getTypeFactory().constructCollectionType(List.class, String.class));
-            } catch (IOException ex) {
-                Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-        return iosDevicesList;
-    }
-
-    public void setIosDevicesList(List<String> iosDevicesList) {
-        this.iosDevicesList = iosDevicesList;
-        try {
-            this.iosDevices = new ObjectMapper().writeValueAsString(this.iosDevicesList);
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
     }
 
     public String getDescripcion() {
@@ -268,10 +236,13 @@ public class Evento implements Serializable {
         return jn;
     }
 
-    @Override
-    public String toString() {
-        return "Evento{" + "id=" + id + ", application=" + application + ", androidDevices=" + androidDevices + ", iosDevices=" + iosDevices + ", sendToSync=" + sendToSync + ", estado=" + estado + ", productionMode=" + productionMode + ", descripcion=" + descripcion + ", prioridad=" + prioridad + ", payloads=" + payloads + ", androidResponse=" + androidResponse + ", iosResponse=" + iosResponse + ", payload=" + payload + ", androidDevicesList=" + androidDevicesList + ", iosDevicesList=" + iosDevicesList + ", applicationName=" + applicationName + '}';
+    @JsonIgnore
+    public List<String> getIosDevicesList() {
+        return (new Gson()).fromJson(iosDevices, List.class);
     }
-    
-    
+
+    @JsonIgnore
+    public List<String> getAndroidDevicesList() {
+        return (new Gson()).fromJson(androidDevices, List.class);
+    }
 }

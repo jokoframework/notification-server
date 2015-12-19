@@ -14,20 +14,33 @@ import javax.servlet.annotation.WebListener;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import py.com.sodep.notificationserver.business.NotificationTimer;
+import py.com.sodep.notificationserver.business.AndroidNotificationTimer;
+import py.com.sodep.notificationserver.business.IosNotificationTimer;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Parametro;
 
 @WebListener
 @ApplicationScoped
-public class HibernateSessionFactoryListener implements ServletContextListener {
+public class InitApplicationListener implements ServletContextListener {
+
     @Inject
     Logger log;
+
     @Inject
-    NotificationTimer notTimer;
+    AndroidNotificationTimer androidTask;
+
+    @Inject
+    IosNotificationTimer iosTask;
+
+    @Inject
+    Timer androidTimer;
+
+    @Inject
+    Timer iosTimer;
+
     @Inject
     ParametroDao pdao;
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
@@ -49,14 +62,22 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
         HibernateSessionLocal.sessionFactory = sessionFactory;
         log.info("Hibernate SessionFactory Configured successfully");
         log.info("Released Hibernate sessionFactory resource");
-        
+
         try {
             log.info("Creando Parametro: PATH_CERTIFICADOS");
             pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
+
             log.info("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
+
             log.info("Creando Parametro: IOS_THREADS");
             pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
+
+            log.info("Creando Parametro: IOS_TIMER");
+            pdao.save(new Parametro("IOS_TIMER", "60", "Integer"));
+
+            log.info("Creando Parametro: ANDROID_TIMER");
+            pdao.save(new Parametro("ANDROID_TIMER", "50", "Integer"));
 
         } catch (Exception ex) {
             log.error("Error al crear los parámetros: " + ex.getMessage());
@@ -67,8 +88,8 @@ public class HibernateSessionFactoryListener implements ServletContextListener {
     }
 
     public void initializeTimer(int seconds) {
-        Timer timer = new Timer();
-        timer.schedule(notTimer,1000, seconds*1000);
+        androidTimer.schedule(androidTask, 1000, Integer.valueOf(pdao.getByName("ANDROID_TIMER").getValor()) * 1000);
+        iosTimer.schedule(iosTask, 1000, Integer.valueOf(pdao.getByName("IOS_TIMER").getValor()) * 1000);
     }
 
 }

@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package py.com.sodep.notificationserver.db.entities.notification;
+package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,21 +16,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.GeneratorType;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
- *
- * @author Vanessa
+ * Json de respuesta de GCM Created by gaby.lorely on 17/05/2015.
  */
 @Entity
-@Table(name = "ios_response")
+@Table(name = "android_response")
 @JsonAutoDetect
-public class IosResponse implements Serializable {
-
-    @JsonProperty("id")
+public class AndroidResponse implements Serializable {
     @Id
-    @GeneratedValue
-    @Column(name = "id")
+    @GeneratedValue   
+    Long id;
+    
+    @JsonProperty("multicast_id")
+    @Column(name = "multicast_id")
     Long multicast_id;
     @JsonProperty("success")
     int success;
@@ -42,17 +39,26 @@ public class IosResponse implements Serializable {
     int failure;
     @JsonProperty("canonical_ids")
     Integer canonical_ids;
-
+    
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "evento_id")
     @JsonIgnore
     private Evento evento;
-
+    
     @OneToMany(targetEntity = Result.class, fetch = FetchType.EAGER,
-            mappedBy = "iosResponse", cascade = CascadeType.ALL)
+            mappedBy = "androidResponse", cascade = CascadeType.ALL)
     List<Result> results;
 
-    String error;
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void setResults(List<Result> results) {
+        for (Result r: results){
+            r.setAndroidResponse(this);
+        }
+        this.results = results;
+    }
 
     public Long getMulticast_id() {
         return multicast_id;
@@ -82,10 +88,6 @@ public class IosResponse implements Serializable {
         return canonical_ids;
     }
 
-    public void setCanonical_ids(Integer canonical_ids) {
-        this.canonical_ids = canonical_ids;
-    }
-
     public Evento getEvento() {
         return evento;
     }
@@ -94,26 +96,24 @@ public class IosResponse implements Serializable {
         this.evento = evento;
     }
 
-    public List<Result> getResults() {
-        return results;
+    public void setCanonical_ids(Integer canonical_ids) {
+        this.canonical_ids = canonical_ids;
     }
 
-    public void setResults(List<Result> results) {
-        this.results = results;
+    public Long getId() {
+        return id;
     }
 
-    public String getError() {
-        return error;
+    public void setId(Long id) {
+        this.id = id;
     }
-
-    public void setError(String error) {
-        this.error = error;
-    }
+    
+    
 
     @Override
     public String toString() {
-        return "IosResponse{" + "multicast_id=" + multicast_id + ", success=" + success + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + ", error=" + error + '}';
+        return "AndroidResponse{" + "multicast_id=" + multicast_id + ", success=" + success 
+                + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + '}';
     }
-    
 
 }

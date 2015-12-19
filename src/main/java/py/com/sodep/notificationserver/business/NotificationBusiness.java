@@ -9,16 +9,15 @@ import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
-import py.com.sodep.notificationserver.db.entities.notification.AndroidNotification;
-import py.com.sodep.notificationserver.db.entities.notification.AndroidResponse;
-import py.com.sodep.notificationserver.db.entities.notification.IosResponse;
+import py.com.sodep.notificationserver.db.entities.AndroidNotification;
+import py.com.sodep.notificationserver.db.entities.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
@@ -40,16 +39,16 @@ public class NotificationBusiness {
     @Inject
     Logger logger;
 
-    public Evento crearEvento(Evento e) throws BusinessException, HibernateException, SQLException {
-        Aplicacion a = appDao.getByName(e.getApplicationName());
+    public Evento crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
+        Aplicacion a = appDao.getByName(appName);
         if (a != null) {
-            e.setApplication(a);
-            e.setEstado("PENDIENTE");
-
+            e.setAplicacion(a);
+            e.setEstadoAndroid("PENDIENTE");
+            e.setEstadoIos("PENDIENTE");
             eventoDao.create(e);
             return e;
         } else {
-            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getApplicationName() + " no existe.");
+            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + appName + " no existe.");
         }
     }
 
@@ -59,7 +58,7 @@ public class NotificationBusiness {
     }
 
     public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException {
-        Aplicacion app = appDao.getByName(e.getApplication().getNombre());
+        Aplicacion app = appDao.getByName(e.getAplicacion().getNombre());
         if (app != null) {
             if (e.isProductionMode()) {
                 if (app.getApiKeyProd() != null) {
@@ -77,14 +76,15 @@ public class NotificationBusiness {
                 }
             }
         } else {
-            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getApplicationName() + " no existe.");
+            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
         }
-        e.setEstado("ENVIADO");
+        e.setEstadoAndroid("ENVIADO");
+        e.setEstadoIos("ENVIADO");
         return e;
     }
 
     @SuppressWarnings("rawtypes")
-    private IosResponse notificarIos(String certifadoPath, String keyFile,
+    public IosResponse notificarIos(String certifadoPath, String keyFile,
             Evento evento, Boolean productionMode) throws BusinessException, HibernateException, SQLException {
         logger.info("[Evento: " + evento.getId() + "]: Notificando iOs");
         File certificado = new File(certifadoPath);
@@ -110,7 +110,7 @@ public class NotificationBusiness {
 
     }
 
-    private AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException {
+    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException {
 
         logger.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {

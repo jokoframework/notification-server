@@ -12,3 +12,4 @@ bin/
 /target
 nb-configuration.xml
 notification-server.log
+nbactions.xml
