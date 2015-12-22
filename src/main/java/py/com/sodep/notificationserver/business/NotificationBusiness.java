@@ -1,10 +1,8 @@
 package py.com.sodep.notificationserver.business;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Iterator;
 import javapns.json.JSONException;
@@ -14,12 +12,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
+import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
@@ -38,6 +39,8 @@ public class NotificationBusiness {
     AndroidNotification notification;
     @Inject
     EventoDao eventoDao;
+    @Inject
+    DeviceRegistrationDao deviceDao;
     @Inject
     Logger logger;
 
@@ -58,7 +61,7 @@ public class NotificationBusiness {
         return e;
     }
 
-    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException {
+    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException, Exception {
         Aplicacion app = appDao.getByName(e.getAplicacion().getNombre());
         if (app != null) {
             if (e.isProductionMode()) {
@@ -117,7 +120,7 @@ public class NotificationBusiness {
 
     }
 
-    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException {
+    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException, Exception {
 
         logger.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
@@ -129,13 +132,48 @@ public class NotificationBusiness {
         }
 
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
-        return service.send(apiKey, notification);
+
+        AndroidResponse ar = service.send(apiKey, notification);
+
+        if (ar.getFailure() > 0) {
+            for (int i = 0; i < ar.getResults().size(); i++) {
+                Result r = ar.getResults().get(i);
+                logger.info("Analizando resultado: " + r);
+                if (r.getError() != null && (r.getError().equals("NotRegistered")
+                        || r.getError().equals("DeviceMessageRate")
+                        || r.getError().equals("InvalidRegistration")
+                        || r.getError().equals("MissingRegistration"))) {
+                    DeviceRegistration d = new DeviceRegistration(
+                            evento.getAndroidDevicesList().get(i), r.getRegistration_id(),
+                            "NUEVO", r.getError(), evento.getAplicacion());
+                    deviceDao.create(d);
+                }
+                if (r.getError() != null && (r.getError().equals("InvalidPackageName")
+                        || r.getError().equals("MismatchSenderId"))) {
+                    logger.info("Se bloquea la aplicación: " + r.getError());
+                    Aplicacion a = evento.getAplicacion();
+                    a.setError(r.getError());
+                    a.setEstado("BLOQUEADA");
+                    appDao.create(a);
+                }
+            }
+        }
+        return ar;
     }
 
     public void validate(Evento e) throws BusinessException {
         String s = e.getAlert() + e.getPayload().asText();
         if (s.getBytes().length > e.getAplicacion().getPayloadSize()) {
-            throw new BusinessException(500, "El tamaño del payload supera el configurado para la aplicación: " + e.getAplicacion().getPayloadSize());
+            throw new BusinessException(500, "El tamaño del payload supera el "
+                    + "configurado para la aplicación: "
+                    + e.getAplicacion().getPayloadSize());
+        }
+        if (e.getAplicacion().getEstado() != null
+                && e.getAplicacion().getEstado().equals("BLOQUEADA")) {
+            throw new BusinessException(
+                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    "La aplicacion " + e.getAplicacion().getNombre()
+                    + " esta bloqueada. Error: " + e.getAplicacion().getError());
         }
     }
 }

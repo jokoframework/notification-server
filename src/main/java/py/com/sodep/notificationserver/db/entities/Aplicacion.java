@@ -61,6 +61,9 @@ public class Aplicacion implements Serializable {
     @PartType("application/text")
     private Integer payloadSize;
 
+    private String error;
+    private String estado;
+
     public Long getId() {
         return id;
     }
@@ -131,6 +134,22 @@ public class Aplicacion implements Serializable {
 
     public void setPayloadSize(Integer payloadSize) {
         this.payloadSize = payloadSize;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     @Override

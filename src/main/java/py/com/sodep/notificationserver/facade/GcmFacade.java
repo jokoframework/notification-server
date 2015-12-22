@@ -12,9 +12,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
+import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.util.Parametro;
 
@@ -41,7 +44,10 @@ public class GcmFacade {
     @Inject
     EventoDao eventoDao;
 
-    public AndroidResponse send(String apiKey, AndroidNotification notification) throws BusinessException {
+    @Inject
+    DeviceRegistrationDao deviceDao;
+
+    public AndroidResponse send(String apiKey, AndroidNotification notification) throws BusinessException, Exception {
         log.info("API KEY: " + apiKey);
         Client client = ClientBuilder.newBuilder().build();
         WebTarget target = client.target(Parametro.URL_GCM);
@@ -56,7 +62,8 @@ public class GcmFacade {
             if (response.getStatus() != 200) {
                 log.info("Error en la respuesta : HTTP error code :" + response.getStatus());
                 log.info(response.getStringHeaders().toString());
-                throw new RuntimeException("Error en la respuesta : HTTP error code : "
+                log.info(response.toString());
+                throw new BusinessException(response.getStatus(), "Error en la respuesta : HTTP error code : "
                         + response.getStatus());
             }
             AndroidResponse r = response.readEntity(AndroidResponse.class);

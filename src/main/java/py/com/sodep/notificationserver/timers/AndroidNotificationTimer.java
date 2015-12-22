@@ -11,11 +11,13 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.business.NotificationBusiness;
+import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 
 /**
  *
@@ -29,6 +31,8 @@ public class AndroidNotificationTimer extends TimerTask {
     @Inject
     EventoDao dao;
     @Inject
+    AplicacionDao appDao;
+    @Inject
     Logger log;
 
     @Override
@@ -37,8 +41,9 @@ public class AndroidNotificationTimer extends TimerTask {
         log.info("[ANDROID]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
             log.info("[ANDROID]: Notificando evento: " + e);
-            try {
-                if (e.getAplicacion() != null) {
+            if ((e.getAplicacion().getEstado() != null && !e.getAplicacion().getEstado().equals("BLOQUEADA"))
+                    || e.getAplicacion().getEstado() == null) {
+                try {
                     if (e.isProductionMode()) {
                         if (e.getAplicacion().getApiKeyProd() != null) {
                             e.setAndroidResponse(business.notificarAndroid(e.getAplicacion().getApiKeyProd(), e));
@@ -48,18 +53,41 @@ public class AndroidNotificationTimer extends TimerTask {
                             e.setAndroidResponse(business.notificarAndroid(e.getAplicacion().getApiKeyDev(), e));
                         }
                     }
-                } else {
-                    throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+
+                    if (e.getAndroidResponse().getSuccess() > 0) {
+                        e.setEstadoAndroid("ENVIADO");
+                    } else {
+                        e.setEstadoAndroid("ERROR");
+
+                    }
+                    dao.create(e);
+                } catch (BusinessException ex) {
+                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
+                    if (ex.getError().getCodigo().equals("401")) {
+                        Aplicacion a = e.getAplicacion();
+                        a.setError(ex.getError().getCodigo());
+                        a.setEstado("BLOQUEADA");
+                        try {
+                            appDao.create(a);
+                        } catch (HibernateException | SQLException ex1) {
+                            log.error("[ANDROID][Evento: " + e.getId() + "]Error al bloquear aplicacion: ", ex1);
+                        }
+                    }
+                } catch (RuntimeException | SQLException ex) {
+                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
+                } catch (Exception ex) {
+                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
                 }
-                if (e.getAndroidResponse().getSuccess() > 0) {
-                    e.setEstadoAndroid("ENVIADO");
-                } else {
-                    e.setEstadoAndroid("ERROR");
+            } else {
+                try {
+                    log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
+                    e.setEstadoAndroid("SUSPENDIDO");
+                    dao.create(e);
+                } catch (HibernateException | SQLException ex) {
+                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);
                 }
-                dao.create(e);
-            } catch (RuntimeException | BusinessException | SQLException ex) {
-                log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
+            log.info("Siguiente evento...");
         }
     }
 }
