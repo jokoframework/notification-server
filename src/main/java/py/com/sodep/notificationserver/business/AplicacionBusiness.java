@@ -77,7 +77,6 @@ public class AplicacionBusiness {
             System.out.println("ALMACENANDO: " + a);
             a = applicationDao.create(a);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new Exception("Error al crear aplicación, " + e.getMessage());
         }
         return a;
@@ -143,10 +142,10 @@ public class AplicacionBusiness {
         }
     }
 
-    public Aplicacion getApplication(String id) throws Exception {
+    public Aplicacion getApplication(Long id) throws Exception {
         System.out.println("Recibido " + id);
         //AplicacionDao applicationDao = new AplicacionDao();
-        Object a = applicationDao.findById(Long.valueOf(id), Aplicacion.class);
+        Object a = applicationDao.findById(id, Aplicacion.class);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
     }
@@ -157,5 +156,19 @@ public class AplicacionBusiness {
         Object a = applicationDao.getByName(nombre);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
+    }
+    
+    public Aplicacion habilitarAplicacion(Long id) throws Exception{
+        Aplicacion a = getApplication(id);
+        a.setEstadoAndroid("HABILITADA");
+        a.setError(null);
+        applicationDao.create(a);
+        return a;
+    }
+    
+    public Aplicacion eliminarAplicacion(Long id) throws Exception{
+        Aplicacion a = getApplication(id);
+        applicationDao.delete(a);
+        return a;
     }
 }
