@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class AndroidNotification {
     private Object data;
 
     @OneToOne(mappedBy = "androidResponse")
+    @JsonIgnore
     private Evento evento;
 
     public Object getData() {

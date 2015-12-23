@@ -53,7 +53,7 @@ public class GcmFacade {
         WebTarget target = client.target(Parametro.URL_GCM);
         Invocation.Builder builder = target.request().accept(MediaType.APPLICATION_JSON);
         builder.header(HttpHeaders.AUTHORIZATION, "key=" + apiKey);
-
+        AndroidResponse r = null;
         try {
             //map = new ObjectMapper();
             String jsonInString = map.writeValueAsString(notification);
@@ -66,12 +66,12 @@ public class GcmFacade {
                 throw new BusinessException(response.getStatus(), "Error en la respuesta : HTTP error code : "
                         + response.getStatus());
             }
-            AndroidResponse r = response.readEntity(AndroidResponse.class);
+            r = response.readEntity(AndroidResponse.class);
             log.info("[Android/Response]: " + r);
             return r;
-        } catch (JsonProcessingException ex) {
-            log.error(ex);
-            throw new BusinessException(500, ex);
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
         } finally {
         }
     }

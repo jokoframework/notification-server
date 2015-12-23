@@ -8,12 +8,15 @@ package py.com.sodep.notificationserver.business;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
+import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 
 /**
  *
@@ -23,6 +26,9 @@ public class AplicacionBusiness {
 
     @Inject
     AplicacionDao applicationDao;
+    
+    @Inject
+    DeviceRegistrationDao deviceDao;
 
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
         System.out.println("Recibido " + nuevo);
@@ -182,5 +188,12 @@ public class AplicacionBusiness {
         Aplicacion a = getApplication(id);
         applicationDao.delete(a);
         return a;
+    }
+    
+    public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws Exception{
+        Aplicacion a = getApplication(id);
+        List<DeviceRegistration> nuevos = deviceDao.getPendientes(a);
+        deviceDao.setEstado("CONSULTADO", nuevos);
+        return nuevos;
     }
 }

@@ -36,6 +36,7 @@ public class DeviceRegistration implements Serializable {
     
     String estado;
     String error;
+    String accion;
     
     @ManyToOne
     @JoinColumn(name = "aplicacion_id")
@@ -45,12 +46,14 @@ public class DeviceRegistration implements Serializable {
     public DeviceRegistration() {
     }
 
-    public DeviceRegistration(String registrationId, String cannonicalId, String estado, String error, Aplicacion aplicacion) {
+    public DeviceRegistration(String registrationId, String cannonicalId, 
+            String estado, String error, Aplicacion aplicacion, String accion) {
         this.registrationId = registrationId;
         this.cannonicalId = cannonicalId;
         this.error = error;
         this.aplicacion = aplicacion;
         this.estado = estado;
+        this.accion = accion;
     }
 
     public Long getId() {
@@ -100,5 +103,13 @@ public class DeviceRegistration implements Serializable {
     public void setAplicacion(Aplicacion aplicacion) {
         this.aplicacion = aplicacion;
     }  
+
+    public String getAccion() {
+        return accion;
+    }
+
+    public void setAccion(String accion) {
+        this.accion = accion;
+    }
     
 }

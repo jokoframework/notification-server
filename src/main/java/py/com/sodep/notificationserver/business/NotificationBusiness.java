@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
@@ -142,15 +143,29 @@ public class NotificationBusiness {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
                 logger.info("Analizando resultado: " + r);
-                if (r.getError() != null && (r.getError().equals("NotRegistered")
-                        || r.getError().equals("DeviceMessageRate")
-                        || r.getError().equals("InvalidRegistration")
-                        || r.getError().equals("MissingRegistration"))) {
+                if (r.getError() != null 
+                        && (r.getError().equals("NotRegistered"))) {
                     DeviceRegistration d = new DeviceRegistration(
-                            evento.getAndroidDevicesList().get(i), r.getRegistrationId(),
-                            "NUEVO", r.getError(), evento.getAplicacion());
+                            evento.getAndroidDevicesList().get(i), 
+                            r.getRegistrationId(),
+                            "NUEVO", 
+                            r.getError(), 
+                            evento.getAplicacion(), 
+                            "ELIMINAR");
                     deviceDao.create(d);
                 }
+                if (r.getError() != null
+                        && (r.getError().equals("InvalidRegistration")
+                        || r.getError().equals("MissingRegistration"))) {
+                    DeviceRegistration d = new DeviceRegistration(
+                            evento.getAndroidDevicesList().get(i),
+                            r.getRegistrationId(),
+                            "NUEVO", r.getError(),
+                            evento.getAplicacion(),
+                            "CAMBIAR");
+                    deviceDao.create(d);
+                }
+
                 if (r.getError() != null && (r.getError().equals("InvalidPackageName")
                         || r.getError().equals("MismatchSenderId"))) {
                     logger.info("Se bloquea la aplicación: " + r.getError());
@@ -171,10 +186,10 @@ public class NotificationBusiness {
                     + "configurado para la aplicación: "
                     + e.getAplicacion().getPayloadSize());
         }
-        if(e.getAndroidDevicesList()!=null && e.getAndroidDevicesList().size() > 1000){
+        if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 1000) {
             throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
         }
-        if(e.getIosDevicesList()!=null && e.getIosDevicesList().size() > 1000){
+        if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 1000) {
             throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
         }
     }
