@@ -41,8 +41,8 @@ public class AndroidNotificationTimer extends TimerTask {
         log.info("[ANDROID]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
             log.info("[ANDROID]: Notificando evento: " + e);
-            if ((e.getAplicacion().getEstado() != null && !e.getAplicacion().getEstado().equals("BLOQUEADA"))
-                    || e.getAplicacion().getEstado() == null) {
+            if ((e.getAplicacion().getEstadoAndroid() != null && !e.getAplicacion().getEstadoAndroid().equals("BLOQUEADA"))
+                    || e.getAplicacion().getEstadoAndroid() == null) {
                 try {
                     if (e.isProductionMode()) {
                         if (e.getAplicacion().getApiKeyProd() != null) {
@@ -66,7 +66,7 @@ public class AndroidNotificationTimer extends TimerTask {
                     if (ex.getError().getCodigo().equals("401")) {
                         Aplicacion a = e.getAplicacion();
                         a.setError(ex.getError().getCodigo());
-                        a.setEstado("BLOQUEADA");
+                        a.setEstadoAndroid("BLOQUEADA");
                         try {
                             appDao.create(a);
                         } catch (HibernateException | SQLException ex1) {

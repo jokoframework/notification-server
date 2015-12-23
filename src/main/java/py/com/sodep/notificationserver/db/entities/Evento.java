@@ -69,6 +69,7 @@ public class Evento implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ios_response_id")
     private IosResponse iosResponse;
+    
 
     public Evento() {
     }

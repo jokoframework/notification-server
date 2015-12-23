@@ -36,8 +36,8 @@ public class NotificationService {
     public Response newNotification(EventoRequest evento) throws JsonParseException, BusinessException, HibernateException, SQLException {
         logger.info("Evento " + evento.getApplicationName());
         Evento e = new Evento(evento);
-        e = business.crearEvento(e, evento.getApplicationName());
-        return Response.ok().entity(new EventoResponse(e)).build();
+        EventoResponse ex = business.crearEvento(e, evento.getApplicationName());
+        return Response.ok().entity(ex).build();
     }
 
     @GET
