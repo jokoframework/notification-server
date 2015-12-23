@@ -52,7 +52,7 @@ public class NotificationBusiness {
             validate(e);
             eventoDao.create(e);
             EventoResponse er = new EventoResponse(e);
-            //verificarNotificacionBloqueada(e);
+            verificarNotificacionBloqueada(e);
             return er;
         } else {
             throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + appName + " no existe.");
