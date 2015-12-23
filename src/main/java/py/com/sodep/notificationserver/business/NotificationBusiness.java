@@ -25,6 +25,7 @@ import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
+import py.com.sodep.notificationserver.rest.entities.EventoResponse;
 
 @ApplicationScoped
 public class NotificationBusiness {
@@ -44,13 +45,15 @@ public class NotificationBusiness {
     @Inject
     Logger logger;
 
-    public Evento crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
+    public EventoResponse crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
         Aplicacion a = appDao.getByName(appName);
         if (a != null) {
             e.setAplicacion(a);
             validate(e);
             eventoDao.create(e);
-            return e;
+            EventoResponse er = new EventoResponse(e);
+            //verificarNotificacionBloqueada(e);
+            return er;
         } else {
             throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + appName + " no existe.");
         }
@@ -153,7 +156,7 @@ public class NotificationBusiness {
                     logger.info("Se bloquea la aplicación: " + r.getError());
                     Aplicacion a = evento.getAplicacion();
                     a.setError(r.getError());
-                    a.setEstado("BLOQUEADA");
+                    a.setEstadoAndroid("BLOQUEADA");
                     appDao.create(a);
                 }
             }
@@ -168,12 +171,27 @@ public class NotificationBusiness {
                     + "configurado para la aplicación: "
                     + e.getAplicacion().getPayloadSize());
         }
-        if (e.getAplicacion().getEstado() != null
-                && e.getAplicacion().getEstado().equals("BLOQUEADA")) {
+    }
+
+    public void verificarNotificacionBloqueada(Evento e) throws BusinessException {
+        if (e.getAplicacion().getEstadoAndroid() != null
+                && e.getAplicacion().getEstadoAndroid().equals("BLOQUEADA")
+                && (e.getAndroidDevicesList() != null
+                && e.getAndroidDevicesList().size() > 0)) {
             throw new BusinessException(
                     ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
                     "La aplicacion " + e.getAplicacion().getNombre()
-                    + " esta bloqueada. Error: " + e.getAplicacion().getError());
+                    + " esta bloqueada para notificaciones Android. Error: " + e.getAplicacion().getError());
         }
+        if (e.getAplicacion().getEstadoIos() != null
+                && e.getAplicacion().getEstadoIos().equals("BLOQUEADA")
+                && (e.getIosDevicesList() != null
+                && e.getIosDevicesList().size() > 0)) {
+            throw new BusinessException(
+                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    "La aplicacion " + e.getAplicacion().getNombre()
+                    + " esta bloqueada para notificaciones iOs. Error: " + e.getAplicacion().getError());
+        }
+
     }
 }
