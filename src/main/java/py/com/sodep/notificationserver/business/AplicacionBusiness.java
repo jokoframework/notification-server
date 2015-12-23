@@ -39,7 +39,8 @@ public class AplicacionBusiness {
         a.setApiKeyProd(nuevo.getApiKeyProd());
         a.setKeyFileDev(nuevo.getKeyFileDev());
         a.setKeyFileProd(nuevo.getKeyFileProd());
-
+        a.setEstadoAndroid(nuevo.getEstadoAndroid() == null ? "HABILITADA" : nuevo.getEstadoAndroid());
+        a.setEstadoIos(nuevo.getEstadoIos() == null ? "HABILITADA" : nuevo.getEstadoIos());
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
         System.out.println("ALMACENANDO EN: " + base);
         try {
@@ -99,6 +100,9 @@ public class AplicacionBusiness {
         a.setKeyFileDev(b.getKeyFileDev());
         a.setKeyFileProd(b.getKeyFileProd());
         a.setNombre(b.getNombre());
+        a.setEstadoAndroid(b.getEstadoAndroid() == null ? "HABILITADA" : b.getEstadoAndroid());
+        a.setEstadoIos(b.getEstadoIos() == null ? "HABILITADA" : b.getEstadoIos());
+
         if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
             a.setPayloadSize(4096);
         }
@@ -106,7 +110,7 @@ public class AplicacionBusiness {
             a.setPayloadSize(2048);
         }
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
-        
+
         if (b.getCertificadoDevFile() != null) {
             String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
             writeFile(fileNameDev, b.getCertificadoDevFile());
@@ -157,16 +161,24 @@ public class AplicacionBusiness {
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
     }
-    
-    public Aplicacion habilitarAplicacion(Long id) throws Exception{
+
+    public Aplicacion habilitarAplicacionAndroid(Long id) throws Exception {
         Aplicacion a = getApplication(id);
         a.setEstadoAndroid("HABILITADA");
         a.setError(null);
         applicationDao.create(a);
         return a;
     }
-    
-    public Aplicacion eliminarAplicacion(Long id) throws Exception{
+
+    public Aplicacion habilitarAplicacionIos(Long id) throws Exception {
+        Aplicacion a = getApplication(id);
+        a.setEstadoIos("HABILITADA");
+        a.setError(null);
+        applicationDao.create(a);
+        return a;
+    }
+
+    public Aplicacion eliminarAplicacion(Long id) throws Exception {
         Aplicacion a = getApplication(id);
         applicationDao.delete(a);
         return a;

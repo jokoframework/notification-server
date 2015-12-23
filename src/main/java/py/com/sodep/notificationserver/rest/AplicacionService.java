@@ -107,10 +107,18 @@ public class AplicacionService {
     }
     
     @POST
-    @Path("/{id}/habilitar")
+    @Path("/{id}/android/habilitar")
     @Produces(MediaType.APPLICATION_JSON)
     public Response habilitarAplicacion(@PathParam(value = "id") Long id) throws SQLException, Exception {
-        Aplicacion a = appBussines.habilitarAplicacion(id);
+        Aplicacion a = appBussines.habilitarAplicacionAndroid(id);
+        return Response.ok(a).build();
+    }
+    
+    @POST
+    @Path("/{id}/ios/habilitar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response habilitarAplicacion(@PathParam(value = "id") Long id) throws SQLException, Exception {
+        Aplicacion a = appBussines.habilitarAplicacionIos(id);
         return Response.ok(a).build();
     }
 }
