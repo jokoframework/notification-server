@@ -109,7 +109,7 @@ public class AplicacionService {
     @POST
     @Path("/{id}/android/habilitar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response habilitarAplicacion(@PathParam(value = "id") Long id) throws SQLException, Exception {
+    public Response habilitarAplicacionAndroid(@PathParam(value = "id") Long id) throws SQLException, Exception {
         Aplicacion a = appBussines.habilitarAplicacionAndroid(id);
         return Response.ok(a).build();
     }
@@ -117,7 +117,7 @@ public class AplicacionService {
     @POST
     @Path("/{id}/ios/habilitar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response habilitarAplicacion(@PathParam(value = "id") Long id) throws SQLException, Exception {
+    public Response habilitarAplicacionIos(@PathParam(value = "id") Long id) throws SQLException, Exception {
         Aplicacion a = appBussines.habilitarAplicacionIos(id);
         return Response.ok(a).build();
     }
