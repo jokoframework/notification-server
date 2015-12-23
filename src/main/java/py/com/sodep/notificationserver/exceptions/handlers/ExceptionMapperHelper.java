@@ -21,6 +21,7 @@ public class ExceptionMapperHelper {
         APLICACION_BLOCKED,
         BAD_REQUEST,
         NOTIFICATION_ERROR,
+        READER_ERROR,
         UNKNOWN_ERROR
     }
 
