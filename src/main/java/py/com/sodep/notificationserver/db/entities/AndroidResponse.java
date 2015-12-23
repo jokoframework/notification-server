@@ -16,8 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import org.hibernate.annotations.GeneratorType;
-import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
  * Json de respuesta de GCM Created by gaby.lorely on 17/05/2015.
@@ -32,13 +30,13 @@ public class AndroidResponse implements Serializable {
     
     @JsonProperty("multicast_id")
     @Column(name = "multicast_id")
-    Long multicast_id;
+    Long multicastId;
     @JsonProperty("success")
     int success;
     @JsonProperty("failure")
     int failure;
     @JsonProperty("canonical_ids")
-    Integer canonical_ids;
+    Integer canonicalIds;
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "evento_id")
@@ -60,12 +58,12 @@ public class AndroidResponse implements Serializable {
         this.results = results;
     }
 
-    public Long getMulticast_id() {
-        return multicast_id;
+    public Long getMulticastId() {
+        return multicastId;
     }
 
-    public void setMulticast_id(Long multicast_id) {
-        this.multicast_id = multicast_id;
+    public void setMulticastId(Long multicastId) {
+        this.multicastId = multicastId;
     }
 
     public int getSuccess() {
@@ -84,8 +82,8 @@ public class AndroidResponse implements Serializable {
         this.failure = failure;
     }
 
-    public Integer getCanonical_ids() {
-        return canonical_ids;
+    public Integer getCanonicalIds() {
+        return canonicalIds;
     }
 
     public Evento getEvento() {
@@ -96,8 +94,8 @@ public class AndroidResponse implements Serializable {
         this.evento = evento;
     }
 
-    public void setCanonical_ids(Integer canonical_ids) {
-        this.canonical_ids = canonical_ids;
+    public void setCanonicalIds(Integer canonicalIds) {
+        this.canonicalIds = canonicalIds;
     }
 
     public Long getId() {
@@ -112,8 +110,8 @@ public class AndroidResponse implements Serializable {
 
     @Override
     public String toString() {
-        return "AndroidResponse{" + "multicast_id=" + multicast_id + ", success=" + success 
-                + ", failure=" + failure + ", canonical_ids=" + canonical_ids + ", results=" + results + '}';
+        return "AndroidResponse{" + "multicast_id=" + multicastId + ", success=" + success 
+                + ", failure=" + failure + ", canonical_ids=" + canonicalIds + ", results=" + results + '}';
     }
 
 }

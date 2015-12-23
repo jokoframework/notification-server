@@ -131,7 +131,7 @@ public class NotificationBusiness {
             notification.setTo(evento.getAndroidDevicesList().get(0));
         } else {
             logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
-            notification.setRegistration_ids(evento.getAndroidDevicesList());
+            notification.setRegistrationIds(evento.getAndroidDevicesList());
         }
 
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
@@ -147,7 +147,7 @@ public class NotificationBusiness {
                         || r.getError().equals("InvalidRegistration")
                         || r.getError().equals("MissingRegistration"))) {
                     DeviceRegistration d = new DeviceRegistration(
-                            evento.getAndroidDevicesList().get(i), r.getRegistration_id(),
+                            evento.getAndroidDevicesList().get(i), r.getRegistrationId(),
                             "NUEVO", r.getError(), evento.getAplicacion());
                     deviceDao.create(d);
                 }
@@ -170,6 +170,12 @@ public class NotificationBusiness {
             throw new BusinessException(500, "El tamaño del payload supera el "
                     + "configurado para la aplicación: "
                     + e.getAplicacion().getPayloadSize());
+        }
+        if(e.getAndroidDevicesList()!=null && e.getAndroidDevicesList().size() > 1000){
+            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
+        }
+        if(e.getIosDevicesList()!=null && e.getIosDevicesList().size() > 1000){
+            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
         }
     }
 

@@ -27,7 +27,7 @@ public class EventoRequest implements Serializable{
     private String prioridad;
 
     private HashMap<String, String> payload;
-
+    
     private List<String> androidDevicesList;
 
     private List<String> iosDevicesList;
