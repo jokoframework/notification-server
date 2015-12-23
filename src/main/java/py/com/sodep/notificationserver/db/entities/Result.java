@@ -21,8 +21,12 @@ public class Result implements Serializable {
 
     String message_id;
     String error;
+    
+    @Column(name = "original_registration_id")
     String originalRegistrationId;
+    
     String registration_id;
+    
     Integer status;
 
     @ManyToOne

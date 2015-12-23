@@ -41,15 +41,18 @@ public class Evento implements Serializable {
     @JsonIgnore
     private Aplicacion aplicacion;
 
-    @Column(name = "android_devices", length = 10240)
+    @Column(name = "android_devices")
     @JsonIgnore
     private String androidDevices;
 
-    @Column(name = "ios_devices", length = 10240)
+    @Column(name = "ios_devices")
     @JsonIgnore
     private String iosDevices;
 
+    @Column(name = "send_to_sync")
     private boolean sendToSync;
+    
+    @Column(name = "production_mode")
     private boolean productionMode;
     private String alert;
     private String prioridad;

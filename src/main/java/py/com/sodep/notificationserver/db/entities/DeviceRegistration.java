@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -20,7 +21,8 @@ import javax.persistence.Table;
  * @author Vanessa
  */
 @Entity
-@Table
+@Table(name = "device_registration")
+@JsonAutoDetect
 public class DeviceRegistration implements Serializable {
     @Id
     @GeneratedValue
