@@ -3,13 +3,12 @@ package py.com.sodep.notificationserver.facade;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Vector;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
 import javapns.devices.Device;
-import javapns.devices.Devices;
 import javapns.notification.Payload;
 import javapns.notification.PushedNotification;
 import javapns.notification.PushedNotifications;
@@ -109,8 +108,8 @@ public class ApnsFacade {
     public List<Device> getInactiveDevices(File certificado, String keyFile,
             Boolean productionMode) throws BusinessException {
         try {
-            ArrayList<Device> lista;
-            lista = (ArrayList) Push.feedback(certificado, keyFile, productionMode);
+            Vector<Device> lista;
+            lista = (Vector) Push.feedback(certificado, keyFile, productionMode);
             return lista;
         } catch (CommunicationException | KeystoreException ex) {
             logger.error("[IOS] Error al traer dispositivos inactivos: " + ex.getMessage());

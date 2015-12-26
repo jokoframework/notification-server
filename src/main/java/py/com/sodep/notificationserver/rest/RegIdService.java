@@ -34,8 +34,16 @@ public class RegIdService {
     @GET
     @Path("/{id}/android")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newDevice(@PathParam(value = "id") Long id) throws SQLException, Exception {
+    public Response getAndroidInactiveDev(@PathParam(value = "id") Long id) throws SQLException, Exception {
         List<DeviceRegistration> devices = appBussines.getListaRegIdInvalido(id);
+        return Response.ok(devices).build();
+    }
+
+    @GET
+    @Path("/{id}/ios")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIosInactiveDev(@PathParam(value = "id") Long id) throws SQLException, Exception {
+        List<DeviceRegistration> devices = appBussines.getListaIosRegIdInvalido(id);
         return Response.ok(devices).build();
 
     }

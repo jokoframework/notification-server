@@ -38,18 +38,17 @@ public class IosNotificationTimer extends TimerTask {
         for (Evento e : eventos) {
             log.info("[IOS]: Notificando evento: " + e);
             try {
-                if (e.getAplicacion() != null) {
-                    if (e.isProductionMode()) {
-                        if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {
-                            e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoProd(), e.getAplicacion().getKeyFileProd(), e, true));
-                        }
-                    } else {
-                        if (e.getAplicacion().getCertificadoDev() != null && e.getAplicacion().getKeyFileDev() != null) {
-                            e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoDev(), e.getAplicacion().getKeyFileDev(), e, false));
-                        }
+                if (e.getAplicacion() == null) {
+                    throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+                }
+                if (e.isProductionMode()) {
+                    if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {
+                        e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoProd(), e.getAplicacion().getKeyFileProd(), e, true));
                     }
                 } else {
-                    throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+                    if (e.getAplicacion().getCertificadoDev() != null && e.getAplicacion().getKeyFileDev() != null) {
+                        e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoDev(), e.getAplicacion().getKeyFileDev(), e, false));
+                    }
                 }
 
                 if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {

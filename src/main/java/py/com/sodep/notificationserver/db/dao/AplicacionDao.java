@@ -5,7 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
-
+import java.util.List;
 import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 
@@ -20,6 +20,16 @@ public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
         Aplicacion a = (Aplicacion) getSession()
                 .createCriteria(Aplicacion.class)
                 .add(Restrictions.like("nombre", name)).uniqueResult();
+        System.out.println("Aplicacion encontrada: " + a);
+        getSession().getTransaction().commit();
+        return a;
+    }
+
+    public List<Aplicacion> getByEstado(String name) {
+        getSession().beginTransaction();
+        List<Aplicacion> a = getSession()
+                .createCriteria(Aplicacion.class)
+                .add(Restrictions.like("estado", name)).list();
         System.out.println("Aplicacion encontrada: " + a);
         getSession().getTransaction().commit();
         return a;
