@@ -1,10 +1,8 @@
 package py.com.sodep.notificationserver.business;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Iterator;
 import javapns.json.JSONException;

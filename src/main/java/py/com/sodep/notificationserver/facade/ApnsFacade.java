@@ -3,10 +3,13 @@ package py.com.sodep.notificationserver.facade;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
 import javapns.communication.exceptions.KeystoreException;
+import javapns.devices.Device;
+import javapns.devices.Devices;
 import javapns.notification.Payload;
 import javapns.notification.PushedNotification;
 import javapns.notification.PushedNotifications;
@@ -20,12 +23,12 @@ import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 public class ApnsFacade {
-    
+
     @Inject
     Logger logger;
     @Inject
     ParametroDao parametroDao;
-    
+
     public IosResponse send(Payload payload, File certificado, String keyFile,
             Boolean productionMode, List<String> devices) throws BusinessException {
         try {
@@ -44,9 +47,9 @@ public class ApnsFacade {
         } catch (Exception ex) {
             throw new BusinessException(500, ex);
         }
-        
+
     }
-    
+
     private IosResponse procesarResponse(PushedNotifications result, List<String> devices) {
         IosResponse ios = new IosResponse();
         ios.setFailure(result.getFailedNotifications().size());
@@ -57,7 +60,7 @@ public class ApnsFacade {
             PushedNotification notification = result.get(i);
             logger.info("[iOS] Divice: " + notification.getDevice().getToken());
             Result r = new Result();
-            
+
             String diviceToken = notification.getDevice().getToken();
             if (notification.isSuccessful()) {
                 r.setMessage_id("OK");
@@ -102,4 +105,16 @@ public class ApnsFacade {
      if (status == 255) return prefix + "None (unknown)";
      return prefix + "Undocumented status code: " + status;
      */
+
+    public List<Device> getInactiveDevices(File certificado, String keyFile,
+            Boolean productionMode) throws BusinessException {
+        try {
+            ArrayList<Device> lista;
+            lista = (ArrayList) Push.feedback(certificado, keyFile, productionMode);
+            return lista;
+        } catch (CommunicationException | KeystoreException ex) {
+            logger.error("[IOS] Error al traer dispositivos inactivos: " + ex.getMessage());
+            throw new BusinessException(500, ex);
+        }
+    }
 }
