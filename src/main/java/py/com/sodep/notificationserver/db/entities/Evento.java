@@ -1,21 +1,17 @@
 package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -23,6 +19,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import py.com.sodep.notificationserver.rest.entities.EventoRequest;
 
 @Entity
@@ -41,15 +39,10 @@ public class Evento implements Serializable {
     @JsonIgnore
     private Aplicacion aplicacion;
 
-    @Column(name = "android_devices", length = 10240)
-    @JsonIgnore
-    private String androidDevices;
-
-    @Column(name = "ios_devices", length = 10240)
-    @JsonIgnore
-    private String iosDevices;
-
+    @Column(name = "send_to_sync")
     private boolean sendToSync;
+
+    @Column(name = "production_mode")
     private boolean productionMode;
     private String alert;
     private String prioridad;
@@ -58,9 +51,20 @@ public class Evento implements Serializable {
     @Column(name = "estado_ios")
     private String estadoIos;
 
-    @OneToMany(targetEntity = Payload.class, //fetch = FetchType.EAGER,
+    @OneToMany(targetEntity = Payload.class,
             mappedBy = "evento", cascade = CascadeType.ALL)
     private List<Payload> payloads;
+
+    @OneToMany(targetEntity = AndroidRegistrationId.class,
+            mappedBy = "evento", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<AndroidRegistrationId> androidDevices;
+
+    
+    @OneToMany(targetEntity = IosRegistrationId.class,
+            mappedBy = "evento", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<IosRegistrationId> iosDevices;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "android_response_id")
@@ -74,17 +78,21 @@ public class Evento implements Serializable {
     }
 
     public Evento(EventoRequest e) {
-        try {
-            this.androidDevices = new ObjectMapper().writeValueAsString(e.getAndroidDevicesList());
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (e.getAndroidDevicesList() != null) {
+            this.androidDevices = new ArrayList<>();
+            for (String s : e.getAndroidDevicesList()) {
+                this.androidDevices.add(new AndroidRegistrationId(s, this));
+            }
         }
 
-        try {
-            this.iosDevices = new ObjectMapper().writeValueAsString(e.getIosDevicesList());
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(Evento.class.getName()).log(Level.SEVERE, null, ex);
+        if (e.getIosDevicesList() != null) {
+            this.iosDevices = new ArrayList<>();
+            for (String s : e.getIosDevicesList()) {
+                this.iosDevices.add(new IosRegistrationId(s, this));
+            }
         }
+
         this.sendToSync = e.isSendToSync();
         this.productionMode = e.isProductionMode();
         this.alert = e.getAlert();
@@ -117,22 +125,6 @@ public class Evento implements Serializable {
 
     public void setAplicacion(Aplicacion aplicacion) {
         this.aplicacion = aplicacion;
-    }
-
-    public String getAndroidDevices() {
-        return androidDevices;
-    }
-
-    public void setAndroidDevices(String androidDevices) {
-        this.androidDevices = androidDevices;
-    }
-
-    public String getIosDevices() {
-        return iosDevices;
-    }
-
-    public void setIosDevices(String iosDevices) {
-        this.iosDevices = iosDevices;
     }
 
     public boolean isSendToSync() {
@@ -235,13 +227,60 @@ public class Evento implements Serializable {
         return jn;
     }
 
+    public List<Payload> getPayloads() {
+        return payloads;
+    }
+
+    public void setPayloads(List<Payload> payloads) {
+        this.payloads = payloads;
+    }
+
+    public List<AndroidRegistrationId> getAndroidDevices() {
+        return androidDevices;
+    }
+
+    public void setAndroidDevices(List<AndroidRegistrationId> androidDevices) {
+        this.androidDevices = androidDevices;
+    }
+
+    public List<IosRegistrationId> getIosDevices() {
+        return iosDevices;
+    }
+
+    public void setIosDevices(List<IosRegistrationId> iosDevices) {
+        this.iosDevices = iosDevices;
+    }
+
     @JsonIgnore
     public List<String> getIosDevicesList() {
-        return (new Gson()).fromJson(iosDevices, List.class);
+        List<String> devices = new ArrayList<>();
+        if (this.getIosDevices() != null) {
+            for (IosRegistrationId ri : this.getIosDevices()) {
+                devices.add(ri.getRegistrationId());
+            }
+        }
+        return devices;
     }
 
     @JsonIgnore
     public List<String> getAndroidDevicesList() {
-        return (new Gson()).fromJson(androidDevices, List.class);
+        System.out.println("Obteniendo android device list");
+        List<String> devices = new ArrayList<>();
+        if (this.getAndroidDevices() != null) {
+            System.out.println(this.getAndroidDevices());
+            for (AndroidRegistrationId ri : this.getAndroidDevices()) {
+                System.out.println(ri.getRegistrationId());
+                devices.add(ri.getRegistrationId());
+            }
+        }else{
+            System.out.println(">>>>>>>>>>> LISTA DE REG ID ES NULL*************");
+        }
+        return devices;
     }
+
+    @Override
+    public String toString() {
+        return "Evento{" + "id=" + id + ", aplicacion=" + aplicacion + ", sendToSync=" + sendToSync + ", productionMode=" + productionMode + ", alert=" + alert + ", prioridad=" + prioridad + ", estadoAndroid=" + estadoAndroid + ", estadoIos=" + estadoIos + ", payloads=" + payloads + ", androidDevices=" + androidDevices + ", iosDevices=" + iosDevices + ", androidResponse=" + androidResponse + ", iosResponse=" + iosResponse + '}';
+    }
+
 }

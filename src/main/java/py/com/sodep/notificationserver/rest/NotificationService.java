@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.rest;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import java.sql.SQLException;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -32,11 +33,11 @@ public class NotificationService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newNotification(EventoRequest evento) throws BusinessException, HibernateException, SQLException {
+    public Response newNotification(EventoRequest evento) throws JsonParseException, BusinessException, HibernateException, SQLException {
         logger.info("Evento " + evento.getApplicationName());
         Evento e = new Evento(evento);
-        e = business.crearEvento(e, evento.getApplicationName());
-        return Response.ok().entity(new EventoResponse(e)).build();
+        EventoResponse ex = business.crearEvento(e, evento.getApplicationName());
+        return Response.ok().entity(ex).build();
     }
 
     @GET

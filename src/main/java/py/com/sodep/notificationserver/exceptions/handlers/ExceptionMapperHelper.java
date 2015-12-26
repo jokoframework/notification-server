@@ -18,8 +18,10 @@ public class ExceptionMapperHelper {
     public static enum appError {
 
         APLICACION_NOT_FOUND,
+        APLICACION_BLOCKED,
         BAD_REQUEST,
         NOTIFICATION_ERROR,
+        READER_ERROR,
         UNKNOWN_ERROR
     }
 
@@ -75,6 +77,9 @@ public class ExceptionMapperHelper {
     public static int mapErrorCode(int code) {
         if(code == appError.APLICACION_NOT_FOUND.ordinal()){
             return Status.BAD_REQUEST.getStatusCode();
+        }
+        if(code == appError.APLICACION_BLOCKED.ordinal()){
+            return Status.INTERNAL_SERVER_ERROR.getStatusCode();
         }
         return code;
     }

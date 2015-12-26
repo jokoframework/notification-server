@@ -5,6 +5,8 @@
  */
 package py.com.sodep.notificationserver.rest.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
@@ -13,7 +15,8 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
  *
  * @author Vanessa
  */
-public class EventoRequest {
+@JsonAutoDetect
+public class EventoRequest implements Serializable{
 
     private Long id;
 
@@ -24,7 +27,7 @@ public class EventoRequest {
     private String prioridad;
 
     private HashMap<String, String> payload;
-
+    
     private List<String> androidDevicesList;
 
     private List<String> iosDevicesList;

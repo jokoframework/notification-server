@@ -8,12 +8,15 @@ package py.com.sodep.notificationserver.business;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
+import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 
 /**
  *
@@ -23,6 +26,9 @@ public class AplicacionBusiness {
 
     @Inject
     AplicacionDao applicationDao;
+    
+    @Inject
+    DeviceRegistrationDao deviceDao;
 
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
         System.out.println("Recibido " + nuevo);
@@ -39,7 +45,8 @@ public class AplicacionBusiness {
         a.setApiKeyProd(nuevo.getApiKeyProd());
         a.setKeyFileDev(nuevo.getKeyFileDev());
         a.setKeyFileProd(nuevo.getKeyFileProd());
-
+        a.setEstadoAndroid(nuevo.getEstadoAndroid() == null ? "HABILITADA" : nuevo.getEstadoAndroid());
+        a.setEstadoIos(nuevo.getEstadoIos() == null ? "HABILITADA" : nuevo.getEstadoIos());
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
         System.out.println("ALMACENANDO EN: " + base);
         try {
@@ -77,7 +84,6 @@ public class AplicacionBusiness {
             System.out.println("ALMACENANDO: " + a);
             a = applicationDao.create(a);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new Exception("Error al crear aplicación, " + e.getMessage());
         }
         return a;
@@ -100,6 +106,9 @@ public class AplicacionBusiness {
         a.setKeyFileDev(b.getKeyFileDev());
         a.setKeyFileProd(b.getKeyFileProd());
         a.setNombre(b.getNombre());
+        a.setEstadoAndroid(b.getEstadoAndroid() == null ? "HABILITADA" : b.getEstadoAndroid());
+        a.setEstadoIos(b.getEstadoIos() == null ? "HABILITADA" : b.getEstadoIos());
+
         if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
             a.setPayloadSize(4096);
         }
@@ -107,7 +116,7 @@ public class AplicacionBusiness {
             a.setPayloadSize(2048);
         }
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
-        
+
         if (b.getCertificadoDevFile() != null) {
             String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
             writeFile(fileNameDev, b.getCertificadoDevFile());
@@ -143,10 +152,10 @@ public class AplicacionBusiness {
         }
     }
 
-    public Aplicacion getApplication(String id) throws Exception {
+    public Aplicacion getApplication(Long id) throws Exception {
         System.out.println("Recibido " + id);
         //AplicacionDao applicationDao = new AplicacionDao();
-        Object a = applicationDao.findById(Long.valueOf(id), Aplicacion.class);
+        Object a = applicationDao.findById(id, Aplicacion.class);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
     }
@@ -157,5 +166,34 @@ public class AplicacionBusiness {
         Object a = applicationDao.getByName(nombre);
         System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
+    }
+
+    public Aplicacion habilitarAplicacionAndroid(Long id) throws Exception {
+        Aplicacion a = getApplication(id);
+        a.setEstadoAndroid("HABILITADA");
+        a.setError(null);
+        applicationDao.create(a);
+        return a;
+    }
+
+    public Aplicacion habilitarAplicacionIos(Long id) throws Exception {
+        Aplicacion a = getApplication(id);
+        a.setEstadoIos("HABILITADA");
+        a.setError(null);
+        applicationDao.create(a);
+        return a;
+    }
+
+    public Aplicacion eliminarAplicacion(Long id) throws Exception {
+        Aplicacion a = getApplication(id);
+        applicationDao.delete(a);
+        return a;
+    }
+    
+    public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws Exception{
+        Aplicacion a = getApplication(id);
+        List<DeviceRegistration> nuevos = deviceDao.getPendientes(a);
+        deviceDao.setEstado("CONSULTADO", nuevos);
+        return nuevos;
     }
 }

@@ -10,14 +10,17 @@
         <property name="hibernate.enable_lazy_load_no_trans">true</property>
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.cache.use_query_cache">false</property>
-        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.hbm2ddl.auto">create</property>
         <mapping class="py.com.sodep.notificationserver.db.entities.Parametro"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.Payload"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.Aplicacion"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.Evento"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.AndroidRegistrationId"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.IosRegistrationId"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.AndroidResponse"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.Result"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.AndroidResponse"/>
         <mapping class="py.com.sodep.notificationserver.db.entities.IosResponse"/>
+        <mapping class="py.com.sodep.notificationserver.db.entities.DeviceRegistration"/>
     </session-factory>
 </hibernate-configuration>

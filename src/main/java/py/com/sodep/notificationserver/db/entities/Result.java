@@ -1,6 +1,7 @@
 package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,11 +19,21 @@ public class Result implements Serializable {
     @GeneratedValue
     @Column(name = "id")
     Long id;
-
-    String message_id;
+    
+    @JsonProperty(value = "message_id")
+    @Column(name = "message_id")
+    String messageId;
+    
+    
     String error;
+    
+    @Column(name = "original_registration_id")
     String originalRegistrationId;
-    String registration_id;
+    
+    @JsonProperty(value = "registration_id")
+    @Column(name = "registration_id")
+    String registrationId;
+    
     Integer status;
 
     @ManyToOne
@@ -43,20 +54,20 @@ public class Result implements Serializable {
         this.id = id;
     }
 
-    public String getRegistration_id() {
-        return registration_id;
+    public String getRegistrationId() {
+        return registrationId;
     }
 
-    public void setRegistration_id(String registration_id) {
-        this.registration_id = registration_id;
+    public void setRegistrationId(String registrationId) {
+        this.registrationId = registrationId;
     }
 
-    public String getMessage_id() {
-        return message_id;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setMessage_id(String message_id) {
-        this.message_id = message_id;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getError() {
@@ -101,7 +112,7 @@ public class Result implements Serializable {
 
     @Override
     public String toString() {
-        return "Result{" + "error=" + error + ", message_id=" + message_id + ", registration_id=" + registration_id + '}';
+        return "Result{" + "error=" + error + ", message_id=" + messageId + ", registration_id=" + registrationId + '}';
     }
 
 }

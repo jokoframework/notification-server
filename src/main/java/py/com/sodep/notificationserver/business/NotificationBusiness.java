@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
@@ -12,16 +13,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
+import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.db.entities.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.AndroidResponse;
+import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
+import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
+import py.com.sodep.notificationserver.rest.entities.EventoResponse;
 
 @ApplicationScoped
 public class NotificationBusiness {
@@ -37,15 +42,19 @@ public class NotificationBusiness {
     @Inject
     EventoDao eventoDao;
     @Inject
+    DeviceRegistrationDao deviceDao;
+    @Inject
     Logger logger;
 
-    public Evento crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
+    public EventoResponse crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
         Aplicacion a = appDao.getByName(appName);
         if (a != null) {
             e.setAplicacion(a);
             validate(e);
             eventoDao.create(e);
-            return e;
+            EventoResponse er = new EventoResponse(e);
+            verificarNotificacionBloqueada(e);
+            return er;
         } else {
             throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + appName + " no existe.");
         }
@@ -56,7 +65,7 @@ public class NotificationBusiness {
         return e;
     }
 
-    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException {
+    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException, Exception {
         Aplicacion app = appDao.getByName(e.getAplicacion().getNombre());
         if (app != null) {
             if (e.isProductionMode()) {
@@ -115,7 +124,7 @@ public class NotificationBusiness {
 
     }
 
-    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException {
+    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException, Exception {
 
         logger.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
@@ -123,17 +132,87 @@ public class NotificationBusiness {
             notification.setTo(evento.getAndroidDevicesList().get(0));
         } else {
             logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
-            notification.setRegistration_ids(evento.getAndroidDevicesList());
+            notification.setRegistrationIds(evento.getAndroidDevicesList());
         }
 
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
-        return service.send(apiKey, notification);
+
+        AndroidResponse ar = service.send(apiKey, notification);
+
+        if (ar.getFailure() > 0) {
+            for (int i = 0; i < ar.getResults().size(); i++) {
+                Result r = ar.getResults().get(i);
+                logger.info("Analizando resultado: " + r);
+                if (r.getError() != null 
+                        && (r.getError().equals("NotRegistered"))) {
+                    DeviceRegistration d = new DeviceRegistration(
+                            evento.getAndroidDevicesList().get(i), 
+                            r.getRegistrationId(),
+                            "NUEVO", 
+                            r.getError(), 
+                            evento.getAplicacion(), 
+                            "ELIMINAR");
+                    deviceDao.create(d);
+                }
+                if (r.getError() != null
+                        && (r.getError().equals("InvalidRegistration")
+                        || r.getError().equals("MissingRegistration"))) {
+                    DeviceRegistration d = new DeviceRegistration(
+                            evento.getAndroidDevicesList().get(i),
+                            r.getRegistrationId(),
+                            "NUEVO", r.getError(),
+                            evento.getAplicacion(),
+                            "CAMBIAR");
+                    deviceDao.create(d);
+                }
+
+                if (r.getError() != null && (r.getError().equals("InvalidPackageName")
+                        || r.getError().equals("MismatchSenderId"))) {
+                    logger.info("Se bloquea la aplicación: " + r.getError());
+                    Aplicacion a = evento.getAplicacion();
+                    a.setError(r.getError());
+                    a.setEstadoAndroid("BLOQUEADA");
+                    appDao.create(a);
+                }
+            }
+        }
+        return ar;
     }
 
     public void validate(Evento e) throws BusinessException {
         String s = e.getAlert() + e.getPayload().asText();
         if (s.getBytes().length > e.getAplicacion().getPayloadSize()) {
-            throw new BusinessException(500, "El tamaño del payload supera el configurado para la aplicación: " + e.getAplicacion().getPayloadSize());
+            throw new BusinessException(500, "El tamaño del payload supera el "
+                    + "configurado para la aplicación: "
+                    + e.getAplicacion().getPayloadSize());
         }
+        if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 1000) {
+            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
+        }
+        if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 1000) {
+            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
+        }
+    }
+
+    public void verificarNotificacionBloqueada(Evento e) throws BusinessException {
+        if (e.getAplicacion().getEstadoAndroid() != null
+                && e.getAplicacion().getEstadoAndroid().equals("BLOQUEADA")
+                && (e.getAndroidDevicesList() != null
+                && e.getAndroidDevicesList().size() > 0)) {
+            throw new BusinessException(
+                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    "La aplicacion " + e.getAplicacion().getNombre()
+                    + " esta bloqueada para notificaciones Android. Error: " + e.getAplicacion().getError());
+        }
+        if (e.getAplicacion().getEstadoIos() != null
+                && e.getAplicacion().getEstadoIos().equals("BLOQUEADA")
+                && (e.getIosDevicesList() != null
+                && e.getIosDevicesList().size() > 0)) {
+            throw new BusinessException(
+                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    "La aplicacion " + e.getAplicacion().getNombre()
+                    + " esta bloqueada para notificaciones iOs. Error: " + e.getAplicacion().getError());
+        }
+
     }
 }

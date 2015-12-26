@@ -81,15 +81,15 @@ public class AplicacionService {
     @Path("/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAplicacion(@MultipartForm AplicacionFile form, Long id) throws SQLException, Exception {
-        Aplicacion a = appBussines.newAplicacionFileUpload(form, id);
+    public Response deleteAplicacion(@PathParam(value="id") Long id) throws SQLException, Exception {
+        Aplicacion a = appBussines.eliminarAplicacion(id);
         return Response.ok(a).build();
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationById(@PathParam("id") String id) throws SQLException, Exception {
+    public Response getApplicationById(@PathParam("id") Long id) throws SQLException, Exception {
         logger.info("Application/id " + id);
         Aplicacion a = appBussines.getApplication(id);
         return Response.ok(a).build();
@@ -104,5 +104,21 @@ public class AplicacionService {
         Aplicacion a = appBussines.findAplicacion(nombre);
         return Response.ok(a).build();
 
+    }
+    
+    @POST
+    @Path("/{id}/android/habilitar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response habilitarAplicacionAndroid(@PathParam(value = "id") Long id) throws SQLException, Exception {
+        Aplicacion a = appBussines.habilitarAplicacionAndroid(id);
+        return Response.ok(a).build();
+    }
+    
+    @POST
+    @Path("/{id}/ios/habilitar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response habilitarAplicacionIos(@PathParam(value = "id") Long id) throws SQLException, Exception {
+        Aplicacion a = appBussines.habilitarAplicacionIos(id);
+        return Response.ok(a).build();
     }
 }

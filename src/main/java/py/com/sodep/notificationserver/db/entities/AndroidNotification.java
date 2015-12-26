@@ -1,9 +1,10 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.OneToOne;
-import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
  * Utilizado para generar JSon de notificaciones tipo Payload que contienen
@@ -12,15 +13,17 @@ import py.com.sodep.notificationserver.db.entities.Evento;
  */
 public class AndroidNotification {
 
-    private String collapse_key = "payload";
+    @JsonProperty(value = "collapse_key")
+    private String collapseKey = "payload";
 
     private String to;
-
-    private List<String> registration_ids;
+    @JsonProperty(value = "registration_ids")
+    private List<String> registrationIds;
 
     private Object data;
 
     @OneToOne(mappedBy = "androidResponse")
+    @JsonIgnore
     private Evento evento;
 
     public Object getData() {
@@ -31,27 +34,27 @@ public class AndroidNotification {
         this.data = data;
     }
 
-    public List<String> getRegistration_ids() {
-        return registration_ids;
+    public List<String> getRegistrationIds() {
+        return registrationIds;
     }
 
-    public void setRegistration_ids(List<String> registration_ids) {
-        this.registration_ids = registration_ids;
+    public void setRegistrationIds(List<String> registrationIds) {
+        this.registrationIds = registrationIds;
     }
 
-    public String getCollapse_key() {
-        return collapse_key;
+    public String getCollapseKey() {
+        return collapseKey;
     }
 
-    public void setCollapse_key(String collapse_key) {
-        this.collapse_key = collapse_key;
+    public void setCollapseKey(String collapseKey) {
+        this.collapseKey = collapseKey;
     }
 
     public void addRegistrationId(String registrationId) {
-        if (this.getRegistration_ids() == null) {
-            this.registration_ids = new ArrayList<String>();
+        if (this.getRegistrationIds() == null) {
+            this.registrationIds = new ArrayList<String>();
         }
-        this.getRegistration_ids().add(registrationId);
+        this.getRegistrationIds().add(registrationId);
     }
 
     public String getTo() {
@@ -72,7 +75,7 @@ public class AndroidNotification {
 
     @Override
     public String toString() {
-        return "AndroidNotification{" + "collapse_key=" + collapse_key + ", to=" + to + ", registration_ids=" + registration_ids + ", data=" + data + ", evento=" + evento + '}';
+        return "AndroidNotification{" + "collapse_key=" + collapseKey + ", to=" + to + ", registration_ids=" + registrationIds + ", data=" + data + ", evento=" + evento + '}';
     }
 
 }

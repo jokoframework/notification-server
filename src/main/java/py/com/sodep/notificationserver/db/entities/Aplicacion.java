@@ -61,6 +61,12 @@ public class Aplicacion implements Serializable {
     @PartType("application/text")
     private Integer payloadSize;
 
+    private String error;
+    @Column(name = "estado_android")
+    private String estadoAndroid;
+    @Column(name = "estado_ios")
+    private String estadoIos;
+
     public Long getId() {
         return id;
     }
@@ -133,9 +139,32 @@ public class Aplicacion implements Serializable {
         this.payloadSize = payloadSize;
     }
 
-    @Override
-    public String toString() {
-        return "Aplicacion{" + "id=" + id + ", nombre=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + ", keyFileProd=" + keyFileProd + ", keyFileDev=" + keyFileDev + '}';
+    public String getError() {
+        return error;
     }
 
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getEstadoAndroid() {
+        return estadoAndroid;
+    }
+
+    public void setEstadoAndroid(String estadoAndroid) {
+        this.estadoAndroid = estadoAndroid;
+    }
+
+    public String getEstadoIos() {
+        return estadoIos;
+    }
+
+    public void setEstadoIos(String estadoIos) {
+        this.estadoIos = estadoIos;
+    }
+
+    @Override
+    public String toString() {
+        return "Aplicacion{" + "id=" + id + ", nombre=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + ", keyFileProd=" + keyFileProd + ", keyFileDev=" + keyFileDev + ", payloadSize=" + payloadSize + ", error=" + error + ", estadoAndroid=" + estadoAndroid + ", estadoIos=" + estadoIos + '}';
+    }
 }

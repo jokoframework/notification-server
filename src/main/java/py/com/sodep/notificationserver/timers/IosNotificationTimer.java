@@ -51,11 +51,13 @@ public class IosNotificationTimer extends TimerTask {
                 } else {
                     throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
                 }
-                if (e.getIosResponse().getError() == null) {
+
+                if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {
                     e.setEstadoIos("ENVIADO");
                 } else {
                     e.setEstadoIos("ERROR");
                 }
+
                 dao.create(e);
             } catch (RuntimeException | BusinessException | SQLException ex) {
                 log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);

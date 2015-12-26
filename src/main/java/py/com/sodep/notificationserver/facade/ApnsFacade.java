@@ -63,7 +63,7 @@ public class ApnsFacade {
 
             String diviceToken = notification.getDevice().getToken();
             if (notification.isSuccessful()) {
-                r.setMessage_id("OK");
+                r.setMessageId("OK");
             } else {
                 Exception theProblem = notification.getException();
                 if (theProblem != null) {
@@ -81,7 +81,7 @@ public class ApnsFacade {
                         r.setOriginalRegistrationId(diviceToken);
                         canonicalIds++;
                     }
-                    r.setMessage_id(String.valueOf(theErrorResponse.getIdentifier()));
+                    r.setMessageId(String.valueOf(theErrorResponse.getIdentifier()));
                     r.setStatus(theErrorResponse.getStatus());
                     r.setError(theErrorResponse.getMessage());
                 }
