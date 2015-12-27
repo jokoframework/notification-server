@@ -39,8 +39,7 @@ public class AplicacionBusiness {
     @Inject
     ApnsFacade facade;
 
-    @Inject
-    Logger log;
+    private static final Logger log = Logger.getLogger(AplicacionBusiness.class);
 
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws BusinessException {
         Aplicacion a = null;
@@ -144,17 +143,17 @@ public class AplicacionBusiness {
         }
     }
 
-    public Aplicacion getApplication(Long id){
+    public Aplicacion getApplication(Long id) {
         Object a = applicationDao.findById(id, Aplicacion.class);
         return (Aplicacion) a;
     }
 
-    public Aplicacion findAplicacion(String nombre){
+    public Aplicacion findAplicacion(String nombre) {
         Object a = applicationDao.getByName(nombre);
         return (Aplicacion) a;
     }
 
-    public Aplicacion habilitarAplicacionAndroid(Long id){
+    public Aplicacion habilitarAplicacionAndroid(Long id) {
         Aplicacion a = getApplication(id);
         a.setEstadoAndroid(GlobalCodes.HABILITADA);
         a.setError(null);
@@ -180,14 +179,14 @@ public class AplicacionBusiness {
         }
     }
 
-    public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws Exception {
+    public List<DeviceRegistration> getListaRegIdInvalido(Long id) {
         Aplicacion a = getApplication(id);
         List<DeviceRegistration> nuevos = deviceDao.getPendientes(a);
         deviceDao.setEstado("CONSULTADO", nuevos);
         return nuevos;
     }
 
-    public List<DeviceRegistration> getListaIosRegIdInvalido(Long id) throws Exception {
+    public List<DeviceRegistration> getListaIosRegIdInvalido(Long id) throws BusinessException {
         Aplicacion a = getApplication(id);
         File certificado = new File(a.getCertificadoProd());
 
@@ -202,5 +201,4 @@ public class AplicacionBusiness {
         }
         return nuevos;
     }
-
 }

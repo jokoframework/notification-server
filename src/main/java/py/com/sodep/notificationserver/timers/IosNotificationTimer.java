@@ -5,7 +5,6 @@
  */
 package py.com.sodep.notificationserver.timers;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.TimerTask;
 import javax.inject.Inject;
@@ -15,7 +14,6 @@ import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
 import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 
 /**
@@ -25,12 +23,12 @@ import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 @Singleton
 public class IosNotificationTimer extends TimerTask {
 
+    final static Logger log = Logger.getLogger(IosNotificationTimer.class);
+
     @Inject
     NotificationBusiness business;
     @Inject
     EventoDao dao;
-    @Inject
-    Logger log;
 
     @Override
     public void run() {
@@ -59,7 +57,7 @@ public class IosNotificationTimer extends TimerTask {
                 }
 
                 dao.create(e);
-            } catch (RuntimeException | BusinessException | SQLException ex) {
+            } catch (RuntimeException | BusinessException ex) {
                 log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
             }
         }

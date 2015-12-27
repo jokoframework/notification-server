@@ -23,8 +23,7 @@ import py.com.sodep.notificationserver.db.entities.Parametro;
 @ApplicationScoped
 public class InitApplicationListener implements ServletContextListener {
 
-    @Inject
-    Logger log;
+    private static final Logger log = Logger.getLogger(InitApplicationListener.class);
 
     @Inject
     AndroidNotificationTimer androidTask;

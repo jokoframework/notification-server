@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
-import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 
@@ -26,11 +25,10 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 @DecoderPrecedence
 public class LoggingInterceptor implements MessageBodyReaderInterceptor, MessageBodyWriterInterceptor, PreProcessInterceptor {
 
+    private static final Logger log = Logger.getLogger(LoggingInterceptor.class);
+
     @Context
     private HttpServletRequest servletRequest;
-
-    @Inject
-    private Logger log;
 
     @Override
     public Object read(MessageBodyReaderContext context) throws IOException, WebApplicationException {

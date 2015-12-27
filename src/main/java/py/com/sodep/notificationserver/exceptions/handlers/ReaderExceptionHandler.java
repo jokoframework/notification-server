@@ -11,8 +11,7 @@ import org.apache.log4j.Logger;
 @Provider
 public class ReaderExceptionHandler implements ExceptionMapper<ReaderException> {
 
-    @Inject
-    private Logger log;
+    private static final Logger log = Logger.getLogger(ReaderExceptionHandler.class);
 
     @Inject
     private ExceptionMapperHelper helper;

@@ -18,6 +18,7 @@ import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.rest.RegIdService;
 
 /**
  *
@@ -26,14 +27,14 @@ import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 @Singleton
 public class AndroidNotificationTimer extends TimerTask {
 
+    final static Logger log = Logger.getLogger(AndroidNotificationTimer.class);
+
     @Inject
     NotificationBusiness business;
     @Inject
     EventoDao dao;
     @Inject
     AplicacionDao appDao;
-    @Inject
-    Logger log;
 
     @Override
     public void run() {
@@ -73,9 +74,7 @@ public class AndroidNotificationTimer extends TimerTask {
                             log.error("[ANDROID][Evento: " + e.getId() + "]Error al bloquear aplicacion: ", ex1);
                         }
                     }
-                } catch (RuntimeException | SQLException ex) {
-                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
-                } catch (Exception ex) {
+                } catch (RuntimeException ex) {
                     log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
                 }
             } else {

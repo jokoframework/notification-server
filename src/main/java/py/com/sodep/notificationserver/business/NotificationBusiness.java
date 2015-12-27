@@ -42,10 +42,10 @@ public class NotificationBusiness {
     EventoDao eventoDao;
     @Inject
     DeviceRegistrationDao deviceDao;
-    @Inject
-    Logger logger;
 
-    public EventoResponse crearEvento(Evento e, String appName) throws BusinessException, HibernateException, SQLException {
+    private static final Logger log = Logger.getLogger(NotificationBusiness.class);
+
+    public EventoResponse crearEvento(Evento e, String appName) throws BusinessException {
         Aplicacion a = appDao.getByName(appName);
         if (a != null) {
             e.setAplicacion(a);
@@ -64,7 +64,7 @@ public class NotificationBusiness {
         return e;
     }
 
-    public Evento notificar(Evento e) throws BusinessException, HibernateException, SQLException, Exception {
+    public Evento notificar(Evento e) throws BusinessException, HibernateException {
         Aplicacion app = appDao.getByName(e.getAplicacion().getNombre());
         if (app != null) {
             if (e.isProductionMode()) {
@@ -92,8 +92,8 @@ public class NotificationBusiness {
 
     @SuppressWarnings("rawtypes")
     public IosResponse notificarIos(String certifadoPath, String keyFile,
-            Evento evento, Boolean productionMode) throws BusinessException, HibernateException, SQLException {
-        logger.info("[Evento: " + evento.getId() + "]: Notificando iOs");
+            Evento evento, Boolean productionMode) throws BusinessException {
+        log.info("[Evento: " + evento.getId() + "]: Notificando iOs");
         File certificado = new File(certifadoPath);
         Payload payload = PushNotificationPayload.complex();
         ObjectNode pay = evento.getObjectNodePayLoad();
@@ -111,38 +111,43 @@ public class NotificationBusiness {
                 Iterator it = pay.fieldNames();
                 while (it.hasNext()) {
                     String pair = (String) it.next();
-                    logger.info(pair + " = " + pay.get(pair));
+                    log.info(pair + " = " + pay.get(pair));
                     payload.addCustomDictionary((String) pair,
                             pay.get(pair).asText());
                 }
             }
         } catch (JSONException e) {
-            logger.error(e);
+            log.error(e);
             throw new BusinessException(GlobalCodes.errors.BAD_REQUEST, "Error al parsear payload en notificacion iOs.");
         }
         return facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
 
     }
 
-    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException, HibernateException, SQLException, Exception {
+    public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException {
 
-        logger.info("[Evento: " + evento.getId() + "]: notificando android");
+        log.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
-            logger.info("[Evento: " + evento.getId() + "]: Un solo device. Notificando android");
+            log.info("[Evento: " + evento.getId() + "]: Un solo device. Notificando android");
             notification.setTo(evento.getAndroidDevicesList().get(0));
         } else {
-            logger.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
+            log.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
             notification.setRegistrationIds(evento.getAndroidDevicesList());
         }
 
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
 
-        AndroidResponse ar = service.send(apiKey, notification);
+        AndroidResponse ar;
+        try {
+            ar = service.send(apiKey, notification);
+        } catch (Exception ex) {
+            throw new BusinessException(GlobalCodes.errors.NOTIFICATION_ERROR, ex);
+        }
 
         if (ar.getFailure() > 0) {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
-                logger.info("Analizando resultado: " + r);
+                log.info("Analizando resultado: " + r);
                 if (r.getError() != null
                         && (r.getError().equals("NotRegistered"))) {
                     DeviceRegistration d = new DeviceRegistration(
@@ -168,7 +173,7 @@ public class NotificationBusiness {
 
                 if (r.getError() != null && (r.getError().equals("InvalidPackageName")
                         || r.getError().equals("MismatchSenderId"))) {
-                    logger.info("Se bloquea la aplicación: " + r.getError());
+                    log.info("Se bloquea la aplicación: " + r.getError());
                     Aplicacion a = evento.getAplicacion();
                     a.setError(r.getError());
                     a.setEstadoAndroid("BLOQUEADA");

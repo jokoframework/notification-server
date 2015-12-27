@@ -32,8 +32,7 @@ import py.com.sodep.notificationserver.business.AplicacionBusiness;
 @RequestScoped
 public class AplicacionService {
 
-    @Inject
-    Logger logger;
+    private static final Logger log = Logger.getLogger(AplicacionService.class);
 
     @Inject
     AplicacionBusiness appBussines;
@@ -42,7 +41,7 @@ public class AplicacionService {
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public Response newApplication(Aplicacion a) throws SQLException, Exception {
-        logger.info("Application/id " + a);
+        log.info("Application/id " + a);
         appBussines.createAplicacionJson(a, null);
         return Response.ok(a).build();
 
@@ -53,7 +52,7 @@ public class AplicacionService {
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
     public Response uploadFile(@MultipartForm AplicacionFile form) throws SQLException, Exception {
-        logger.info("Recibido: " + form);
+        log.info("Recibido: " + form);
         Aplicacion a = appBussines.newAplicacionFileUpload(form, null);
         return Response.ok(a).build();
     }
@@ -62,7 +61,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateApplication(Aplicacion b, @PathParam(value = "id") String id) throws SQLException, Exception {
-        logger.info("Application/id " + b);
+        log.info("Application/id " + b);
         Aplicacion a = appBussines.createAplicacionJson(b, Long.valueOf(id));
         return Response.ok(a).build();
 
@@ -81,7 +80,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Consumes("multipart/form-data")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAplicacion(@PathParam(value="id") Long id) throws SQLException, Exception {
+    public Response deleteAplicacion(@PathParam(value = "id") Long id) throws SQLException, Exception {
         Aplicacion a = appBussines.eliminarAplicacion(id);
         return Response.ok(a).build();
     }
@@ -90,7 +89,7 @@ public class AplicacionService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getApplicationById(@PathParam("id") Long id) throws SQLException, Exception {
-        logger.info("Application/id " + id);
+        log.info("Application/id " + id);
         Aplicacion a = appBussines.getApplication(id);
         return Response.ok(a).build();
 
@@ -100,12 +99,12 @@ public class AplicacionService {
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
     public Response findAplicacion(@QueryParam(value = "nombre") String nombre) throws SQLException, Exception {
-        logger.info("Application/nombre " + nombre);
+        log.info("Application/nombre " + nombre);
         Aplicacion a = appBussines.findAplicacion(nombre);
         return Response.ok(a).build();
 
     }
-    
+
     @POST
     @Path("/{id}/android/habilitar")
     @Produces(MediaType.APPLICATION_JSON)
@@ -113,7 +112,7 @@ public class AplicacionService {
         Aplicacion a = appBussines.habilitarAplicacionAndroid(id);
         return Response.ok(a).build();
     }
-    
+
     @POST
     @Path("/{id}/ios/habilitar")
     @Produces(MediaType.APPLICATION_JSON)

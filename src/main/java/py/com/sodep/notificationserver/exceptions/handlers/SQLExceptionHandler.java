@@ -19,10 +19,10 @@ import org.apache.log4j.Logger;
 @Provider
 public class SQLExceptionHandler implements ExceptionMapper<SQLException> {
 
+    private static final Logger log = Logger.getLogger(SQLExceptionHandler.class);
+
     @Inject
     private ExceptionMapperHelper helper;
-    @Inject
-    Logger log;
 
     @Override
     public Response toResponse(SQLException exception) {

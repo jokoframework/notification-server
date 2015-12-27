@@ -19,14 +19,14 @@ import org.apache.log4j.Logger;
 @ServerInterceptor
 @EncoderPrecedence
 public class PostServiceInterceptor implements PostProcessInterceptor, MessageBodyWriterInterceptor {
-    @Inject
-    private Logger log;
+
+    private static final Logger log = Logger.getLogger(PostServiceInterceptor.class);
+
     @Inject
     private RequestParams requestParams;
 
     @Context
     private HttpServletResponse httpResponse;
-
 
     @Override
     public void postProcess(ServerResponse response)

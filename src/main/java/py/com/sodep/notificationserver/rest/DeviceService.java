@@ -26,8 +26,7 @@ import py.com.sodep.notificationserver.business.AplicacionBusiness;
 @RequestScoped
 public class DeviceService {
 
-    @Inject
-    Logger logger;
+    private static final Logger log = Logger.getLogger(DeviceService.class);
 
     @Inject
     AplicacionBusiness appBussines;
@@ -37,8 +36,8 @@ public class DeviceService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response newDevice(@PathParam(value = "app") String appName, String json) throws SQLException, Exception {
-        logger.info("REGISTRACION EN " + appName);
-        logger.info(json);
+        log.info("REGISTRACION EN " + appName);
+        log.info(json);
         return Response.ok().build();
 
     }

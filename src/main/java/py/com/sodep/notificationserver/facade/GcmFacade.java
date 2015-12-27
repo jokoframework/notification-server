@@ -18,6 +18,7 @@ import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.AndroidResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.exceptions.handlers.SQLExceptionHandler;
 
 /**
  * Se comunica con el servidor GCM para enviar la notificación correspondiente
@@ -33,11 +34,10 @@ import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
  */
 public class GcmFacade {
 
-    @Inject
-    ObjectMapper map;
+    private static final Logger log = Logger.getLogger(GcmFacade.class);
 
     @Inject
-    Logger log;
+    ObjectMapper map;
 
     @Inject
     EventoDao eventoDao;
@@ -47,7 +47,7 @@ public class GcmFacade {
 
     @Inject
     ParametroDao parametroDao;
-    
+
     public AndroidResponse send(String apiKey, AndroidNotification notification) throws BusinessException, Exception {
         log.info("API KEY: " + apiKey);
         Client client = ClientBuilder.newBuilder().build();

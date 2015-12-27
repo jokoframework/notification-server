@@ -22,11 +22,12 @@ import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.exceptions.handlers.SQLExceptionHandler;
 
 public class ApnsFacade {
 
-    @Inject
-    Logger logger;
+    private static final Logger log = Logger.getLogger(ApnsFacade.class);
+
     @Inject
     ParametroDao parametroDao;
 
@@ -60,7 +61,7 @@ public class ApnsFacade {
         int canonicalIds = 0;
         for (int i = 0; i < result.size(); i++) {
             PushedNotification notification = result.get(i);
-            logger.info("[iOS] Divice: " + notification.getDevice().getToken());
+            log.info("[iOS] Divice: " + notification.getDevice().getToken());
             Result r = new Result();
 
             String diviceToken = notification.getDevice().getToken();
@@ -70,7 +71,7 @@ public class ApnsFacade {
                 Exception theProblem = notification.getException();
                 if (theProblem != null) {
                     r.setError(theProblem.getMessage());
-                    logger.error("[iOS] Excepcion retornada al notificar "
+                    log.error("[iOS] Excepcion retornada al notificar "
                             + diviceToken + " " + theProblem.getMessage());
                 }
                 /*

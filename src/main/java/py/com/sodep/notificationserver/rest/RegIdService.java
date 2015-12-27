@@ -25,8 +25,7 @@ import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 @Path("/aplicacion")
 public class RegIdService {
 
-    @Inject
-    Logger logger;
+    final static Logger log = Logger.getLogger(RegIdService.class);
 
     @Inject
     AplicacionBusiness appBussines;
