@@ -7,9 +7,9 @@ package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -22,7 +22,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "android_reg_id")
-public class AndroidRegistrationId {
+public class AndroidRegistrationId implements Serializable{
 
     @Id
     @GeneratedValue

@@ -48,12 +48,11 @@ public class InitApplicationListener implements ServletContextListener {
         androidTimer.cancel();
         log.info("Cancelando tareas pendientes del timer ios");
         iosTimer.cancel();
-        SessionFactory sessionFactory = HibernateSessionLocal.sessionFactory;
+        SessionFactory sessionFactory = HibernateSessionLocal.getSessionFactory();
         if (sessionFactory != null && !sessionFactory.isClosed()) {
             log.info("Closing sessionFactory");
             sessionFactory.close();
         }
-        
     }
 
     @Override
@@ -64,7 +63,7 @@ public class InitApplicationListener implements ServletContextListener {
         SessionFactory sessionFactory = configuration
                 .buildSessionFactory();
         log.info("SessionFactory created successfully");
-        HibernateSessionLocal.sessionFactory = sessionFactory;
+        HibernateSessionLocal.setSessionFactory(sessionFactory);
         log.info("Hibernate SessionFactory Configured successfully");
         log.info("Released Hibernate sessionFactory resource");
 
@@ -85,7 +84,7 @@ public class InitApplicationListener implements ServletContextListener {
             pdao.save(new Parametro("ANDROID_TIMER", "50", "Integer"));
 
         } catch (Exception ex) {
-            log.error("Error al crear los parámetros: " + ex.getMessage());
+            log.error("Error al crear los parámetros: ", ex);
         }
         log.info("Inicializando timer");
         initializeTimer(20);

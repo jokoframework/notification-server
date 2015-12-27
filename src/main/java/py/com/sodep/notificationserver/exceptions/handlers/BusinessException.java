@@ -5,25 +5,37 @@
  */
 package py.com.sodep.notificationserver.exceptions.handlers;
 
+import javax.ws.rs.core.Response;
+
 /**
  *
  * @author Vanessa
  */
 public class BusinessException extends Exception {
 
-    private final int errorCode;
+    private final GlobalCodes.errors error;
 
-    public BusinessException(int errorCode, String mensaje) {
+    public BusinessException(GlobalCodes.errors error, String mensaje) {
         super(mensaje);
-        this.errorCode = errorCode;
+        this.error = error;
     }
 
-    public BusinessException(int errorCode, Throwable cause) {
+    public BusinessException(GlobalCodes.errors error, Throwable cause) {
         super(cause);
-        this.errorCode = errorCode;
+        this.error = error;
+    }
+
+    public BusinessException(Response.Status status, Throwable cause) {
+        super(cause);
+        this.error = GlobalCodes.statusError.get(status);
+    }
+
+    public BusinessException(Response.Status status, String mensaje) {
+        super(mensaje);
+        this.error = GlobalCodes.statusError.get(status);
     }
 
     public Error getError() {
-        return new Error(errorCode, this.getMessage());
+        return new Error(this.error.ordinal(), this.getMessage());
     }
 }

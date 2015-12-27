@@ -1,9 +1,11 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.ws.rs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 
 @Entity
 @Table(name = "aplicacion")
@@ -161,6 +163,27 @@ public class Aplicacion implements Serializable {
 
     public void setEstadoIos(String estadoIos) {
         this.estadoIos = estadoIos;
+    }
+
+    @JsonIgnore
+    public boolean isIos() {
+        return (keyFileDev != null || certificadoDev != null)
+                && (keyFileProd != null || certificadoProd != null);
+    }
+
+    @JsonIgnore
+    public boolean isAndroid() {
+        return apiKeyDev != null || apiKeyProd != null;
+    }
+
+    @JsonIgnore
+    public boolean androidEnabled() {
+        return estadoAndroid != null && estadoAndroid.equals(GlobalCodes.HABILITADA);
+    }
+
+    @JsonIgnore
+    public boolean iosEnabled() {
+        return estadoIos != null && estadoIos.equals(GlobalCodes.HABILITADA);
     }
 
     @Override

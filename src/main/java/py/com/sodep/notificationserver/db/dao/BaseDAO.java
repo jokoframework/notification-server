@@ -7,7 +7,6 @@ package py.com.sodep.notificationserver.db.dao;
 
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import java.io.Serializable;
-import java.sql.SQLException;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -15,7 +14,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 
 /**
  *
@@ -32,7 +30,7 @@ public class BaseDAO<T, PK extends Serializable> {
     }
 
     public Session getSession() {
-        return HibernateSessionLocal.sessionFactory.getCurrentSession();
+        return HibernateSessionLocal.getSessionFactory().getCurrentSession();
     }
 
     public void save(T entity) throws Exception {
@@ -40,15 +38,15 @@ public class BaseDAO<T, PK extends Serializable> {
             getSession().beginTransaction();
             getSession().persist(entity);
             getSession().getTransaction().commit();
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             if (getSession().getTransaction() != null) {
                 getSession().getTransaction().rollback();
             }
-            throw new Exception("Error al crear registro: " + e.getMessage());
+            throw e;
         }
     }
 
-    public T findById(long id, Class<T> objectClass) throws Exception {
+    public T findById(long id, Class<T> objectClass) {
         try {
             getSession().beginTransaction();
             T result = (T) getSession().get(objectClass, id);
@@ -63,7 +61,7 @@ public class BaseDAO<T, PK extends Serializable> {
         }
     }
 
-    public T create(T newInstance) throws HibernateException, SQLException {
+    public T create(T newInstance) throws HibernateException {
         try {
             log.info("Persistiendo: " + newInstance.toString());
             getSession().beginTransaction();
@@ -74,14 +72,7 @@ public class BaseDAO<T, PK extends Serializable> {
             if (getSession().getTransaction() != null) {
                 getSession().getTransaction().rollback();
             }
-            log.info(e.getClass().toString());
-            e.printStackTrace();
-            if (e instanceof ConstraintViolationException) {
-                throw ((ConstraintViolationException) e).getSQLException();
-            } else {
-                throw e;
-            }
-
+            throw e;
         }
         return newInstance;
     }
@@ -111,11 +102,9 @@ public class BaseDAO<T, PK extends Serializable> {
             getSession().delete(entity);
             getSession().getTransaction().commit();
             return true;
-        } catch (Exception e) {
+        } catch (HibernateException e) {
             getSession().getTransaction().rollback();
-            e.printStackTrace();
             throw e;
-        } finally {
         }
     }
 

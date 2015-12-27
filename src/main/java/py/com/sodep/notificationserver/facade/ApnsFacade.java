@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
@@ -20,6 +21,7 @@ import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 
 public class ApnsFacade {
 
@@ -41,12 +43,13 @@ public class ApnsFacade {
                         keyFile, productionMode, devices);
             }
             return procesarResponse(result, devices);
-        } catch (CommunicationException | KeystoreException e) {
-            throw new BusinessException(500, e);
+        } catch (CommunicationException e) {
+            throw new BusinessException(GlobalCodes.errors.IOS_COMM, e);
+        } catch (KeystoreException e1) {
+            throw new BusinessException(GlobalCodes.errors.IOS_KEY_STORE, e1);
         } catch (Exception ex) {
-            throw new BusinessException(500, ex);
+            throw new BusinessException(GlobalCodes.errors.IOS_PUSH_PAYLOAD, ex);
         }
-
     }
 
     private IosResponse procesarResponse(PushedNotifications result, List<String> devices) {
@@ -111,9 +114,10 @@ public class ApnsFacade {
             Vector<Device> lista;
             lista = (Vector) Push.feedback(certificado, keyFile, productionMode);
             return lista;
-        } catch (CommunicationException | KeystoreException ex) {
-            logger.error("[IOS] Error al traer dispositivos inactivos: " + ex.getMessage());
-            throw new BusinessException(500, ex);
+        } catch (CommunicationException e) {
+            throw new BusinessException(GlobalCodes.errors.IOS_COMM, e);
+        } catch (KeystoreException e1) {
+            throw new BusinessException(GlobalCodes.errors.IOS_KEY_STORE, e1);
         }
     }
 }

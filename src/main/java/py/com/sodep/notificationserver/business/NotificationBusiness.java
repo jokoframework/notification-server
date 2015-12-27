@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
@@ -23,7 +22,7 @@ import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
 import py.com.sodep.notificationserver.rest.entities.EventoResponse;
@@ -56,7 +55,7 @@ public class NotificationBusiness {
             verificarNotificacionBloqueada(e);
             return er;
         } else {
-            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + appName + " no existe.");
+            throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, "La aplicacion " + appName + " no existe.");
         }
     }
 
@@ -84,7 +83,7 @@ public class NotificationBusiness {
                 }
             }
         } else {
-            throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+            throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
         }
         e.setEstadoAndroid("ENVIADO");
         e.setEstadoIos("ENVIADO");
@@ -118,7 +117,8 @@ public class NotificationBusiness {
                 }
             }
         } catch (JSONException e) {
-            throw new BusinessException(ExceptionMapperHelper.appError.BAD_REQUEST.ordinal(), "Error al parsear payload en notificacion iOs.");
+            logger.error(e);
+            throw new BusinessException(GlobalCodes.errors.BAD_REQUEST, "Error al parsear payload en notificacion iOs.");
         }
         return facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
 
@@ -143,14 +143,14 @@ public class NotificationBusiness {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
                 logger.info("Analizando resultado: " + r);
-                if (r.getError() != null 
+                if (r.getError() != null
                         && (r.getError().equals("NotRegistered"))) {
                     DeviceRegistration d = new DeviceRegistration(
-                            evento.getAndroidDevicesList().get(i), 
+                            evento.getAndroidDevicesList().get(i),
                             r.getRegistrationId(),
-                            "NUEVO", 
-                            r.getError(), 
-                            evento.getAplicacion(), 
+                            "NUEVO",
+                            r.getError(),
+                            evento.getAplicacion(),
                             "ELIMINAR");
                     deviceDao.create(d);
                 }
@@ -182,15 +182,15 @@ public class NotificationBusiness {
     public void validate(Evento e) throws BusinessException {
         String s = e.getAlert() + e.getPayload().asText();
         if (s.getBytes().length > e.getAplicacion().getPayloadSize()) {
-            throw new BusinessException(500, "El tamaño del payload supera el "
+            throw new BusinessException(GlobalCodes.errors.PAYLOAD_SIZE, "El tamaño del payload supera el "
                     + "configurado para la aplicación: "
                     + e.getAplicacion().getPayloadSize());
         }
         if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 1000) {
-            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
+            throw new BusinessException(GlobalCodes.errors.DEVICES_SIZE, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
         }
         if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 1000) {
-            throw new BusinessException(500, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
+            throw new BusinessException(GlobalCodes.errors.DEVICES_SIZE, "No se pueden enviar notificaciones a mas de 1000 dispositivos.");
         }
     }
 
@@ -200,7 +200,7 @@ public class NotificationBusiness {
                 && (e.getAndroidDevicesList() != null
                 && e.getAndroidDevicesList().size() > 0)) {
             throw new BusinessException(
-                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    GlobalCodes.errors.APLICACION_BLOCKED,
                     "La aplicacion " + e.getAplicacion().getNombre()
                     + " esta bloqueada para notificaciones Android. Error: " + e.getAplicacion().getError());
         }
@@ -209,7 +209,7 @@ public class NotificationBusiness {
                 && (e.getIosDevicesList() != null
                 && e.getIosDevicesList().size() > 0)) {
             throw new BusinessException(
-                    ExceptionMapperHelper.appError.APLICACION_BLOCKED.ordinal(),
+                    GlobalCodes.errors.APLICACION_BLOCKED,
                     "La aplicacion " + e.getAplicacion().getNombre()
                     + " esta bloqueada para notificaciones iOs. Error: " + e.getAplicacion().getError());
         }

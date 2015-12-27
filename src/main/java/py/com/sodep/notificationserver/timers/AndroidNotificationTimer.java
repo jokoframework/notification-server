@@ -69,7 +69,7 @@ public class AndroidNotificationTimer extends TimerTask {
                         a.setEstadoAndroid("BLOQUEADA");
                         try {
                             appDao.create(a);
-                        } catch (HibernateException | SQLException ex1) {
+                        } catch (HibernateException ex1) {
                             log.error("[ANDROID][Evento: " + e.getId() + "]Error al bloquear aplicacion: ", ex1);
                         }
                     }
@@ -83,7 +83,7 @@ public class AndroidNotificationTimer extends TimerTask {
                     log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
                     e.setEstadoAndroid("SUSPENDIDO");
                     dao.create(e);
-                } catch (HibernateException | SQLException ex) {
+                } catch (HibernateException ex) {
                     log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);
                 }
             }

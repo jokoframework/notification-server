@@ -22,7 +22,7 @@ public class ReaderExceptionHandler implements ExceptionMapper<ReaderException> 
 
         log.error("Error en la lectura: " + e.getMessage());
 
-        Error error = new Error(ExceptionMapperHelper.appError.READER_ERROR.ordinal(), message);
+        Error error = new Error(GlobalCodes.errors.READER_ERROR.ordinal(), message);
 
         return error;
     }

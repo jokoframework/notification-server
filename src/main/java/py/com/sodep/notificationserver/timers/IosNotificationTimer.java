@@ -16,6 +16,7 @@ import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 
 /**
  *
@@ -39,7 +40,7 @@ public class IosNotificationTimer extends TimerTask {
             log.info("[IOS]: Notificando evento: " + e);
             try {
                 if (e.getAplicacion() == null) {
-                    throw new BusinessException(ExceptionMapperHelper.appError.APLICACION_NOT_FOUND.ordinal(), "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+                    throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
                 }
                 if (e.isProductionMode()) {
                     if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {

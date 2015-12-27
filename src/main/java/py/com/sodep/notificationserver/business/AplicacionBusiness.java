@@ -1,27 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package py.com.sodep.notificationserver.business;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import static javapns.Push.payload;
 import javapns.devices.Device;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
 import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 
 /**
@@ -34,6 +31,9 @@ public class AplicacionBusiness {
     AplicacionDao applicationDao;
 
     @Inject
+    ParametroDao paramDao;
+
+    @Inject
     DeviceRegistrationDao deviceDao;
 
     @Inject
@@ -42,72 +42,58 @@ public class AplicacionBusiness {
     @Inject
     Logger log;
 
-    public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws Exception {
-        System.out.println("Recibido " + nuevo);
-        Aplicacion a;
-        //AplicacionDao applicationDao = new AplicacionDao();
-        ParametroDao paramDao = new ParametroDao();
-        if (id != null) {
-            a = applicationDao.findById(id, Aplicacion.class);
-        } else {
-            a = nuevo;
-        }
-        a.setNombre(nuevo.getNombre());
-        a.setApiKeyDev(nuevo.getApiKeyDev());
-        a.setApiKeyProd(nuevo.getApiKeyProd());
-        a.setKeyFileDev(nuevo.getKeyFileDev());
-        a.setKeyFileProd(nuevo.getKeyFileProd());
-        a.setEstadoAndroid(nuevo.getEstadoAndroid() == null ? "HABILITADA" : nuevo.getEstadoAndroid());
-        a.setEstadoIos(nuevo.getEstadoIos() == null ? "HABILITADA" : nuevo.getEstadoIos());
-        String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
-        System.out.println("ALMACENANDO EN: " + base);
+    public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws BusinessException {
+        Aplicacion a = null;
         try {
-            if (nuevo.getCertificadoDev() != null) {
-                byte[] desarrollo = Base64.decodeBase64(nuevo.getCertificadoDev().getBytes());
-                String fileNameDev = base + "/" + nuevo.getNombre() + "-develop" + ".p12";
-                try (FileOutputStream fos = new FileOutputStream(fileNameDev)) {
-                    fos.write(desarrollo);
-                    fos.close();
-                    a.setCertificadoDev(fileNameDev);
-                    System.out.println("CERTIFICADO - DEV: " + a.getCertificadoDev());
-                } catch (IOException io) {
-                    throw new Exception("Error al guardar certificado de desarrollo: " + io.getMessage());
-                }
-            }
-            if (nuevo.getCertificadoProd() != null) {
-                String fileNameProd = base + "/" + nuevo.getNombre() + "-production" + ".p12";
-                byte[] produccion = Base64.decodeBase64(nuevo.getCertificadoProd().getBytes());
-                try (FileOutputStream fos = new FileOutputStream(fileNameProd)) {
-                    fos.write(produccion);
-                    fos.close();
-                    a.setCertificadoProd(fileNameProd);
-                    System.out.println("CERTIFICADO - PROD: " + a.getCertificadoProd());
-                } catch (IOException io) {
-                    throw new Exception("Error al guardar certificado de produccion: " + io.getMessage());
-                }
-            }
-            if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
-                a.setPayloadSize(4096);
-            }
-            if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
-                a.setPayloadSize(2048);
+            if (id != null) {
+                a = applicationDao.findById(id, Aplicacion.class);
+            } else {
+                a = nuevo;
             }
 
-            System.out.println("ALMACENANDO: " + a);
+            a.setNombre(nuevo.getNombre());
+            a.setApiKeyDev(nuevo.getApiKeyDev());
+            a.setApiKeyProd(nuevo.getApiKeyProd());
+            a.setKeyFileDev(nuevo.getKeyFileDev());
+            a.setKeyFileProd(nuevo.getKeyFileProd());
+            a.setEstadoAndroid(nuevo.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : nuevo.getEstadoAndroid());
+            a.setEstadoIos(nuevo.getEstadoIos() == null ? GlobalCodes.HABILITADA : nuevo.getEstadoIos());
+            String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
+            if (nuevo.getCertificadoDev() != null) {
+                a.setCertificadoDev(writeFile(base, nuevo.getNombre(), nuevo.getCertificadoDev(), "develop"));
+            }
+            if (nuevo.getCertificadoProd() != null) {
+                a.setCertificadoProd(writeFile(base, nuevo.getNombre(), nuevo.getCertificadoProd(), "production"));
+            }
+            if (a.isIos()) {
+                a.setPayloadSize(2048);
+            } else {
+                a.setPayloadSize(4096);
+            }
             a = applicationDao.create(a);
-        } catch (Exception e) {
-            throw new Exception("Error al crear aplicación, " + e.getMessage());
+        } catch (HibernateException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
         }
         return a;
     }
 
-    public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws SQLException, Exception {
-        Aplicacion a;
-        //AplicacionDao applicationDao = new AplicacionDao();
-        if (applicationDao != null) {
-            System.out.println("**************** DAO NO ES NULL ****************");
+    public String writeFile(String base, String nombre, String certificado, String type) throws BusinessException {
+        String fileName = base + "/" + nombre + "-" + type + ".p12";
+        try {
+            byte[] file = Base64.decodeBase64(certificado.getBytes());
+            FileOutputStream fos = new FileOutputStream(fileName);
+            fos.write(file);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            throw new BusinessException(GlobalCodes.errors.APP_PATH_NOT_FOUND, e);
+        } catch (IOException ex) {
+            throw new BusinessException(GlobalCodes.errors.APP_PATH_ERROR, ex);
         }
-        ParametroDao paramDao = new ParametroDao();
+        return fileName;
+    }
+
+    public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws BusinessException {
+        Aplicacion a;
         if (id != null) {
             a = applicationDao.findById(id, Aplicacion.class);
         } else {
@@ -118,15 +104,9 @@ public class AplicacionBusiness {
         a.setKeyFileDev(b.getKeyFileDev());
         a.setKeyFileProd(b.getKeyFileProd());
         a.setNombre(b.getNombre());
-        a.setEstadoAndroid(b.getEstadoAndroid() == null ? "HABILITADA" : b.getEstadoAndroid());
-        a.setEstadoIos(b.getEstadoIos() == null ? "HABILITADA" : b.getEstadoIos());
+        a.setEstadoAndroid(b.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : b.getEstadoAndroid());
+        a.setEstadoIos(b.getEstadoIos() == null ? GlobalCodes.HABILITADA : b.getEstadoIos());
 
-        if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
-            a.setPayloadSize(4096);
-        }
-        if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
-            a.setPayloadSize(2048);
-        }
         String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
 
         if (b.getCertificadoDevFile() != null) {
@@ -139,67 +119,65 @@ public class AplicacionBusiness {
             writeFile(fileNameProd, b.getCertificadoProdFile());
             a.setCertificadoProd(fileNameProd);
         }
-        if (a.getApiKeyDev() != null || a.getApiKeyProd() != null) {
+        if (a.isIos()) {
+            a.setPayloadSize(2048);
+        } else {
             a.setPayloadSize(4096);
         }
-        if (a.getCertificadoDev() != null || a.getCertificadoProd() != null) {
-            a.setPayloadSize(2048);
-        }
-        System.out.println("CREANDO: " + a);
         applicationDao.create(a);
 
         return a;
     }
 
-    public void writeFile(String fileName, byte[] data) throws Exception {
+    public void writeFile(String fileName, byte[] data) throws BusinessException {
         if (data != null) {
-            try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            try {
+                FileOutputStream fos = new FileOutputStream(fileName);
                 fos.write(data);
                 fos.close();
             } catch (IOException io) {
-                throw new Exception("Error al guardar certificado: " + io.getMessage());
+                log.error("Error al crear archivo: ", io);
+                throw new BusinessException(GlobalCodes.errors.APP_PATH_ERROR, "Error al guardar certificado: " + io.getMessage());
             }
         } else {
-            throw new Exception("El archivo es null.");
+            throw new BusinessException(GlobalCodes.errors.APP_EMPTY_FILE, "El archivo es null.");
         }
     }
 
-    public Aplicacion getApplication(Long id) throws Exception {
-        System.out.println("Recibido " + id);
-        //AplicacionDao applicationDao = new AplicacionDao();
+    public Aplicacion getApplication(Long id){
         Object a = applicationDao.findById(id, Aplicacion.class);
-        System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
     }
 
-    public Aplicacion findAplicacion(String nombre) throws Exception {
-        System.out.println("Buscando " + nombre);
-        //AplicacionDao applicationDao = new AplicacionDao();
+    public Aplicacion findAplicacion(String nombre){
         Object a = applicationDao.getByName(nombre);
-        System.out.println("Application encontrado:" + a);
         return (Aplicacion) a;
     }
 
-    public Aplicacion habilitarAplicacionAndroid(Long id) throws Exception {
+    public Aplicacion habilitarAplicacionAndroid(Long id){
         Aplicacion a = getApplication(id);
-        a.setEstadoAndroid("HABILITADA");
+        a.setEstadoAndroid(GlobalCodes.HABILITADA);
         a.setError(null);
         applicationDao.create(a);
         return a;
     }
 
-    public Aplicacion habilitarAplicacionIos(Long id) throws Exception {
+    public Aplicacion habilitarAplicacionIos(Long id) {
         Aplicacion a = getApplication(id);
-        a.setEstadoIos("HABILITADA");
+        a.setEstadoIos(GlobalCodes.HABILITADA);
         a.setError(null);
         applicationDao.create(a);
         return a;
     }
 
-    public Aplicacion eliminarAplicacion(Long id) throws Exception {
-        Aplicacion a = getApplication(id);
-        applicationDao.delete(a);
-        return a;
+    public Aplicacion eliminarAplicacion(Long id) throws BusinessException {
+        try {
+            Aplicacion a = getApplication(id);
+            applicationDao.delete(a);
+            return a;
+        } catch (HibernateException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws Exception {
