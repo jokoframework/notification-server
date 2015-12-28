@@ -37,7 +37,7 @@ import py.com.sodep.notificationserver.exceptions.handlers.SQLExceptionHandler;
  */
 public class GcmFacade {
 
-    private static final Logger log = Logger.getLogger(GcmFacade.class);
+    private static final Logger LOGGER = Logger.getLogger(GcmFacade.class);
 
     @Inject
     ObjectMapper map;
@@ -53,24 +53,24 @@ public class GcmFacade {
 
     public AndroidResponse send(String apiKey, AndroidNotification notification) throws BusinessException {
         try {
-            log.info("API KEY: " + apiKey);
+            LOGGER.info("API KEY: " + apiKey);
             Client client = ClientBuilder.newBuilder().build();
             WebTarget target = client.target(parametroDao.getByName("URL_GCM").getValor());
             Invocation.Builder builder = target.request().accept(MediaType.APPLICATION_JSON);
             builder.header(HttpHeaders.AUTHORIZATION, "key=" + apiKey);
             AndroidResponse r;
             String jsonInString = map.writeValueAsString(notification);
-            log.info("Json a enviar: " + jsonInString);
+            LOGGER.info("Json a enviar: " + jsonInString);
             Response response = builder.post(Entity.entity(jsonInString, MediaType.APPLICATION_JSON));
             if (response.getStatus() != 200) {
-                log.info("Error en la respuesta : HTTP error code :" + response.getStatus());
-                log.info(response.getStringHeaders().toString());
-                log.info(response.toString());
+                LOGGER.info("Error en la respuesta : HTTP error code :" + response.getStatus());
+                LOGGER.info(response.getStringHeaders().toString());
+                LOGGER.info(response.toString());
                 throw new BusinessException((Status) response.getStatusInfo(), "Error en la respuesta : HTTP error code : "
                         + response.getStatus());
             }
             r = response.readEntity(AndroidResponse.class);
-            log.info("[Android/Response]: " + r);
+            LOGGER.info("[Android/Response]: " + r);
             return r;
         } catch (JsonProcessingException ex) {
             throw new BusinessException(GlobalCodes.errors.NOTIFICATION_ERROR, ex);

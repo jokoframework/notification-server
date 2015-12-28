@@ -22,7 +22,7 @@ import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMappe
 
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
-    private static final Logger log = Logger.getLogger(GeneralExceptionMapper.class);
+    private static final Logger LOGGER = Logger.getLogger(GeneralExceptionMapper.class);
 
     @Inject
     private ExceptionMapperHelper helper;
@@ -44,7 +44,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
                 Response response = failure.getResponse();
 
                 if (response.getEntity() instanceof Error) {
-                    log.trace("Usando respuesta obtenida de la excepción");
+                    LOGGER.trace("Usando respuesta obtenida de la excepción");
                     return helper.toResponse(response.getEntity(), response.getStatus());
                 } else {
                     // Tratar de reproducir el error usando Error
@@ -62,7 +62,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
             int responseErrorCode = failure.getErrorCode();
 
             if (!isInErrorCodes(responseErrorCode)) {
-                log.trace("El código " + entityErrorCode + " no pertenece a los códigos de error estándares, la respuesta se retorna con errorCode " + mapErrorCode(DEFAULT_RESPONSE_CODE));
+                LOGGER.trace("El código " + entityErrorCode + " no pertenece a los códigos de error estándares, la respuesta se retorna con errorCode " + mapErrorCode(DEFAULT_RESPONSE_CODE));
                 responseErrorCode = DEFAULT_RESPONSE_CODE;
             }
 
@@ -75,7 +75,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
             return helper.toResponse(new Error(mapErrorCode(entityErrorCode), message), responseErrorCode);
         }
 
-        log.info("No se puede encontrar un mapper para la excepción, se maneja como una excepción general", exception);
+        LOGGER.info("No se puede encontrar un mapper para la excepción, se maneja como una excepción general", exception);
 
         // Cualquier otro tipo de excepcion.
         Error error = new Error(mapErrorCode(DEFAULT_RESPONSE_CODE), exception.getMessage());

@@ -25,7 +25,7 @@ import org.jboss.resteasy.core.ResourceMethodInvoker;
 @DecoderPrecedence
 public class LoggingInterceptor implements MessageBodyReaderInterceptor, MessageBodyWriterInterceptor, PreProcessInterceptor {
 
-    private static final Logger log = Logger.getLogger(LoggingInterceptor.class);
+    private static final Logger LOGGER = Logger.getLogger(LoggingInterceptor.class);
 
     @Context
     private HttpServletRequest servletRequest;
@@ -39,7 +39,7 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
             context.setInputStream(stream);
             Object proceed = context.proceed();
             byte[] body = stream.toByteArray();
-            log.info("Contenido de entrada: " + new String(body));
+            LOGGER.info("Contenido de entrada: " + new String(body));
 
             return proceed;
         } finally {
@@ -57,7 +57,7 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
             context.setOutputStream(stream);
             context.proceed();
             byte[] body = stream.toByteArray();
-            log.info("Body request de salida: " + new String(body));
+            LOGGER.info("Body request de salida: " + new String(body));
             stream.close();
         } finally {
             context.setOutputStream(old);
@@ -79,27 +79,27 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
                 + "Query String: " + queryString + "\n\t\t\t"
                 + "HTTP Method: " + httpMethod;
 
-        log.info(requestData);
+        LOGGER.info(requestData);
 
         Enumeration<String> headerNames = servletRequest.getHeaderNames();
         servletRequest.getHeader("");
 
-        if (log.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             while (headerNames.hasMoreElements()) {
                 String headerName = headerNames.nextElement();
 
                 Enumeration<String> headers = servletRequest.getHeaders(headerName);
                 while (headers.hasMoreElements()) {
                     String headerValue = headers.nextElement();
-                    log.trace(headerName + ": " + headerValue);
+                    LOGGER.trace(headerName + ": " + headerValue);
                 }
             }
         } else {
             String contentType = servletRequest.getHeader("content-type");
-            log.info("content-type: " + contentType);
+            LOGGER.info("content-type: " + contentType);
 
             String acceptEnconding = servletRequest.getHeader("accept-encoding");
-            log.info("accept-encoding: " + acceptEnconding);
+            LOGGER.info("accept-encoding: " + acceptEnconding);
         }
 
         return null;

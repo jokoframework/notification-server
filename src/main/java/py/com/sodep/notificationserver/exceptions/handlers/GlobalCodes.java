@@ -44,11 +44,31 @@ public class GlobalCodes {
     }
     public static final String HABILITADA = "HABILITADA";
     public static final String BLOQUEADA = "BLOQUEADA";
-    
     public static final String ELIMINAR = "ELIMINAR";
     public static final String NUEVO = "NUEVO";
     public static final String CONSULTADO = "CONSULTADO";
     public static final String CAMBIAR = "CAMBIAR";
+    public static final String ENVIADO = "ENVIADO";
+    public static final String SUSPENDIDO = "SUSPENDIDO";
+    public static final String ERROR = "ERROR";
     
 
+    public static final String NotRegistered = "NotRegistered";
+    public static final String InvalidRegistration = "InvalidRegistration";
+    public static final String MissingRegistration = "MissingRegistration";
+    public static final String InvalidPackageName = "InvalidPackageName";
+    public static final String MismatchSenderId = "MismatchSenderId";
+
+    protected static final HashMap<String, String> accion
+            = new HashMap<>();
+
+    static {
+        accion.put(NotRegistered, ELIMINAR);
+        accion.put(InvalidRegistration, CAMBIAR);
+        accion.put(MissingRegistration, ELIMINAR);
+    }
+
+    public static String getAccion(String error) {
+        return accion.get(error);
+    }
 }

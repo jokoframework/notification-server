@@ -15,6 +15,9 @@ import org.hibernate.SessionFactory;
 @ApplicationScoped
 public class HibernateSessionLocal {
 
+    private HibernateSessionLocal() {
+    }
+
     private static SessionFactory sessionFactory;
 
     public static SessionFactory getSessionFactory() {

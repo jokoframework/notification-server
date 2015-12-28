@@ -18,6 +18,7 @@ import py.com.sodep.notificationserver.db.dao.EventoDao;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 import py.com.sodep.notificationserver.rest.RegIdService;
 
 /**
@@ -56,9 +57,9 @@ public class AndroidNotificationTimer extends TimerTask {
                     }
 
                     if (e.getAndroidResponse().getSuccess() > 0) {
-                        e.setEstadoAndroid("ENVIADO");
+                        e.setEstadoAndroid(GlobalCodes.ENVIADO);
                     } else {
-                        e.setEstadoAndroid("ERROR");
+                        e.setEstadoAndroid(GlobalCodes.ERROR);
 
                     }
                     dao.create(e);
@@ -67,7 +68,7 @@ public class AndroidNotificationTimer extends TimerTask {
                     if (ex.getError().getCodigo().equals("401")) {
                         Aplicacion a = e.getAplicacion();
                         a.setError(ex.getError().getCodigo());
-                        a.setEstadoAndroid("BLOQUEADA");
+                        a.setEstadoAndroid(GlobalCodes.BLOQUEADA);
                         try {
                             appDao.create(a);
                         } catch (HibernateException ex1) {
@@ -80,7 +81,7 @@ public class AndroidNotificationTimer extends TimerTask {
             } else {
                 try {
                     log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
-                    e.setEstadoAndroid("SUSPENDIDO");
+                    e.setEstadoAndroid(GlobalCodes.SUSPENDIDO);
                     dao.create(e);
                 } catch (HibernateException ex) {
                     log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);

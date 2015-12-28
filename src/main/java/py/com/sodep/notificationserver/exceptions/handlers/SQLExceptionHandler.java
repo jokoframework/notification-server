@@ -19,16 +19,16 @@ import org.apache.log4j.Logger;
 @Provider
 public class SQLExceptionHandler implements ExceptionMapper<SQLException> {
 
-    private static final Logger log = Logger.getLogger(SQLExceptionHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(SQLExceptionHandler.class);
 
     @Inject
     private ExceptionMapperHelper helper;
 
     @Override
     public Response toResponse(SQLException exception) {
-        log.error("SQL Error Code: " + exception.getErrorCode());
-        log.error("SQL Error Message: " + exception.getMessage());
-        log.error("SQL State: " + exception.getSQLState());
+        LOGGER.error("SQL Error Code: " + exception.getErrorCode());
+        LOGGER.error("SQL Error Message: " + exception.getMessage());
+        LOGGER.error("SQL State: " + exception.getSQLState());
         Error error = new Error(exception.getErrorCode(), exception.getLocalizedMessage());
         return helper.toResponse(error, 500);
     }

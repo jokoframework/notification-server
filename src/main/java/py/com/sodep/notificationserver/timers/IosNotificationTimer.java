@@ -53,7 +53,7 @@ public class IosNotificationTimer extends TimerTask {
                 if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {
                     e.setEstadoIos("ENVIADO");
                 } else {
-                    e.setEstadoIos("ERROR");
+                    e.setEstadoIos(GlobalCodes.ERROR);
                 }
 
                 dao.create(e);

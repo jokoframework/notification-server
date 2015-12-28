@@ -60,7 +60,6 @@ public class Evento implements Serializable {
     @JsonIgnore
     private List<AndroidRegistrationId> androidDevices;
 
-    
     @OneToMany(targetEntity = IosRegistrationId.class,
             mappedBy = "evento", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -272,10 +271,18 @@ public class Evento implements Serializable {
                 System.out.println(ri.getRegistrationId());
                 devices.add(ri.getRegistrationId());
             }
-        }else{
-            System.out.println(">>>>>>>>>>> LISTA DE REG ID ES NULL*************");
         }
         return devices;
+    }
+
+    public boolean isIosEvent() {
+        return this.getIosDevicesList() != null
+                && this.getIosDevicesList().size() > 0;
+    }
+
+    public boolean isAndroidEvent() {
+        return this.getAndroidDevicesList() != null
+                && this.getAndroidDevicesList().size() > 0;
     }
 
     @Override

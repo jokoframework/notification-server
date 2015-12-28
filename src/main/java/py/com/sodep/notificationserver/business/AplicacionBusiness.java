@@ -39,7 +39,7 @@ public class AplicacionBusiness {
     @Inject
     ApnsFacade facade;
 
-    private static final Logger log = Logger.getLogger(AplicacionBusiness.class);
+    private static final Logger LOGGER = Logger.getLogger(AplicacionBusiness.class);
 
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws BusinessException {
         Aplicacion a = null;
@@ -135,7 +135,7 @@ public class AplicacionBusiness {
                 fos.write(data);
                 fos.close();
             } catch (IOException io) {
-                log.error("Error al crear archivo: ", io);
+                LOGGER.error("Error al crear archivo: ", io);
                 throw new BusinessException(GlobalCodes.errors.APP_PATH_ERROR, "Error al guardar certificado: " + io.getMessage());
             }
         } else {
@@ -196,7 +196,7 @@ public class AplicacionBusiness {
             try {
                 nuevos.add(new DeviceRegistration(d.getToken(), null, "NUEVO", "Inactivo", a, "ELIMINAR"));
             } catch (Exception e) {
-                log.error("Error al almacenar dispositivo inactivo IOS: " + e);
+                LOGGER.error("Error al almacenar dispositivo inactivo IOS: " + e);
             }
         }
         return nuevos;

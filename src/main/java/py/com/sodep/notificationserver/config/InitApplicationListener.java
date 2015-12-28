@@ -23,7 +23,7 @@ import py.com.sodep.notificationserver.db.entities.Parametro;
 @ApplicationScoped
 public class InitApplicationListener implements ServletContextListener {
 
-    private static final Logger log = Logger.getLogger(InitApplicationListener.class);
+    private static final Logger LOGGER = Logger.getLogger(InitApplicationListener.class);
 
     @Inject
     AndroidNotificationTimer androidTask;
@@ -43,13 +43,13 @@ public class InitApplicationListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
-        log.info("Cancelando tareas pendientes del timer android");
+        LOGGER.info("Cancelando tareas pendientes del timer android");
         androidTimer.cancel();
-        log.info("Cancelando tareas pendientes del timer ios");
+        LOGGER.info("Cancelando tareas pendientes del timer ios");
         iosTimer.cancel();
         SessionFactory sessionFactory = HibernateSessionLocal.getSessionFactory();
         if (sessionFactory != null && !sessionFactory.isClosed()) {
-            log.info("Closing sessionFactory");
+            LOGGER.info("Closing sessionFactory");
             sessionFactory.close();
         }
     }
@@ -58,42 +58,42 @@ public class InitApplicationListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         Configuration configuration = new Configuration();
         configuration.configure("hibernate.cfg.xml");
-        log.info("Hibernate Configuration created successfully");
+        LOGGER.info("Hibernate Configuration created successfully");
         SessionFactory sessionFactory = configuration
                 .buildSessionFactory();
-        log.info("SessionFactory created successfully");
+        LOGGER.info("SessionFactory created successfully");
         HibernateSessionLocal.setSessionFactory(sessionFactory);
-        log.info("Hibernate SessionFactory Configured successfully");
-        log.info("Released Hibernate sessionFactory resource");
+        LOGGER.info("Hibernate SessionFactory Configured successfully");
+        LOGGER.info("Released Hibernate sessionFactory resource");
 
         try {
-            log.info("Creando Parametro: PATH_CERTIFICADOS");
+            LOGGER.info("Creando Parametro: PATH_CERTIFICADOS");
             pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
 
-            log.info("Creando Parametro: URL_GCM");
+            LOGGER.info("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
 
-            log.info("Creando Parametro: IOS_THREADS");
+            LOGGER.info("Creando Parametro: IOS_THREADS");
             pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
 
-            log.info("Creando Parametro: IOS_TIMER");
+            LOGGER.info("Creando Parametro: IOS_TIMER");
             pdao.save(new Parametro("IOS_TIMER", "60", "Integer"));
 
-            log.info("Creando Parametro: ANDROID_TIMER");
+            LOGGER.info("Creando Parametro: ANDROID_TIMER");
             pdao.save(new Parametro("ANDROID_TIMER", "50", "Integer"));
 
         } catch (Exception ex) {
-            log.error("Error al crear los parámetros: ", ex);
+            LOGGER.error("Error al crear los parámetros: ", ex);
         }
-        log.info("Inicializando timer");
+        LOGGER.info("Inicializando timer");
         initializeTimer(20);
 
     }
 
     public void initializeTimer(int seconds) {
-        log.info("Iniciando Timer Android");
+        LOGGER.info("Iniciando Timer Android");
         androidTimer.schedule(androidTask, 1000, Integer.valueOf(pdao.getByName("ANDROID_TIMER").getValor()) * 1000);
-        log.info("Iniciando Timer Ios");
+        LOGGER.info("Iniciando Timer Ios");
         iosTimer.schedule(iosTask, 1000, Integer.valueOf(pdao.getByName("IOS_TIMER").getValor()) * 1000);
     }
 

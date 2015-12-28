@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 @EncoderPrecedence
 public class PostServiceInterceptor implements PostProcessInterceptor, MessageBodyWriterInterceptor {
 
-    private static final Logger log = Logger.getLogger(PostServiceInterceptor.class);
+    private static final Logger LOGGER = Logger.getLogger(PostServiceInterceptor.class);
 
     @Inject
     private RequestParams requestParams;
@@ -33,7 +33,7 @@ public class PostServiceInterceptor implements PostProcessInterceptor, MessageBo
             throws Failure, WebApplicationException {
 
         if (response.getEntity() == null) {
-            log.info("Entity de la respuesta es null");
+            LOGGER.info("Entity de la respuesta es null");
         }
     }
 

@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 @Provider
 public class ReaderExceptionHandler implements ExceptionMapper<ReaderException> {
 
-    private static final Logger log = Logger.getLogger(ReaderExceptionHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(ReaderExceptionHandler.class);
 
     @Inject
     private ExceptionMapperHelper helper;
@@ -19,7 +19,7 @@ public class ReaderExceptionHandler implements ExceptionMapper<ReaderException> 
     protected Error getEntity(ReaderException e) {
         String message = helper.getMessage(e);
 
-        log.error("Error en la lectura: " + e.getMessage());
+        LOGGER.error("Error en la lectura: " + e.getMessage());
 
         Error error = new Error(GlobalCodes.errors.READER_ERROR.ordinal(), message);
 
