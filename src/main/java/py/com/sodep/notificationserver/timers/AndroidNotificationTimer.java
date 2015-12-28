@@ -43,7 +43,7 @@ public class AndroidNotificationTimer extends TimerTask {
         log.info("[ANDROID]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
             log.info("[ANDROID]: Notificando evento: " + e);
-            if ((e.getAplicacion().getEstadoAndroid() != null && !e.getAplicacion().getEstadoAndroid().equals("BLOQUEADA"))
+            if ((e.getAplicacion().getEstadoAndroid() != null && !e.getAplicacion().getEstadoAndroid().equals(GlobalCodes.BLOQUEADA))
                     || e.getAplicacion().getEstadoAndroid() == null) {
                 try {
                     if (e.isProductionMode()) {

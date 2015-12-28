@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
@@ -17,8 +18,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "android_reg_id")
+@JsonAutoDetect
 public class AndroidRegistrationId implements Serializable {
-
     @Id
     @GeneratedValue
     Long id;
@@ -30,7 +31,11 @@ public class AndroidRegistrationId implements Serializable {
     @ManyToOne
     @JoinColumn(name = "evento_id")
     @JsonIgnore
-    private final Evento evento;
+    private Evento evento;
+
+    public AndroidRegistrationId() {
+        //Default Constructor
+    }
 
     public AndroidRegistrationId(String registrationId, Evento e) {
         this.registrationId = registrationId;

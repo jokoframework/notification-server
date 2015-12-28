@@ -20,11 +20,23 @@ public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration> {
 
     private static final Logger LOGGER = Logger.getLogger(DeviceRegistrationDao.class);
 
-    public List<DeviceRegistration> getPendientes(Aplicacion aplicacion) {
+    public List<DeviceRegistration> getPendientesAndroid(Aplicacion aplicacion) {
         getSession().beginTransaction();
         List<DeviceRegistration> a = getSession()
                 .createCriteria(DeviceRegistration.class)
                 .add(Restrictions.like("estado", GlobalCodes.NUEVO))
+                .add(Restrictions.like("tipo", GlobalCodes.ANDROID))
+                .add(Restrictions.eq("aplicacion", aplicacion)).list();
+        getSession().getTransaction().commit();
+        return a;
+    }
+    
+    public List<DeviceRegistration> getPendientesIos(Aplicacion aplicacion) {
+        getSession().beginTransaction();
+        List<DeviceRegistration> a = getSession()
+                .createCriteria(DeviceRegistration.class)
+                .add(Restrictions.like("estado", GlobalCodes.NUEVO))
+                .add(Restrictions.like("tipo", GlobalCodes.IOS))
                 .add(Restrictions.eq("aplicacion", aplicacion)).list();
         getSession().getTransaction().commit();
         return a;

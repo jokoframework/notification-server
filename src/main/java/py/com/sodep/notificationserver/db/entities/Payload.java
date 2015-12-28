@@ -28,6 +28,10 @@ public class Payload implements Serializable {
     @JsonIgnore
     private Evento evento;
 
+    public Payload() {
+        //Default constructor
+    }
+
     public Payload(String clave, String valor) {
         this.clave = clave;
         this.valor = valor;

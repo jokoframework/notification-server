@@ -45,6 +45,9 @@ public class GlobalCodes {
         UNKNOWN_ERROR,
         UNAUTHORIZED
     }
+    //TIPOS DE NOTIFICACION
+    public static final String ANDROID = "ANDROID";
+    public static final String IOS = "IOS";
     //ESTADOS DE APLICACION
     public static final String HABILITADA = "HABILITADA";
     public static final String BLOQUEADA = "BLOQUEADA";
@@ -61,13 +64,27 @@ public class GlobalCodes {
     public static final String SUSPENDIDO = "SUSPENDIDO";
     public static final String ERROR = "ERROR";
     
-
+    //ERRORES GCM
     public static final String NotRegistered = "NotRegistered";
     public static final String InvalidRegistration = "InvalidRegistration";
     public static final String MissingRegistration = "MissingRegistration";
     public static final String InvalidPackageName = "InvalidPackageName";
     public static final String MismatchSenderId = "MismatchSenderId";
-
+    //ERRORES TOKEN IOS
+    public static final String iosTokenError = "258";
+    /**
+    *
+    * if (status == 0) return prefix + "No errors encountered";
+    * if (status == 1) return prefix + "Processing error";
+    * if (status == 2) return prefix + "Missing device token";
+    * if (status == 3) return prefix + "Missing topic";
+    * if (status == 4) return prefix + "Missing payload";
+    * if (status == 5) return prefix + "Invalid token size";
+    * if (status == 6) return prefix + "Invalid topic size";
+    * if (status == 7) return prefix + "Invalid payload size";
+    * if (status == 8) return prefix + "Invalid token";
+    * if (status == 255) return prefix + "None (unknown)";
+    */
     protected static final HashMap<String, String> accion
             = new HashMap<>();
 

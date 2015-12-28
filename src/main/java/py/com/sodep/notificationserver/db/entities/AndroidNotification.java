@@ -8,8 +8,7 @@ import javax.persistence.OneToOne;
 
 /**
  * Utilizado para generar JSon de notificaciones tipo Payload que contienen
- * información a mostrar en los dispositivos Created by gaby.lorely on
- * 19/04/2015.
+ * información a mostrar en los dispositivos 
  */
 public class AndroidNotification {
 

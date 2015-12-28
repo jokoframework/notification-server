@@ -13,6 +13,7 @@ public class RequestParams {
     private String transactionId;
 
     public RequestParams() {
+        //Default constructor
     }
 
     public String getTransactionId() {

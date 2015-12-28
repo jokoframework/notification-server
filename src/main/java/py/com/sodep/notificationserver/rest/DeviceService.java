@@ -5,7 +5,6 @@
  */
 package py.com.sodep.notificationserver.rest;
 
-import java.sql.SQLException;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -17,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import py.com.sodep.notificationserver.business.AplicacionBusiness;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 /**
  *
@@ -35,7 +35,7 @@ public class DeviceService {
     @Path("/android/{app}/device")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newDevice(@PathParam(value = "app") String appName, String json) throws SQLException, Exception {
+    public Response newDevice(@PathParam(value = "app") String appName, String json) throws BusinessException {
         LOGGER.info("REGISTRACION EN " + appName);
         LOGGER.info(json);
         return Response.ok().build();

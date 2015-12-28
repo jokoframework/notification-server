@@ -59,12 +59,12 @@ public class NotificationBusiness {
         }
     }
 
-    public Evento actualizarEvento(Evento e) throws HibernateException, SQLException {
+    public Evento actualizarEvento(Evento e) {
         eventoDao.update(e);
         return e;
     }
 
-    public Evento notificar(Evento e) throws BusinessException, HibernateException {
+    public Evento notificar(Evento e) throws BusinessException {
         Aplicacion app = appDao.getByName(e.getAplicacion().getNombre());
         if (app != null) {
             if (e.isProductionMode()) {
@@ -157,7 +157,8 @@ public class NotificationBusiness {
                             GlobalCodes.NUEVO,
                             r.getError(),
                             evento.getAplicacion(),
-                            GlobalCodes.getAccion(r.getError()));
+                            GlobalCodes.getAccion(r.getError()),
+                            GlobalCodes.ANDROID);
                     deviceDao.create(d);
                 }
                 if (r.getError() != null && (r.getError().equals(GlobalCodes.InvalidPackageName)

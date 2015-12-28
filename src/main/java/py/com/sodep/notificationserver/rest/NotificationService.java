@@ -33,18 +33,11 @@ public class NotificationService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newNotification(EventoRequest evento) throws JsonParseException, BusinessException, HibernateException, SQLException {
+    public Response newNotification(EventoRequest evento) throws 
+            BusinessException {
         logger.info("Evento " + evento.getApplicationName());
         Evento e = new Evento(evento);
         EventoResponse ex = business.crearEvento(e, evento.getApplicationName());
         return Response.ok().entity(ex).build();
     }
-
-    @GET
-    public Response newApplication() {
-
-        return Response.ok().build();
-
-    }
-
 }

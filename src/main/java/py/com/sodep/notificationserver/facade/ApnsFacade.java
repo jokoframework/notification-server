@@ -56,56 +56,51 @@ public class ApnsFacade {
         ios.setFailure(result.getFailedNotifications().size());
         ios.setSuccess(result.getSuccessfulNotifications().size());
         ios.setResults(new ArrayList<Result>());
-        int canonicalIds = 0;
         for (PushedNotification notification : result) {
-            LOGGER.info("[iOS] Divice: " + notification.getDevice().getToken());
-            Result r = new Result();
-
-            String diviceToken = notification.getDevice().getToken();
-            if (notification.isSuccessful()) {
-                r.setMessageId("OK");
-            } else {
-                Exception theProblem = notification.getException();
-                if (theProblem != null) {
-                    r.setError(theProblem.getMessage());
-                    LOGGER.error("[iOS] Excepcion retornada al notificar "
-                            + diviceToken + " " + theProblem.getMessage());
-                }
-                /*
-                * If the problem was an error-response packet returned by
-                * Apple, get it
-                */
-                ResponsePacket theErrorResponse = notification.getResponse();
-                if (theErrorResponse != null) {
-                    if (theErrorResponse.getStatus() == 2 || theErrorResponse.getStatus() == 5 || theErrorResponse.getStatus() == 8) {
-                        r.setOriginalRegistrationId(diviceToken);
-                        canonicalIds++;
-                    }
-                    r.setMessageId(String.valueOf(theErrorResponse.getIdentifier()));
-                    r.setStatus(theErrorResponse.getStatus());
-                    r.setError(theErrorResponse.getMessage());
-                }
-            }
+            LOGGER.info("[iOs] Divice: " + notification.getDevice().getToken());
+            Result r = procesarPushed(notification);
             r.setIosResponse(ios);
             ios.getResults().add(r);
         }
-        ios.setCanonical_ids(canonicalIds);
         return ios;
     }
-    /*
-     if (status == 0) return prefix + "No errors encountered";
-     if (status == 1) return prefix + "Processing error";
-     if (status == 2) return prefix + "Missing device token";
-     if (status == 3) return prefix + "Missing topic";
-     if (status == 4) return prefix + "Missing payload";
-     if (status == 5) return prefix + "Invalid token size";
-     if (status == 6) return prefix + "Invalid topic size";
-     if (status == 7) return prefix + "Invalid payload size";
-     if (status == 8) return prefix + "Invalid token";
-     if (status == 255) return prefix + "None (unknown)";
-     return prefix + "Undocumented status code: " + status;
-     */
 
+    public static Result procesarPushed(PushedNotification notification) {
+        Result r = new Result();
+        String diviceToken = notification.getDevice().getToken();
+        if (notification.isSuccessful()) {
+            r.setMessageId("OK");
+        } else {
+            Exception theProblem = notification.getException();
+            if (theProblem != null) {
+                r.setError(theProblem.getMessage());
+                LOGGER.error("[iOS] Excepcion retornada al notificar "
+                        + diviceToken + " " + theProblem.getMessage());
+            }
+            /*
+             * If the problem was an error-response packet returned by
+             * Apple, get it
+             */
+            ResponsePacket theErrorResponse = notification.getResponse();
+            if (theErrorResponse != null) {
+                if (GlobalCodes.iosTokenError.contains(String.valueOf(theErrorResponse.getStatus()))) {
+                    r.setOriginalRegistrationId(diviceToken);
+                }
+                r.setMessageId(String.valueOf(theErrorResponse.getIdentifier()));
+                r.setStatus(theErrorResponse.getStatus());
+                r.setError(theErrorResponse.getMessage());
+            }
+        }
+        return r;
+    }
+    /**
+     * 
+     * @param certificado
+     * @param keyFile
+     * @param productionMode
+     * @return
+     * @throws BusinessException 
+     */
     public List<Device> getInactiveDevices(File certificado, String keyFile,
             Boolean productionMode) throws BusinessException {
         try {

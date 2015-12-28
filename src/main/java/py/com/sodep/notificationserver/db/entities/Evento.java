@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -22,7 +23,8 @@ import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 import py.com.sodep.notificationserver.rest.entities.EventoRequest;
 
 @Entity
-@Table
+@Table(name = "evento")
+@JsonAutoDetect
 public class Evento implements Serializable {
 
     private static final long serialVersionUID = 6055960223584022815L;
@@ -70,6 +72,10 @@ public class Evento implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ios_response_id")
     private IosResponse iosResponse;
+
+    public Evento() {
+        //Default constructor
+    }
 
     public Evento(EventoRequest e) {
 

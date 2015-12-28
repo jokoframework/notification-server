@@ -18,6 +18,7 @@ public class EventoResponse {
     private String estadoIos;
 
     public EventoResponse() {
+        //Default constructor
     }
 
     public EventoResponse(Evento e) {
@@ -49,7 +50,5 @@ public class EventoResponse {
     public void setEstadoIos(String estadoIos) {
         this.estadoIos = estadoIos;
     }
-
-    
 
 }

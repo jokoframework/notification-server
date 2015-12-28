@@ -104,14 +104,14 @@ public class AndroidResponse implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-    
-    
+    }  
 
     @Override
     public String toString() {
-        return "AndroidResponse{" + "multicast_id=" + multicastId + ", success=" + success 
-                + ", failure=" + failure + ", canonical_ids=" + canonicalIds + ", results=" + results + '}';
+        return "AndroidResponse{" + "multicast_id=" + multicastId 
+                + ", success=" + success 
+                + ", failure=" + failure + ", canonical_ids=" + canonicalIds 
+                + ", results=" + results + '}';
     }
 
 }

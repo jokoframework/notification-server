@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table
+@JsonAutoDetect
 public class Parametro  implements Serializable {
     private static final long serialVersionUID = 6163667597446187934L;
 

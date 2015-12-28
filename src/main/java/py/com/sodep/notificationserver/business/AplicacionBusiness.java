@@ -181,7 +181,7 @@ public class AplicacionBusiness {
 
     public List<DeviceRegistration> getListaRegIdInvalido(Long id) {
         Aplicacion a = getApplication(id);
-        List<DeviceRegistration> nuevos = deviceDao.getPendientes(a);
+        List<DeviceRegistration> nuevos = deviceDao.getPendientesAndroid(a);
         deviceDao.setEstado(GlobalCodes.CONSULTADO, nuevos);
         return nuevos;
     }
@@ -194,7 +194,7 @@ public class AplicacionBusiness {
         List<DeviceRegistration> nuevos = new ArrayList<>();
         for (Device d : lista) {
             try {
-                nuevos.add(new DeviceRegistration(d.getToken(), null, "NUEVO", "Inactivo", a, "ELIMINAR"));
+                nuevos.add(new DeviceRegistration(d.getToken(), null, GlobalCodes.NUEVO, "Inactivo", a, GlobalCodes.ELIMINAR,GlobalCodes.IOS));
             } catch (Exception e) {
                 LOGGER.error("Error al almacenar dispositivo inactivo IOS: " + e);
             }

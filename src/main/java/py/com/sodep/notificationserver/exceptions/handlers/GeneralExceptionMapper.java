@@ -1,6 +1,7 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
 import com.google.common.base.Throwables;
+import java.sql.SQLException;
 import javax.inject.Inject;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.Failure;
@@ -8,10 +9,11 @@ import org.jboss.resteasy.spi.Failure;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import static org.apache.log4j.LogMF.error;
+import org.hibernate.exception.ConstraintViolationException;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.DEFAULT_RESPONSE_CODE;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.isInErrorCodes;
 import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMapperHelper.mapErrorCode;
-
 
 /**
  * Maneja las excepciones que no tengan un ExceptionHandler
@@ -19,9 +21,9 @@ import static py.com.sodep.notificationserver.exceptions.handlers.ExceptionMappe
  * @author duartm
  * @version 1.0 03/06/2014
  */
-
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
+
     private static final Logger LOGGER = Logger.getLogger(GeneralExceptionMapper.class);
 
     @Inject
@@ -30,10 +32,15 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(Exception exception) {
         Throwable cause = Throwables.getRootCause(exception);
-        if (exception instanceof BusinessException){
+        if (exception instanceof BusinessException) {
             LOGGER.info("Es un bussibesException");
-            Error error = ((BusinessException)exception).getError();
+            Error error = ((BusinessException) exception).getError();
             return helper.toResponse(error, mapErrorCode(Integer.valueOf(error.getCodigo())));
+        }
+        if (exception instanceof ConstraintViolationException) {
+            SQLException s;
+            s = ((ConstraintViolationException) exception).getSQLException();
+            return helper.toResponse(new Error(s.getErrorCode(), s.getLocalizedMessage()), 500);
         }
         //Errores de Resteasy
         if (cause instanceof Failure) {

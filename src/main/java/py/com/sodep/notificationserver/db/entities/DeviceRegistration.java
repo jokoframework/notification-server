@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -38,20 +33,26 @@ public class DeviceRegistration implements Serializable {
     String estado;
     String error;
     String accion;
+    String tipo;
 
     @ManyToOne
     @JoinColumn(name = "aplicacion_id")
     @JsonIgnore
     private Aplicacion aplicacion;
 
+    public DeviceRegistration() {
+        //Default constructor
+    }
+
     public DeviceRegistration(String registrationId, String cannonicalId,
-            String estado, String error, Aplicacion aplicacion, String accion) {
+            String estado, String error, Aplicacion aplicacion, String accion, String tipo) {
         this.registrationId = registrationId;
         this.cannonicalId = cannonicalId;
         this.error = error;
         this.aplicacion = aplicacion;
         this.estado = estado;
         this.accion = accion;
+        this.tipo = tipo;
     }
 
     public Long getId() {
@@ -108,6 +109,14 @@ public class DeviceRegistration implements Serializable {
 
     public void setAccion(String accion) {
         this.accion = accion;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
 }

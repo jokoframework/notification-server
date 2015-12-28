@@ -18,6 +18,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "ios_reg_id")
 public class IosRegistrationId implements Serializable {
+
     @Id
     @GeneratedValue
     Long id;
@@ -29,8 +30,12 @@ public class IosRegistrationId implements Serializable {
     @ManyToOne
     @JoinColumn(name = "evento_id")
     @JsonIgnore
-    private final Evento evento;
-    
+    private Evento evento;
+
+    public IosRegistrationId() {
+        //Default constructor
+    }
+
     public IosRegistrationId(String token, Evento e) {
         this.token = token;
         this.evento = e;
@@ -56,5 +61,5 @@ public class IosRegistrationId implements Serializable {
     public String toString() {
         return "IosRegistrationId{" + "id=" + id + ", token=" + token + ", evento=" + evento.getId() + '}';
     }
-    
+
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 
 /**
@@ -86,12 +87,12 @@ public class EventoRequest implements Serializable{
         this.prioridad = prioridad;
     }
 
-    public HashMap<String, String> getPayload() {
+    public Map<String, String> getPayload() {
         return payload;
     }
 
-    public void setPayload(HashMap<String, String> payload) {
-        this.payload = payload;
+    public void setPayload(Map<String, String> payload) {
+        this.payload = (HashMap<String, String>) payload;
     }
 
     public List<String> getAndroidDevicesList() {
