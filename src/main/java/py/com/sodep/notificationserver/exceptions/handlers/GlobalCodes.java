@@ -44,5 +44,11 @@ public class GlobalCodes {
     }
     public static final String HABILITADA = "HABILITADA";
     public static final String BLOQUEADA = "BLOQUEADA";
+    
+    public static final String ELIMINAR = "ELIMINAR";
+    public static final String NUEVO = "NUEVO";
+    public static final String CONSULTADO = "CONSULTADO";
+    public static final String CAMBIAR = "CAMBIAR";
+    
 
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 
 /**
  *
@@ -20,14 +21,14 @@ public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration, Long> {
         getSession().beginTransaction();
         List<DeviceRegistration> a = getSession()
                 .createCriteria(DeviceRegistration.class)
-                .add(Restrictions.like("estado", "NUEVO"))
+                .add(Restrictions.like("estado", GlobalCodes.NUEVO))
                 .add(Restrictions.eq("aplicacion", aplicacion)).list();
         getSession().getTransaction().commit();
         return a;
     }
 
     public void setEstado(String estado, List<DeviceRegistration> list) {
-        
+
         for (DeviceRegistration d : list) {
             try {
                 d.setEstado("CONSULTADO");
@@ -36,6 +37,6 @@ public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration, Long> {
                 log.error(e);
             }
         }
-        
+
     }
 }

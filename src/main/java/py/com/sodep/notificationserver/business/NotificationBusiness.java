@@ -125,7 +125,6 @@ public class NotificationBusiness {
     }
 
     public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException {
-
         log.info("[Evento: " + evento.getId() + "]: notificando android");
         if (evento.getAndroidDevicesList().size() == 1) {
             log.info("[Evento: " + evento.getId() + "]: Un solo device. Notificando android");
@@ -138,25 +137,26 @@ public class NotificationBusiness {
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
 
         AndroidResponse ar;
-        try {
-            ar = service.send(apiKey, notification);
-        } catch (Exception ex) {
-            throw new BusinessException(GlobalCodes.errors.NOTIFICATION_ERROR, ex);
-        }
+        ar = service.send(apiKey, notification);
 
+        procesarErrores(evento, ar);
+        return ar;
+    }
+
+    public void procesarErrores(Evento evento, AndroidResponse ar) {
         if (ar.getFailure() > 0) {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
                 log.info("Analizando resultado: " + r);
                 if (r.getError() != null
-                        && (r.getError().equals("NotRegistered"))) {
+                        && r.getError().equals("NotRegistered")) {
                     DeviceRegistration d = new DeviceRegistration(
                             evento.getAndroidDevicesList().get(i),
                             r.getRegistrationId(),
-                            "NUEVO",
+                            GlobalCodes.NUEVO,
                             r.getError(),
                             evento.getAplicacion(),
-                            "ELIMINAR");
+                            GlobalCodes.ELIMINAR);
                     deviceDao.create(d);
                 }
                 if (r.getError() != null
@@ -165,9 +165,9 @@ public class NotificationBusiness {
                     DeviceRegistration d = new DeviceRegistration(
                             evento.getAndroidDevicesList().get(i),
                             r.getRegistrationId(),
-                            "NUEVO", r.getError(),
+                            GlobalCodes.NUEVO, r.getError(),
                             evento.getAplicacion(),
-                            "CAMBIAR");
+                            GlobalCodes.CAMBIAR);
                     deviceDao.create(d);
                 }
 
@@ -176,12 +176,11 @@ public class NotificationBusiness {
                     log.info("Se bloquea la aplicación: " + r.getError());
                     Aplicacion a = evento.getAplicacion();
                     a.setError(r.getError());
-                    a.setEstadoAndroid("BLOQUEADA");
+                    a.setEstadoAndroid(GlobalCodes.BLOQUEADA);
                     appDao.create(a);
                 }
             }
         }
-        return ar;
     }
 
     public void validate(Evento e) throws BusinessException {
