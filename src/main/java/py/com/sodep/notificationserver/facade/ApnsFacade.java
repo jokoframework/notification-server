@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
@@ -22,7 +21,6 @@ import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
-import py.com.sodep.notificationserver.exceptions.handlers.SQLExceptionHandler;
 
 public class ApnsFacade {
 
@@ -35,7 +33,7 @@ public class ApnsFacade {
             Boolean productionMode, List<String> devices) throws BusinessException {
         try {
             String threads = parametroDao.getByName("IOS_THREADS").getValor();
-            PushedNotifications result = null;
+            PushedNotifications result;
             if (threads != null) {
                 result = Push.payload(payload, certificado,
                         keyFile, productionMode, Integer.parseInt(threads), devices);
@@ -43,7 +41,7 @@ public class ApnsFacade {
                 result = Push.payload(payload, certificado,
                         keyFile, productionMode, devices);
             }
-            return procesarResponse(result, devices);
+            return procesarResponse(result);
         } catch (CommunicationException e) {
             throw new BusinessException(GlobalCodes.errors.IOS_COMM, e);
         } catch (KeystoreException e1) {
@@ -53,14 +51,13 @@ public class ApnsFacade {
         }
     }
 
-    private IosResponse procesarResponse(PushedNotifications result, List<String> devices) {
+    private static IosResponse procesarResponse(PushedNotifications result) {
         IosResponse ios = new IosResponse();
         ios.setFailure(result.getFailedNotifications().size());
         ios.setSuccess(result.getSuccessfulNotifications().size());
         ios.setResults(new ArrayList<Result>());
         int canonicalIds = 0;
-        for (int i = 0; i < result.size(); i++) {
-            PushedNotification notification = result.get(i);
+        for (PushedNotification notification : result) {
             LOGGER.info("[iOS] Divice: " + notification.getDevice().getToken());
             Result r = new Result();
 
@@ -75,9 +72,9 @@ public class ApnsFacade {
                             + diviceToken + " " + theProblem.getMessage());
                 }
                 /*
-                 * If the problem was an error-response packet returned by
-                 * Apple, get it
-                 */
+                * If the problem was an error-response packet returned by
+                * Apple, get it
+                */
                 ResponsePacket theErrorResponse = notification.getResponse();
                 if (theErrorResponse != null) {
                     if (theErrorResponse.getStatus() == 2 || theErrorResponse.getStatus() == 5 || theErrorResponse.getStatus() == 8) {

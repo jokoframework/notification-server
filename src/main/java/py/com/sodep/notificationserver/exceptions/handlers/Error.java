@@ -1,23 +1,14 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
-/**
- * User: duartm
- * Date: 18/09/13
- * Time: 04:47 PM
- */
-@XmlRootElement
 public class Error implements Serializable {
 
-    private static final long serialVersionUID = -1004168309004710157L;
-
-    private String codigo;
-    private String mensaje;
+    private final String codigo;
+    private final String mensaje;
 
     public Error(int codigo, String mensaje) {
-        this(codigo + "", mensaje);
+        this(Integer.toString(codigo), mensaje);
     }
 
     public Error(String codigo, String mensaje) {
@@ -29,23 +20,15 @@ public class Error implements Serializable {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
     public String getMensaje() {
         return mensaje;
     }
 
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
-    }
-
     @Override
     public String toString() {
-        return "Error{" +
-                "codigo='" + codigo + '\'' +
-                ", mensaje='" + mensaje + '\'' +
-                '}';
+        return "Error{"
+                + "codigo='" + codigo + '\''
+                + ", mensaje='" + mensaje + '\''
+                + '}';
     }
 }

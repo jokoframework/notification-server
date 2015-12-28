@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
 import javax.ws.rs.core.Response.Status;
+import org.apache.log4j.Logger;
 
 /**
  * @author duartm
@@ -14,6 +15,8 @@ import javax.ws.rs.core.Response.Status;
  */
 @RequestScoped
 public class ExceptionMapperHelper {
+
+    private static final Logger LOGGER = Logger.getLogger(ExceptionMapperHelper.class);
 
     private static final int httpErrorCodes[] = {400, 401, 402, 403, 404, 405,
         406, 407, 408, 409, 410, 411, 412, 413,
@@ -34,9 +37,9 @@ public class ExceptionMapperHelper {
     }
 
     public Response.ResponseBuilder finishResponse(Response.ResponseBuilder response, int statusCode) {
-
-        System.out.println("Body request de salida: " + response.build().getEntity());
-
+        LOGGER.info("StatusCode: " + statusCode);
+        LOGGER.info("Body request de salida: " + response.build().getEntity());
+        
         return response;
     }
 

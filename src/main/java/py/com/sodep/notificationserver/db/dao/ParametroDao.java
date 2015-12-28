@@ -12,7 +12,7 @@ import py.com.sodep.notificationserver.db.entities.Parametro;
  *
  * @author Vanessa
  */
-public class ParametroDao extends BaseDAO<Parametro, Long> {
+public class ParametroDao extends BaseDAO<Parametro> {
 
     public Parametro getByName(String name) {
         getSession().beginTransaction();

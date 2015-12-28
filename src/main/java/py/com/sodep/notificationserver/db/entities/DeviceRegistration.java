@@ -24,29 +24,27 @@ import javax.persistence.Table;
 @Table(name = "device_registration")
 @JsonAutoDetect
 public class DeviceRegistration implements Serializable {
+
     @Id
     @GeneratedValue
     Long id;
-    
+
     @Column(name = "registration_id")
     String registrationId;
-    
+
     @Column(name = "cannonical_id")
     String cannonicalId;
-    
+
     String estado;
     String error;
     String accion;
-    
+
     @ManyToOne
     @JoinColumn(name = "aplicacion_id")
     @JsonIgnore
     private Aplicacion aplicacion;
 
-    public DeviceRegistration() {
-    }
-
-    public DeviceRegistration(String registrationId, String cannonicalId, 
+    public DeviceRegistration(String registrationId, String cannonicalId,
             String estado, String error, Aplicacion aplicacion, String accion) {
         this.registrationId = registrationId;
         this.cannonicalId = cannonicalId;
@@ -102,7 +100,7 @@ public class DeviceRegistration implements Serializable {
 
     public void setAplicacion(Aplicacion aplicacion) {
         this.aplicacion = aplicacion;
-    }  
+    }
 
     public String getAccion() {
         return accion;
@@ -111,5 +109,5 @@ public class DeviceRegistration implements Serializable {
     public void setAccion(String accion) {
         this.accion = accion;
     }
-    
+
 }

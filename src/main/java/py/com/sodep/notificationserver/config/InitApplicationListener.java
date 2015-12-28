@@ -42,7 +42,6 @@ public class InitApplicationListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        //SessionFactory sessionFactory = (SessionFactory) servletContextEvent.getServletContext().getAttribute("SessionFactory");
         LOGGER.info("Cancelando tareas pendientes del timer android");
         androidTimer.cancel();
         LOGGER.info("Cancelando tareas pendientes del timer ios");
@@ -86,15 +85,15 @@ public class InitApplicationListener implements ServletContextListener {
             LOGGER.error("Error al crear los parámetros: ", ex);
         }
         LOGGER.info("Inicializando timer");
-        initializeTimer(20);
+        initializeTimer();
 
     }
 
-    public void initializeTimer(int seconds) {
+    public void initializeTimer() {
         LOGGER.info("Iniciando Timer Android");
-        androidTimer.schedule(androidTask, 1000, Integer.valueOf(pdao.getByName("ANDROID_TIMER").getValor()) * 1000);
+        androidTimer.schedule(androidTask, 1000, Long.valueOf(pdao.getByName("ANDROID_TIMER").getValor()) * 1000);
         LOGGER.info("Iniciando Timer Ios");
-        iosTimer.schedule(iosTask, 1000, Integer.valueOf(pdao.getByName("IOS_TIMER").getValor()) * 1000);
+        iosTimer.schedule(iosTask, 1000, Long.valueOf(pdao.getByName("IOS_TIMER").getValor()) * 1000);
     }
 
 }

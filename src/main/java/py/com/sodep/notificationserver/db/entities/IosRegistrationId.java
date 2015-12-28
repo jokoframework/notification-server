@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -18,26 +17,22 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "ios_reg_id")
-public class IosRegistrationId implements Serializable{
-
+public class IosRegistrationId implements Serializable {
     @Id
     @GeneratedValue
     Long id;
 
-    @JsonProperty(value = "registration_id")
-    @Column(name = "registration_id")
-    String registrationId;
+    @JsonProperty(value = "token")
+    @Column(name = "token")
+    String token;
 
     @ManyToOne
     @JoinColumn(name = "evento_id")
     @JsonIgnore
-    private Evento evento;
-
-    public IosRegistrationId() {
-    }
-
-    public IosRegistrationId(String registrationId, Evento e) {
-        this.registrationId = registrationId;
+    private final Evento evento;
+    
+    public IosRegistrationId(String token, Evento e) {
+        this.token = token;
         this.evento = e;
     }
 
@@ -49,12 +44,17 @@ public class IosRegistrationId implements Serializable{
         this.id = id;
     }
 
-    public String getRegistrationId() {
-        return registrationId;
+    public String getToken() {
+        return token;
     }
 
-    public void setRegistrationId(String registrationId) {
-        this.registrationId = registrationId;
+    public void setToken(String token) {
+        this.token = token;
     }
 
+    @Override
+    public String toString() {
+        return "IosRegistrationId{" + "id=" + id + ", token=" + token + ", evento=" + evento.getId() + '}';
+    }
+    
 }

@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.exceptions.handlers;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import javax.ws.rs.core.Response;
 
@@ -13,9 +14,11 @@ import javax.ws.rs.core.Response;
  * @author Vanessa
  */
 public class GlobalCodes {
-
-    protected static final HashMap<Response.Status, GlobalCodes.errors> statusError
-            = new HashMap<>();
+    private GlobalCodes(){
+        
+    }
+    protected static final EnumMap<Response.Status, GlobalCodes.errors> statusError
+            = new EnumMap<>(Response.Status.class);
 
     static {
         statusError.put(Response.Status.BAD_REQUEST, errors.BAD_REQUEST);
@@ -23,7 +26,7 @@ public class GlobalCodes {
         statusError.put(Response.Status.INTERNAL_SERVER_ERROR, errors.UNKNOWN_ERROR);
     }
 
-    public static enum errors {
+    public enum errors {
 
         APLICACION_NOT_FOUND,
         APP_PATH_NOT_FOUND,
@@ -42,12 +45,18 @@ public class GlobalCodes {
         UNKNOWN_ERROR,
         UNAUTHORIZED
     }
+    //ESTADOS DE APLICACION
     public static final String HABILITADA = "HABILITADA";
     public static final String BLOQUEADA = "BLOQUEADA";
+    //ACCIONES DE REGISTRATION ID
     public static final String ELIMINAR = "ELIMINAR";
+    public static final String CAMBIAR = "CAMBIAR";
+    //ESTADOS DE REGISTRATION ID
     public static final String NUEVO = "NUEVO";
     public static final String CONSULTADO = "CONSULTADO";
-    public static final String CAMBIAR = "CAMBIAR";
+    //ESTADO DE NOTIFICACIONES
+    public static final String NO_APLICA = "N/A";
+    public static final String PENDIENTE = "PENDIENTE";
     public static final String ENVIADO = "ENVIADO";
     public static final String SUSPENDIDO = "SUSPENDIDO";
     public static final String ERROR = "ERROR";

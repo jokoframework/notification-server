@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -19,8 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
 import py.com.sodep.notificationserver.rest.entities.EventoRequest;
 
 @Entity
@@ -73,9 +71,6 @@ public class Evento implements Serializable {
     @JoinColumn(name = "ios_response_id")
     private IosResponse iosResponse;
 
-    public Evento() {
-    }
-
     public Evento(EventoRequest e) {
 
         if (e.getAndroidDevicesList() != null) {
@@ -97,15 +92,15 @@ public class Evento implements Serializable {
         this.alert = e.getAlert();
         this.prioridad = e.getPrioridad();
         this.setPayload(e.getPayload());
-        if (e.getAndroidDevicesList() != null && e.getAndroidDevicesList().size() > 0) {
-            this.estadoAndroid = "PENDIENTE";
+        if (e.getAndroidDevicesList() != null && !e.getAndroidDevicesList().isEmpty()) {
+            this.estadoAndroid = GlobalCodes.PENDIENTE;
         } else {
-            this.estadoAndroid = "NO APLICA";
+            this.estadoAndroid = GlobalCodes.NO_APLICA;
         }
-        if (e.getIosDevicesList() != null && e.getIosDevicesList().size() > 0) {
-            this.estadoIos = "PENDIENTE";
+        if (e.getIosDevicesList() != null && !e.getIosDevicesList().isEmpty()) {
+            this.estadoIos = GlobalCodes.PENDIENTE;
         } else {
-            this.estadoIos = "NO APLICA";
+            this.estadoIos = GlobalCodes.NO_APLICA;
         }
 
     }
@@ -168,7 +163,6 @@ public class Evento implements Serializable {
                 payloads.add(p);
             }
         }
-        System.out.println("PAYLOAD STRING: " + this.payloads.toString());
     }
 
     public ObjectNode getPayload() {
@@ -177,7 +171,7 @@ public class Evento implements Serializable {
         for (Payload s : this.payloads) {
             jn.put(s.getClave(), s.getValor());
         }
-        System.out.println("ANDROID PAYLOAD: " + jn.toString());
+
         return jn;
     }
 
@@ -222,7 +216,6 @@ public class Evento implements Serializable {
         for (Payload s : this.payloads) {
             jn.put(s.getClave(), String.valueOf(s.getValor()));
         }
-        System.out.println("ANDROID PAYLOAD: " + jn.toString());
         return jn;
     }
 
@@ -255,7 +248,7 @@ public class Evento implements Serializable {
         List<String> devices = new ArrayList<>();
         if (this.getIosDevices() != null) {
             for (IosRegistrationId ri : this.getIosDevices()) {
-                devices.add(ri.getRegistrationId());
+                devices.add(ri.getToken());
             }
         }
         return devices;
@@ -263,12 +256,9 @@ public class Evento implements Serializable {
 
     @JsonIgnore
     public List<String> getAndroidDevicesList() {
-        System.out.println("Obteniendo android device list");
         List<String> devices = new ArrayList<>();
         if (this.getAndroidDevices() != null) {
-            System.out.println(this.getAndroidDevices());
             for (AndroidRegistrationId ri : this.getAndroidDevices()) {
-                System.out.println(ri.getRegistrationId());
                 devices.add(ri.getRegistrationId());
             }
         }
@@ -277,12 +267,12 @@ public class Evento implements Serializable {
 
     public boolean isIosEvent() {
         return this.getIosDevicesList() != null
-                && this.getIosDevicesList().size() > 0;
+                && !this.getIosDevicesList().isEmpty();
     }
 
     public boolean isAndroidEvent() {
         return this.getAndroidDevicesList() != null
-                && this.getAndroidDevicesList().size() > 0;
+                && !this.getAndroidDevicesList().isEmpty();
     }
 
     @Override

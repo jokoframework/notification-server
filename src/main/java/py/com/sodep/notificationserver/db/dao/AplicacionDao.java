@@ -13,14 +13,13 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
  *
  * @author Vanessa
  */
-public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
+public class AplicacionDao extends BaseDAO<Aplicacion> {
 
     public Aplicacion getByName(String name) {
         getSession().beginTransaction();
         Aplicacion a = (Aplicacion) getSession()
                 .createCriteria(Aplicacion.class)
                 .add(Restrictions.like("nombre", name)).uniqueResult();
-        System.out.println("Aplicacion encontrada: " + a);
         getSession().getTransaction().commit();
         return a;
     }
@@ -30,7 +29,6 @@ public class AplicacionDao extends BaseDAO<Aplicacion, Long> {
         List<Aplicacion> a = getSession()
                 .createCriteria(Aplicacion.class)
                 .add(Restrictions.like("estado", name)).list();
-        System.out.println("Aplicacion encontrada: " + a);
         getSession().getTransaction().commit();
         return a;
     }

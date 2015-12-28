@@ -6,6 +6,7 @@
 package py.com.sodep.notificationserver.db.dao;
 
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
@@ -15,7 +16,9 @@ import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
  *
  * @author Vanessa
  */
-public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration, Long> {
+public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration> {
+
+    private static final Logger LOGGER = Logger.getLogger(DeviceRegistrationDao.class);
 
     public List<DeviceRegistration> getPendientes(Aplicacion aplicacion) {
         getSession().beginTransaction();
@@ -31,10 +34,10 @@ public class DeviceRegistrationDao extends BaseDAO<DeviceRegistration, Long> {
 
         for (DeviceRegistration d : list) {
             try {
-                d.setEstado("CONSULTADO");
+                d.setEstado(estado);
                 create(d);
             } catch (Exception e) {
-                log.error(e);
+                LOGGER.error(e);
             }
         }
 

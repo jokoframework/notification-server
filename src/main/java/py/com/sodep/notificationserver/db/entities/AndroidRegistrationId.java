@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +17,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "android_reg_id")
-public class AndroidRegistrationId implements Serializable{
+public class AndroidRegistrationId implements Serializable {
 
     @Id
     @GeneratedValue
@@ -35,10 +30,7 @@ public class AndroidRegistrationId implements Serializable{
     @ManyToOne
     @JoinColumn(name = "evento_id")
     @JsonIgnore
-    private Evento evento;
-
-    public AndroidRegistrationId() {
-    }
+    private final Evento evento;
 
     public AndroidRegistrationId(String registrationId, Evento e) {
         this.registrationId = registrationId;
@@ -61,4 +53,12 @@ public class AndroidRegistrationId implements Serializable{
         this.registrationId = registrationId;
     }
 
+    public Evento getEvento() {
+        return evento;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getName() + "{" + "id=" + id + ", registrationId=" + registrationId + '}';
+    }
 }

@@ -27,6 +27,8 @@ import py.com.sodep.notificationserver.facade.ApnsFacade;
  */
 public class AplicacionBusiness {
 
+    private static final Logger LOGGER = Logger.getLogger(AplicacionBusiness.class);
+
     @Inject
     AplicacionDao applicationDao;
 
@@ -38,8 +40,6 @@ public class AplicacionBusiness {
 
     @Inject
     ApnsFacade facade;
-
-    private static final Logger LOGGER = Logger.getLogger(AplicacionBusiness.class);
 
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws BusinessException {
         Aplicacion a = null;
@@ -182,7 +182,7 @@ public class AplicacionBusiness {
     public List<DeviceRegistration> getListaRegIdInvalido(Long id) {
         Aplicacion a = getApplication(id);
         List<DeviceRegistration> nuevos = deviceDao.getPendientes(a);
-        deviceDao.setEstado("CONSULTADO", nuevos);
+        deviceDao.setEstado(GlobalCodes.CONSULTADO, nuevos);
         return nuevos;
     }
 

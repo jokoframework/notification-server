@@ -6,21 +6,24 @@
 package py.com.sodep.notificationserver.db.dao;
 
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
+import py.com.sodep.notificationserver.config.InitApplicationListener;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**
  *
  * @author Vanessa
  */
-public class EventoDao extends BaseDAO<Evento, Long> {
+public class EventoDao extends BaseDAO<Evento> {
+    private static final Logger LOGGER = Logger.getLogger(EventoDao.class);
 
     public List<Evento> getPendientesAndroid() {
         getSession().beginTransaction();
         List<Evento> eventos = getSession()
                 .createCriteria(Evento.class)
                 .add(Restrictions.like("estadoAndroid", "PENDIENTE")).list();
-        System.out.println("[EventoDao] Eventos ANDROID: " + eventos.size());
+        LOGGER.info("[EventoDao] Eventos ANDROID: " + eventos.size());
         getSession().getTransaction().commit();
         return eventos;
     }
@@ -29,7 +32,7 @@ public class EventoDao extends BaseDAO<Evento, Long> {
         List<Evento> eventos = getSession()
                 .createCriteria(Evento.class)
                 .add(Restrictions.like("estadoIos", "PENDIENTE")).list();
-        System.out.println("[EventoDao] Eventos IOS: " + eventos.size());
+        LOGGER.info("[EventoDao] Eventos IOS: " + eventos.size());
         getSession().getTransaction().commit();
         return eventos;
     }

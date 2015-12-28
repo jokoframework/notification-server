@@ -34,6 +34,7 @@ public class Parametro  implements Serializable {
     private String tipoDato;
 
     public Parametro() {
+        //Default constructor
     }
 
     public Parametro(String name, String valor, String tipoDato) {

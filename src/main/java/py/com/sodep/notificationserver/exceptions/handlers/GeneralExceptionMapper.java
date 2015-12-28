@@ -31,7 +31,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
     public Response toResponse(Exception exception) {
         Throwable cause = Throwables.getRootCause(exception);
         if (exception instanceof BusinessException){
-            System.out.println("Es un bussibesException");
+            LOGGER.info("Es un bussibesException");
             Error error = ((BusinessException)exception).getError();
             return helper.toResponse(error, mapErrorCode(Integer.valueOf(error.getCodigo())));
         }

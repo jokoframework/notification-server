@@ -19,27 +19,23 @@ import org.hibernate.Transaction;
  *
  * @author Vanessa
  * @param <T>
- * @param <PK>
  */
-public class BaseDAO<T, PK extends Serializable> {
+public class BaseDAO<T> {
 
-    @Inject
-    Logger log;
-
-    public BaseDAO() {
-    }
+    private static final Logger LOGGER = Logger.getLogger(BaseDAO.class);
 
     public Session getSession() {
         return HibernateSessionLocal.getSessionFactory().getCurrentSession();
     }
 
-    public void save(T entity) throws Exception {
+    public void save(T entity) {
         try {
             getSession().beginTransaction();
             getSession().persist(entity);
             getSession().getTransaction().commit();
         } catch (HibernateException e) {
             if (getSession().getTransaction() != null) {
+                LOGGER.error("ROLLBACK: " + entity);
                 getSession().getTransaction().rollback();
             }
             throw e;
@@ -47,48 +43,45 @@ public class BaseDAO<T, PK extends Serializable> {
     }
 
     public T findById(long id, Class<T> objectClass) {
-        try {
-            getSession().beginTransaction();
-            T result = (T) getSession().get(objectClass, id);
-            if (result != null) {
-                Hibernate.initialize(result);
-                return result;
-            } else {
-                throw new ObjectNotFoundException(id, objectClass.getName());
-            }
-        } finally {
+        LOGGER.info("Buscando: " + objectClass);
+        getSession().beginTransaction();
+        T result = (T) getSession().get(objectClass, id);
+        if (result != null) {
+            Hibernate.initialize(result);
             getSession().getTransaction().commit();
+            return result;
+        } else {
+            throw new ObjectNotFoundException(id, objectClass.getName());
         }
     }
 
-    public T create(T newInstance) throws HibernateException {
+    public T create(T entity) throws HibernateException {
         try {
-            log.info("Persistiendo: " + newInstance.toString());
             getSession().beginTransaction();
-            //getSession().evict(newInstance);
-            getSession().saveOrUpdate(newInstance);
+            getSession().saveOrUpdate(entity);
             getSession().getTransaction().commit();
         } catch (HibernateException e) {
             if (getSession().getTransaction() != null) {
+                LOGGER.error("ROLLBACK: " + entity);
                 getSession().getTransaction().rollback();
             }
             throw e;
         }
-        return newInstance;
+        return entity;
     }
 
-    public boolean update(T updateInstance) {
-
+    public boolean update(T entity) {
         Transaction tx = getSession().beginTransaction();
         try {
-            if (updateInstance == null) {
+            if (entity == null) {
                 return false;
             }
-            getSession().evict(updateInstance);
-            getSession().update(updateInstance);
+            getSession().evict(entity);
+            getSession().update(entity);
             tx.commit();
             return true;
         } catch (Exception e) {
+            LOGGER.error("ROLLBACK: " + entity);
             tx.rollback();
             throw e;
         }
@@ -103,43 +96,9 @@ public class BaseDAO<T, PK extends Serializable> {
             getSession().getTransaction().commit();
             return true;
         } catch (HibernateException e) {
+            LOGGER.error("ROLLBACK: " + entity);
             getSession().getTransaction().rollback();
             throw e;
         }
     }
-
-    /*private Class<T> type;
-
-     @SuppressWarnings("unchecked")
-     public PK create(T object) {
-     return (PK) getSession().save(object);
-     }
-
-     @SuppressWarnings("unchecked")
-     public T read(PK id) {
-     return (T) getSession().get(type, id);
-     }
-
-     public List<T> readAll() {
-     return readByCriteria();
-     }
-
-     @SuppressWarnings("unchecked")
-     public List<T> readByCriteria(Criterion... criterion) {
-     Criteria crit = getSession().createCriteria(type);
-     for (Criterion c : criterion) {
-     crit.add(c);
-     }
-     return crit.list();
-     }
-
-     @Transactional
-     public void update(T object) {
-     getSession().update(object);
-     }
-
-     @Transactional
-     public void delete(T object) {
-     getSession().delete(object);
-     }*/
 }
