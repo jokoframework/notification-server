@@ -6,8 +6,6 @@
 package py.com.sodep.notificationserver.db.dao;
 
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
-import java.io.Serializable;
-import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;

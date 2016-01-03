@@ -18,7 +18,7 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.AplicacionFile;
 import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 
 /**

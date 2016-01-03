@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package py.com.sodep.notificationserver.exceptions.handlers;
 
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import javax.ws.rs.core.Response;
 
 /**
@@ -27,12 +23,12 @@ public class BusinessException extends Exception {
 
     public BusinessException(Response.Status status, Throwable cause) {
         super(cause);
-        this.error = GlobalCodes.statusError.get(status);
+        this.error = GlobalCodes.getStatusErr(status);
     }
 
     public BusinessException(Response.Status status, String mensaje) {
         super(mensaje);
-        this.error = GlobalCodes.statusError.get(status);
+        this.error = GlobalCodes.getStatusErr(status);
     }
 
     public Error getError() {

@@ -19,7 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import py.com.sodep.notificationserver.rest.entities.EventoRequest;
 
 @Entity

@@ -1,6 +1,5 @@
 package py.com.sodep.notificationserver.rest;
 
-import java.sql.SQLException;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;

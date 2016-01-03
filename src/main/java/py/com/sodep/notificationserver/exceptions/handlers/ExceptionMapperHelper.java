@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import com.google.common.base.Throwables;
 
 import javax.enterprise.context.RequestScoped;
@@ -9,10 +10,6 @@ import java.util.Arrays;
 import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 
-/**
- * @author duartm
- * @version 1.0 03/04/2014
- */
 @RequestScoped
 public class ExceptionMapperHelper {
 

@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 
 /**
  *

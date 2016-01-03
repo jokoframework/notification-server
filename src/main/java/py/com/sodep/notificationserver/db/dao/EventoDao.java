@@ -8,7 +8,6 @@ package py.com.sodep.notificationserver.db.dao;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
-import py.com.sodep.notificationserver.config.InitApplicationListener;
 import py.com.sodep.notificationserver.db.entities.Evento;
 
 /**

@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.logging.Level;
 import javax.ws.rs.core.Response.Status;
 import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
@@ -20,8 +19,7 @@ import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.AndroidNotification;
 import py.com.sodep.notificationserver.db.entities.AndroidResponse;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
-import py.com.sodep.notificationserver.exceptions.handlers.SQLExceptionHandler;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 
 /**
  * Se comunica con el servidor GCM para enviar la notificación correspondiente

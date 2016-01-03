@@ -3,7 +3,6 @@ package py.com.sodep.notificationserver.facade;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javapns.Push;
 import javapns.communication.exceptions.CommunicationException;
@@ -20,7 +19,7 @@ import py.com.sodep.notificationserver.db.dao.ParametroDao;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 
 public class ApnsFacade {
 
@@ -104,8 +103,8 @@ public class ApnsFacade {
     public List<Device> getInactiveDevices(File certificado, String keyFile,
             Boolean productionMode) throws BusinessException {
         try {
-            Vector<Device> lista;
-            lista = (Vector) Push.feedback(certificado, keyFile, productionMode);
+            List<Device> lista;
+            lista = (List) Push.feedback(certificado, keyFile, productionMode);
             return lista;
         } catch (CommunicationException e) {
             throw new BusinessException(GlobalCodes.errors.IOS_COMM, e);

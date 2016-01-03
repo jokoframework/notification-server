@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.exceptions.handlers;
 
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import org.jboss.resteasy.spi.ReaderException;
 
 import javax.inject.Inject;

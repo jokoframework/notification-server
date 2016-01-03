@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package py.com.sodep.notificationserver.exceptions.handlers;
+package py.com.sodep.notificationserver.config;
 
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
@@ -14,10 +10,7 @@ import javax.ws.rs.core.Response;
  * @author Vanessa
  */
 public class GlobalCodes {
-    private GlobalCodes(){
-        
-    }
-    protected static final EnumMap<Response.Status, GlobalCodes.errors> statusError
+    protected static final Map<Response.Status, GlobalCodes.errors> statusError
             = new EnumMap<>(Response.Status.class);
 
     static {
@@ -97,4 +90,11 @@ public class GlobalCodes {
     public static String getAccion(String error) {
         return accion.get(error);
     }
+    public static GlobalCodes.errors getStatusErr(Response.Status status){
+        return statusError.get(status);
+    }
+    private GlobalCodes(){
+        
+    }
+    
 }

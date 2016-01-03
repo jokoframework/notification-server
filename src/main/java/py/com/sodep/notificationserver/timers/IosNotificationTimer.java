@@ -10,11 +10,13 @@ import java.util.TimerTask;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.business.NotificationBusiness;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
+import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 
 /**
  *
@@ -36,30 +38,49 @@ public class IosNotificationTimer extends TimerTask {
         log.info("[IOS]: se encontraron " + eventos.size() + " eventos.");
         for (Evento e : eventos) {
             log.info("[IOS]: Notificando evento: " + e);
-            try {
-                if (e.getAplicacion() == null) {
-                    throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, "La aplicacion " + e.getAplicacion().getNombre() + " no existe.");
+            if (aplicacionHabilitada(e.getAplicacion())) {
+                try {
+                    notificar(e);
+                } catch (RuntimeException | BusinessException ex) {
+                    log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
                 }
-                if (e.isProductionMode()) {
-                    if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {
-                        e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoProd(), e.getAplicacion().getKeyFileProd(), e, true));
-                    }
-                } else {
-                    if (e.getAplicacion().getCertificadoDev() != null && e.getAplicacion().getKeyFileDev() != null) {
-                        e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoDev(), e.getAplicacion().getKeyFileDev(), e, false));
-                    }
-                }
-
-                if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {
-                    e.setEstadoIos("ENVIADO");
-                } else {
-                    e.setEstadoIos(GlobalCodes.ERROR);
-                }
-
-                dao.create(e);
-            } catch (RuntimeException | BusinessException ex) {
-                log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
+            } else {
+                suspenderNotificaciones(e);
             }
+        }
+    }
+
+    public void notificar(Evento e) throws BusinessException {
+        if (e.isProductionMode()) {
+            if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {
+                e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoProd(), e.getAplicacion().getKeyFileProd(), e, true));
+            }
+        } else {
+            if (e.getAplicacion().getCertificadoDev() != null && e.getAplicacion().getKeyFileDev() != null) {
+                e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoDev(), e.getAplicacion().getKeyFileDev(), e, false));
+            }
+        }
+
+        if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {
+            e.setEstadoIos("ENVIADO");
+        } else {
+            e.setEstadoIos(GlobalCodes.ERROR);
+        }
+
+        dao.create(e);
+    }
+
+    public static boolean aplicacionHabilitada(Aplicacion a) {
+        return (a.getEstadoIos() != null && !a.getEstadoIos().equals(GlobalCodes.BLOQUEADA)) || a.getEstadoIos() == null;
+    }
+
+    public void suspenderNotificaciones(Evento e) {
+        try {
+            log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
+            e.setEstadoIos(GlobalCodes.SUSPENDIDO);
+            dao.create(e);
+        } catch (HibernateException ex) {
+            log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);
         }
     }
 }

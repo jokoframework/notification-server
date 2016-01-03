@@ -79,7 +79,7 @@ public class InitApplicationListener implements ServletContextListener {
             pdao.save(new Parametro("IOS_TIMER", "60", "Integer"));
 
             LOGGER.info("Creando Parametro: ANDROID_TIMER");
-            pdao.save(new Parametro("ANDROID_TIMER", "50", "Integer"));
+            pdao.save(new Parametro("ANDROID_TIMER", "10", "Integer"));
 
         } catch (Exception ex) {
             LOGGER.error("Error al crear los parámetros: ", ex);

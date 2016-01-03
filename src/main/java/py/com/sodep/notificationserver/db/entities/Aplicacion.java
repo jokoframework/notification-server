@@ -5,15 +5,12 @@ import java.io.Serializable;
 import javax.persistence.*;
 import javax.ws.rs.FormParam;
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 
 @Entity
 @Table(name = "aplicacion")
 public class Aplicacion implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 6163667597446187934L;
 
     @Id

@@ -3,14 +3,12 @@ package py.com.sodep.notificationserver.business;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
@@ -22,7 +20,7 @@ import py.com.sodep.notificationserver.db.entities.DeviceRegistration;
 import py.com.sodep.notificationserver.db.entities.IosResponse;
 import py.com.sodep.notificationserver.db.entities.Result;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
-import py.com.sodep.notificationserver.exceptions.handlers.GlobalCodes;
+import py.com.sodep.notificationserver.config.GlobalCodes;
 import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
 import py.com.sodep.notificationserver.rest.entities.EventoResponse;
@@ -126,14 +124,8 @@ public class NotificationBusiness {
 
     public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException {
         LOGGER.info("[Evento: " + evento.getId() + "]: notificando android");
-        if (evento.getAndroidDevicesList().size() == 1) {
-            LOGGER.info("[Evento: " + evento.getId() + "]: Un solo device. Notificando android");
-            notification.setTo(evento.getAndroidDevicesList().get(0));
-        } else {
-            LOGGER.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
-            notification.setRegistrationIds(evento.getAndroidDevicesList());
-        }
-
+        LOGGER.info("[Evento: " + evento.getId() + "]: Lista. Notificando android");
+        notification.setRegistrationIds(evento.getAndroidDevicesList());
         notification.setData(evento.getObjectNodePayLoad().put("alert", evento.getAlert()));
 
         AndroidResponse ar;
