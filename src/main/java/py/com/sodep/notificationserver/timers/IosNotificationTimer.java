@@ -17,6 +17,7 @@ import py.com.sodep.notificationserver.db.entities.Aplicacion;
 import py.com.sodep.notificationserver.db.entities.Evento;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 import py.com.sodep.notificationserver.config.GlobalCodes;
+import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 
 /**
  *
@@ -31,8 +32,11 @@ public class IosNotificationTimer extends TimerTask {
     NotificationBusiness business;
     @Inject
     EventoDao dao;
+    @Inject
+    AplicacionDao appDao;
 
     @Override
+
     public void run() {
         ArrayList<Evento> eventos = (ArrayList) dao.getPendientesIos();
         log.info("[IOS]: se encontraron " + eventos.size() + " eventos.");
@@ -41,13 +45,32 @@ public class IosNotificationTimer extends TimerTask {
             if (aplicacionHabilitada(e.getAplicacion())) {
                 try {
                     notificar(e);
-                } catch (RuntimeException | BusinessException ex) {
+                } catch (RuntimeException ex) {
                     log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
+                } catch (BusinessException ex) {
+                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
+                    if (isErrorIosApp(ex.getError().getCodigo())) {
+                        bloquearAplicacion(e.getAplicacion(), ex.getError());
+                    }
                 }
             } else {
                 suspenderNotificaciones(e);
             }
         }
+    }
+
+    public void bloquearAplicacion(Aplicacion a, py.com.sodep.notificationserver.exceptions.handlers.Error e) {
+        a.setError(e.getCodigo() + ": " + e.getMensaje());
+        a.setEstadoIos(GlobalCodes.BLOQUEADA);
+        try {
+            appDao.create(a);
+        } catch (HibernateException ex) {
+            log.error("[ANDROID]Error al bloquear aplicacion: ", ex);
+        }
+    }
+
+    public boolean isErrorIosApp(String codigo) {
+        return codigo.equals(String.valueOf(GlobalCodes.errors.IOS_KEY_STORE.ordinal()));
     }
 
     public void notificar(Evento e) throws BusinessException {

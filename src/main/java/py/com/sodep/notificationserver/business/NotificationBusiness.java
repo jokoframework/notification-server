@@ -118,8 +118,31 @@ public class NotificationBusiness {
             LOGGER.error(e);
             throw new BusinessException(GlobalCodes.errors.BAD_REQUEST, "Error al parsear payload en notificacion iOs.");
         }
-        return facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
+        IosResponse response = facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
+        procesarErroresIos(evento, response);
 
+        return response;
+
+    }
+
+    public void procesarErroresIos(Evento e, IosResponse res) {
+        if (res.getFailure() > 0) {
+            for (int i = 0; i < res.getResults().size(); i++) {
+                Result r = res.getResults().get(i);
+                LOGGER.info("Analizando resultado: " + r);
+                if (r.getOriginalRegistrationId()!=null){
+                    DeviceRegistration d = new DeviceRegistration(
+                            e.getAndroidDevicesList().get(i),
+                            r.getRegistrationId(),
+                            GlobalCodes.NUEVO,
+                            r.getError(),
+                            e.getAplicacion(),
+                            GlobalCodes.ELIMINAR,
+                            GlobalCodes.IOS);
+                    deviceDao.create(d);
+                }
+            }
+        }
     }
 
     public AndroidResponse notificarAndroid(String apiKey, Evento evento) throws BusinessException {
@@ -130,12 +153,11 @@ public class NotificationBusiness {
 
         AndroidResponse ar;
         ar = service.send(apiKey, notification);
-
-        procesarErrores(evento, ar);
+        procesarErroresAndroid(evento, ar);
         return ar;
     }
 
-    public void procesarErrores(Evento evento, AndroidResponse ar) {
+    public void procesarErroresAndroid(Evento evento, AndroidResponse ar) {
         if (ar.getFailure() > 0) {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
