@@ -67,7 +67,7 @@ public class InitApplicationListener implements ServletContextListener {
 
         try {
             LOGGER.info("Creando Parametro: PATH_CERTIFICADOS");
-            pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\Users\\Vanessa\\Documents\\work", "String"));
+            pdao.save(new Parametro("PATH_CERTIFICADOS", "C:\\certificados", "String"));
 
             LOGGER.info("Creando Parametro: URL_GCM");
             pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
@@ -76,7 +76,7 @@ public class InitApplicationListener implements ServletContextListener {
             pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
 
             LOGGER.info("Creando Parametro: IOS_TIMER");
-            pdao.save(new Parametro("IOS_TIMER", "60", "Integer"));
+            pdao.save(new Parametro("IOS_TIMER", "10", "Integer"));
 
             LOGGER.info("Creando Parametro: ANDROID_TIMER");
             pdao.save(new Parametro("ANDROID_TIMER", "10", "Integer"));

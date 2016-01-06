@@ -31,21 +31,26 @@ public class ApnsFacade {
     public IosResponse send(Payload payload, File certificado, String keyFile,
             Boolean productionMode, List<String> devices) throws BusinessException {
         try {
-            String threads = parametroDao.getByName("IOS_THREADS").getValor();
+            LOGGER.info("Enviando notificacion IOS");
             PushedNotifications result;
-            if (threads != null) {
+            String threads = parametroDao.getByName("IOS_THREADS").getValor();
+            if (threads != null && devices.size() >= Integer.parseInt(threads)) {
                 result = Push.payload(payload, certificado,
                         keyFile, productionMode, Integer.parseInt(threads), devices);
             } else {
                 result = Push.payload(payload, certificado,
                         keyFile, productionMode, devices);
             }
+            LOGGER.info("Procesando response: " + result.toString());
             return procesarResponse(result);
         } catch (CommunicationException e) {
+            LOGGER.error("CommunicationException" + e.getMessage());
             throw new BusinessException(GlobalCodes.errors.IOS_COMM, e);
         } catch (KeystoreException e1) {
+            LOGGER.error("KeystoreException" + e1.getMessage());
             throw new BusinessException(GlobalCodes.errors.IOS_KEY_STORE, e1);
         } catch (Exception ex) {
+            LOGGER.error("Exception" + ex.getMessage());
             throw new BusinessException(GlobalCodes.errors.IOS_PUSH_PAYLOAD, ex);
         }
     }
@@ -92,13 +97,14 @@ public class ApnsFacade {
         }
         return r;
     }
+
     /**
-     * 
+     *
      * @param certificado
      * @param keyFile
      * @param productionMode
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Device> getInactiveDevices(File certificado, String keyFile,
             Boolean productionMode) throws BusinessException {

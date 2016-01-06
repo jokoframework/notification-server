@@ -91,7 +91,7 @@ public class NotificationBusiness {
     @SuppressWarnings("rawtypes")
     public IosResponse notificarIos(String certifadoPath, String keyFile,
             Evento evento, Boolean productionMode) throws BusinessException {
-        LOGGER.info("[Evento: " + evento.getId() + "]: Notificando iOs");
+        LOGGER.info("[Evento: " + evento + "]: Notificando iOs");
         File certificado = new File(certifadoPath);
         Payload payload = PushNotificationPayload.complex();
         ObjectNode pay = evento.getObjectNodePayLoad();
@@ -119,6 +119,7 @@ public class NotificationBusiness {
             throw new BusinessException(GlobalCodes.errors.BAD_REQUEST, "Error al parsear payload en notificacion iOs.");
         }
         IosResponse response = facade.send(payload, certificado, keyFile, productionMode, evento.getIosDevicesList());
+        LOGGER.info("[IOS] Response: " + response);
         procesarErroresIos(evento, response);
 
         return response;
@@ -126,6 +127,7 @@ public class NotificationBusiness {
     }
 
     public void procesarErroresIos(Evento e, IosResponse res) {
+        LOGGER.info("Procesando Errores");
         if (res.getFailure() > 0) {
             for (int i = 0; i < res.getResults().size(); i++) {
                 Result r = res.getResults().get(i);
