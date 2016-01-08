@@ -48,12 +48,15 @@ public class IosNotificationTimer extends TimerTask {
                 } catch (RuntimeException ex) {
                     log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
                 } catch (BusinessException ex) {
-                    log.error("[ANDROID][Evento: " + e.getId() + "]Error al notificar: ", ex);
+                    log.error("[IOS][Evento: " + e.getId() + "]Error al notificar: ", ex);
                     if (isErrorIosApp(ex.getError().getCodigo())) {
                         bloquearAplicacion(e.getAplicacion(), ex.getError());
                     }
+                    e.setEstadoIos(GlobalCodes.ERROR);
+                    dao.create(e);
                 }
             } else {
+                log.info("La aplicacion " + e.getAplicacion().getNombre() + " deshabilitada");
                 suspenderNotificaciones(e);
             }
         }
@@ -74,23 +77,36 @@ public class IosNotificationTimer extends TimerTask {
     }
 
     public void notificar(Evento e) throws BusinessException {
+        log.info("Production Mode: " + controlarProductionMode(e));
+        log.info("Development Mode: " + controlarDeveloperMode(e));
         if (e.isProductionMode()) {
-            if (e.getAplicacion().getCertificadoProd() != null && e.getAplicacion().getKeyFileProd() != null) {
+            if (controlarProductionMode(e)) {
                 e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoProd(), e.getAplicacion().getKeyFileProd(), e, true));
             }
         } else {
-            if (e.getAplicacion().getCertificadoDev() != null && e.getAplicacion().getKeyFileDev() != null) {
+            if (controlarDeveloperMode(e)) {
                 e.setIosResponse(business.notificarIos(e.getAplicacion().getCertificadoDev(), e.getAplicacion().getKeyFileDev(), e, false));
             }
         }
 
         if (e.getIosResponse() != null && e.getIosResponse().getError() == null) {
-            e.setEstadoIos("ENVIADO");
+            e.setEstadoIos(GlobalCodes.ENVIADO);
         } else {
             e.setEstadoIos(GlobalCodes.ERROR);
         }
 
+        log.error("Actualizando evento: " + e.getEstadoIos());
         dao.create(e);
+    }
+
+    public boolean controlarProductionMode(Evento e) {
+        return e.getAplicacion().getCertificadoProd() != null
+                && e.getAplicacion().getKeyFileProd() != null;
+    }
+
+    public boolean controlarDeveloperMode(Evento e) {
+        return e.getAplicacion().getCertificadoDev() != null
+                && e.getAplicacion().getKeyFileDev() != null;
     }
 
     public static boolean aplicacionHabilitada(Aplicacion a) {
