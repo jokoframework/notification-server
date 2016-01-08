@@ -66,27 +66,24 @@ public class InitApplicationListener implements ServletContextListener {
         LOGGER.info("Released Hibernate sessionFactory resource");
 
         try {
-            LOGGER.info("Creando Parametro: PATH_CERTIFICADOS");
-            pdao.save(new Parametro("PATH_CERTIFICADOS", "/srv/notification-server/certs", "String"));
-
-            LOGGER.info("Creando Parametro: URL_GCM");
-            pdao.save(new Parametro("URL_GCM", "https://android.googleapis.com/gcm/send", "String"));
-
-            LOGGER.info("Creando Parametro: IOS_THREADS");
-            pdao.save(new Parametro("IOS_THREADS", "3", "Integer"));
-
-            LOGGER.info("Creando Parametro: IOS_TIMER");
-            pdao.save(new Parametro("IOS_TIMER", "10", "Integer"));
-
-            LOGGER.info("Creando Parametro: ANDROID_TIMER");
-            pdao.save(new Parametro("ANDROID_TIMER", "10", "Integer"));
-
+            createParam("PATH_CERTIFICADOS", "/srv/notification-server/certs", "String");
+            createParam("URL_GCM", "https://android.googleapis.com/gcm/send", "String");
+            createParam("IOS_THREADS", "3", "Integer");
+            createParam("IOS_TIMER", "10", "Integer");
+            createParam("ANDROID_TIMER", "10", "Integer");
         } catch (Exception ex) {
             LOGGER.error("Error al crear los parámetros: ", ex);
         }
         LOGGER.info("Inicializando timer");
         initializeTimer();
 
+    }
+
+    public void createParam(String key, String value, String datatype) {
+        if (pdao.getByName(key) == null) {
+            LOGGER.info("Creando Parametro: " + key + " - " + value + " - " + datatype);
+            pdao.save(new Parametro(key, value, datatype));
+        }
     }
 
     public void initializeTimer() {
