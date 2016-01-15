@@ -177,8 +177,7 @@ public class NotificationBusiness {
                             GlobalCodes.ANDROID);
                     deviceDao.create(d);
                 }
-                if (r.getError() != null && (r.getError().equals(GlobalCodes.InvalidPackageName)
-                        || r.getError().equals(GlobalCodes.MismatchSenderId))) {
+                if (r.getError() != null && r.getError().equals(GlobalCodes.InvalidPackageName)) {
                     LOGGER.info("Se bloquea la aplicación: " + r.getError());
                     Aplicacion a = evento.getAplicacion();
                     a.setError(r.getError());
