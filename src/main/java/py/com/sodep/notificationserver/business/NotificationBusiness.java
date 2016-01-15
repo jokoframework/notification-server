@@ -7,7 +7,6 @@ import java.util.Iterator;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
@@ -25,7 +24,6 @@ import py.com.sodep.notificationserver.facade.ApnsFacade;
 import py.com.sodep.notificationserver.facade.GcmFacade;
 import py.com.sodep.notificationserver.rest.entities.EventoResponse;
 
-@ApplicationScoped
 public class NotificationBusiness {
 
     @Inject
