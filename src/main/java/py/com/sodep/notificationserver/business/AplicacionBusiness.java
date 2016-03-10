@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javapns.devices.Device;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -92,40 +94,44 @@ public class AplicacionBusiness {
     }
 
     public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws BusinessException {
-        Aplicacion a;
-        if (id != null) {
-            a = applicationDao.findById(id, Aplicacion.class);
-        } else {
-            a = b.getAplicacion();
-        }
-        a.setApiKeyDev(b.getApiKeyDev());
-        a.setApiKeyProd(b.getApiKeyProd());
-        a.setKeyFileDev(b.getKeyFileDev());
-        a.setKeyFileProd(b.getKeyFileProd());
-        a.setNombre(b.getNombre());
-        a.setEstadoAndroid(b.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : b.getEstadoAndroid());
-        a.setEstadoIos(b.getEstadoIos() == null ? GlobalCodes.HABILITADA : b.getEstadoIos());
+        try {
+            Aplicacion a;
+            if (id != null) {
+                a = applicationDao.findById(id, Aplicacion.class);
+            } else {
+                a = b.getAplicacion();
+            }
+            a.setApiKeyDev(b.getApiKeyDev());
+            a.setApiKeyProd(b.getApiKeyProd());
+            a.setKeyFileDev(b.getKeyFileDev());
+            a.setKeyFileProd(b.getKeyFileProd());
+            a.setNombre(b.getNombre());
+            a.setEstadoAndroid(b.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : b.getEstadoAndroid());
+            a.setEstadoIos(b.getEstadoIos() == null ? GlobalCodes.HABILITADA : b.getEstadoIos());
 
-        String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
+            String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
 
-        if (b.getCertificadoDevFile() != null) {
-            String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
-            writeFile(fileNameDev, b.getCertificadoDevFile());
-            a.setCertificadoDev(fileNameDev);
-        }
-        if (b.getCertificadoProdFile() != null) {
-            String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
-            writeFile(fileNameProd, b.getCertificadoProdFile());
-            a.setCertificadoProd(fileNameProd);
-        }
-        if (a.isIos()) {
-            a.setPayloadSize(2048);
-        } else {
-            a.setPayloadSize(4096);
-        }
-        applicationDao.create(a);
+            if (b.getCertificadoDevFile() != null) {
+                String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
+                writeFile(fileNameDev, b.getCertificadoDevFile());
+                a.setCertificadoDev(fileNameDev);
+            }
+            if (b.getCertificadoProdFile() != null) {
+                String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
+                writeFile(fileNameProd, b.getCertificadoProdFile());
+                a.setCertificadoProd(fileNameProd);
+            }
+            if (a.isIos()) {
+                a.setPayloadSize(2048);
+            } else {
+                a.setPayloadSize(4096);
+            }
+            applicationDao.create(a);
 
-        return a;
+            return a;
+        } catch (HibernateException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public void writeFile(String fileName, byte[] data) throws BusinessException {
@@ -194,7 +200,7 @@ public class AplicacionBusiness {
         List<DeviceRegistration> nuevos = new ArrayList<>();
         for (Device d : lista) {
             try {
-                nuevos.add(new DeviceRegistration(d.getToken(), null, GlobalCodes.NUEVO, "Inactivo", a, GlobalCodes.ELIMINAR,GlobalCodes.IOS));
+                nuevos.add(new DeviceRegistration(d.getToken(), null, GlobalCodes.NUEVO, "Inactivo", a, GlobalCodes.ELIMINAR, GlobalCodes.IOS));
             } catch (Exception e) {
                 LOGGER.error("Error al almacenar dispositivo inactivo IOS: " + e);
             }
