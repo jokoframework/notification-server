@@ -5,6 +5,7 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
+import java.sql.SQLException;
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -12,6 +13,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
+import py.com.sodep.notificationserver.config.GlobalCodes;
+import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
 /**
  *
@@ -27,41 +31,59 @@ public class BaseDAO<T> {
     }
 
     public void save(T entity) {
+        Transaction t = getSession().getTransaction();
         try {
-            getSession().beginTransaction();
+            t.begin();
             getSession().persist(entity);
-            getSession().getTransaction().commit();
+            t.commit();
         } catch (HibernateException e) {
-            if (getSession().getTransaction() != null) {
+            if (t != null) {
                 LOGGER.error("ROLLBACK: " + entity);
-                getSession().getTransaction().rollback();
+                t.rollback();
             }
             throw e;
         }
     }
 
-    public T findById(long id, Class<T> objectClass) {
-        LOGGER.info("Buscando: " + objectClass);
-        getSession().beginTransaction();
-        T result = (T) getSession().get(objectClass, id);
-        if (result != null) {
-            Hibernate.initialize(result);
-            getSession().getTransaction().commit();
-            return result;
-        } else {
-            throw new ObjectNotFoundException(id, objectClass.getName());
+    public T findById(long id, Class<T> objectClass) throws BusinessException {
+        T result = null;
+        Transaction t = getSession().getTransaction();
+        try {
+            LOGGER.info("Buscando: " + objectClass);
+            t.begin();
+            LOGGER.info("Transaccion iniciada!");
+            result = (T) getSession().get(objectClass, id);
+            if (result != null) {
+                Hibernate.initialize(result);
+            } else {
+                throw new ObjectNotFoundException(id, objectClass.getName());
+            }
+            t.commit();
+        } catch (Exception h) {
+            LOGGER.error("Error al buscar por id: ", h);
+            t.rollback();            
+            throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, h.getLocalizedMessage());
+        } finally {
+            if (!t.wasCommitted() && !t.wasRolledBack() ){
+                t.commit();
+            }
         }
+        return result;
     }
 
-    public T create(T entity) throws HibernateException {
+    public T create(T entity) throws HibernateException, SQLException {
+        Transaction t = getSession().getTransaction();
         try {
-            getSession().beginTransaction();
+            t.begin();
             getSession().saveOrUpdate(entity);
-            getSession().getTransaction().commit();
+            t.commit();
         } catch (HibernateException e) {
-            if (getSession().getTransaction() != null) {
+            if (t != null) {
                 LOGGER.error("ROLLBACK: " + entity);
-                getSession().getTransaction().rollback();
+                t.rollback();
+            }
+            if (e instanceof ConstraintViolationException){
+                throw ((ConstraintViolationException)e).getSQLException();
             }
             throw e;
         }
@@ -86,16 +108,17 @@ public class BaseDAO<T> {
     }
 
     public boolean delete(T entity) {
+        Transaction tx = getSession().beginTransaction();
         try {
             if (entity == null) {
                 return false;
             }
             getSession().delete(entity);
-            getSession().getTransaction().commit();
+            tx.commit();
             return true;
         } catch (HibernateException e) {
             LOGGER.error("ROLLBACK: " + entity);
-            getSession().getTransaction().rollback();
+            tx.rollback();
             throw e;
         }
     }

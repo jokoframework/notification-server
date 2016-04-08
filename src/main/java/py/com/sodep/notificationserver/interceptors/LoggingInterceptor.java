@@ -39,7 +39,7 @@ public class LoggingInterceptor implements MessageBodyReaderInterceptor, Message
             context.setInputStream(stream);
             Object proceed = context.proceed();
             byte[] body = stream.toByteArray();
-            LOGGER.info("Contenido de entrada: " + new String(body));
+            //LOGGER.info("Contenido de entrada: " + new String(body));
 
             return proceed;
         } finally {

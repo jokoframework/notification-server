@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javapns.devices.Device;
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -72,7 +72,7 @@ public class AplicacionBusiness {
                 a.setPayloadSize(4096);
             }
             a = applicationDao.create(a);
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
         }
         return a;
@@ -129,7 +129,7 @@ public class AplicacionBusiness {
             applicationDao.create(a);
 
             return a;
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
         }
     }
@@ -149,7 +149,7 @@ public class AplicacionBusiness {
         }
     }
 
-    public Aplicacion getApplication(Long id) {
+    public Aplicacion getApplication(Long id) throws BusinessException {
         Object a = applicationDao.findById(id, Aplicacion.class);
         return (Aplicacion) a;
     }
@@ -159,20 +159,29 @@ public class AplicacionBusiness {
         return (Aplicacion) a;
     }
 
-    public Aplicacion habilitarAplicacionAndroid(Long id) {
-        Aplicacion a = getApplication(id);
-        a.setEstadoAndroid(GlobalCodes.HABILITADA);
-        a.setError(null);
-        applicationDao.create(a);
-        return a;
+    public Aplicacion habilitarAplicacionAndroid(Long id) throws BusinessException {
+        try {
+            Aplicacion a = getApplication(id);
+            a.setEstadoAndroid(GlobalCodes.HABILITADA);
+            a.setError(null);
+            applicationDao.create(a);
+            return a;
+        } catch (HibernateException | SQLException ex) {
+            LOGGER.error(ex);
+        }
+        return null;
     }
 
-    public Aplicacion habilitarAplicacionIos(Long id) {
-        Aplicacion a = getApplication(id);
-        a.setEstadoIos(GlobalCodes.HABILITADA);
-        a.setError(null);
-        applicationDao.create(a);
-        return a;
+    public Aplicacion habilitarAplicacionIos(Long id) throws BusinessException {
+        try {
+            Aplicacion a = getApplication(id);
+            a.setEstadoIos(GlobalCodes.HABILITADA);
+            a.setError(null);
+            applicationDao.create(a);
+            return a;
+        } catch (HibernateException | SQLException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public Aplicacion eliminarAplicacion(Long id) throws BusinessException {
@@ -185,7 +194,7 @@ public class AplicacionBusiness {
         }
     }
 
-    public List<DeviceRegistration> getListaRegIdInvalido(Long id) {
+    public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws BusinessException {
         Aplicacion a = getApplication(id);
         List<DeviceRegistration> nuevos = deviceDao.getPendientesAndroid(a);
         deviceDao.setEstado(GlobalCodes.CONSULTADO, nuevos);
