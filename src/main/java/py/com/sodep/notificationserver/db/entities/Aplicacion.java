@@ -1,9 +1,12 @@
 package py.com.sodep.notificationserver.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
 import javax.ws.rs.FormParam;
+
 import org.jboss.resteasy.annotations.providers.multipart.PartType;
 import py.com.sodep.notificationserver.config.GlobalCodes;
 
@@ -14,7 +17,8 @@ public class Aplicacion implements Serializable {
     private static final long serialVersionUID = 6163667597446187934L;
 
     @Id
-    @GeneratedValue
+    @SequenceGenerator(name = "aplicacion_id_seq", sequenceName = "aplicacion_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "aplicacion_id_seq")
     @FormParam("id")
     @PartType("application/text")
     @Column(name = "aplicacion_id")
@@ -65,6 +69,8 @@ public class Aplicacion implements Serializable {
     private String estadoAndroid;
     @Column(name = "estado_ios")
     private String estadoIos;
+    @Column(name = "created_at")
+    private Date createdAt = new Date();
 
     public Long getId() {
         return id;
@@ -186,5 +192,13 @@ public class Aplicacion implements Serializable {
     @Override
     public String toString() {
         return "Aplicacion{" + "id=" + id + ", nombre=" + nombre + ", apiKeyDev=" + apiKeyDev + ", apiKeyProd=" + apiKeyProd + ", certificadoDev=" + certificadoDev + ", certificadoProd=" + certificadoProd + ", keyFileProd=" + keyFileProd + ", keyFileDev=" + keyFileDev + ", payloadSize=" + payloadSize + ", error=" + error + ", estadoAndroid=" + estadoAndroid + ", estadoIos=" + estadoIos + '}';
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -3,6 +3,7 @@ package py.com.sodep.notificationserver.db.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -45,6 +46,9 @@ public class Result implements Serializable {
     @JoinColumn(name = "ios_response_id")
     @JsonIgnore
     private IosResponse iosResponse;
+
+    @Column(name = "created_at")
+    private Date createdAt = new Date();
 
     public Long getId() {
         return id;
@@ -115,4 +119,11 @@ public class Result implements Serializable {
         return "Result{" + "error=" + error + ", message_id=" + messageId + ", registration_id=" + registrationId + '}';
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }

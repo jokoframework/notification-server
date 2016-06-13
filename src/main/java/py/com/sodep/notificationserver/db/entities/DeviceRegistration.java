@@ -3,6 +3,7 @@ package py.com.sodep.notificationserver.db.entities;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,6 +40,9 @@ public class DeviceRegistration implements Serializable {
     @JoinColumn(name = "aplicacion_id")
     @JsonIgnore
     private Aplicacion aplicacion;
+
+    @Column(name = "created_at")
+    private Date createdAt = new Date();
 
     public DeviceRegistration() {
         //Default constructor
@@ -119,4 +123,11 @@ public class DeviceRegistration implements Serializable {
         this.tipo = tipo;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }
