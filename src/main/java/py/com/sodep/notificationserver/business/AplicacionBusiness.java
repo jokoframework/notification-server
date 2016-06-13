@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javapns.devices.Device;
+
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
@@ -25,7 +27,7 @@ import py.com.sodep.notificationserver.facade.ApnsFacade;
  *
  * @author Vanessa
  */
-public class AplicacionBusiness {
+public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
 
     private static final Logger LOGGER = Logger.getLogger(AplicacionBusiness.class);
 
@@ -41,11 +43,16 @@ public class AplicacionBusiness {
     @Inject
     ApnsFacade facade;
 
+    @PostConstruct
+    private void init(){
+        this.baseDAO = applicationDao;
+    }
+
     public Aplicacion createAplicacionJson(Aplicacion nuevo, Long id) throws BusinessException {
         Aplicacion a = null;
         try {
             if (id != null) {
-                a = applicationDao.findById(id, Aplicacion.class);
+                a = applicationDao.findById(id);
             } else {
                 a = nuevo;
             }
@@ -94,7 +101,7 @@ public class AplicacionBusiness {
     public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws BusinessException {
         Aplicacion a;
         if (id != null) {
-            a = applicationDao.findById(id, Aplicacion.class);
+            a = applicationDao.findById(id);
         } else {
             a = b.getAplicacion();
         }
@@ -144,7 +151,7 @@ public class AplicacionBusiness {
     }
 
     public Aplicacion getApplication(Long id) {
-        Object a = applicationDao.findById(id, Aplicacion.class);
+        Object a = applicationDao.findById(id);
         return (Aplicacion) a;
     }
 
@@ -200,5 +207,10 @@ public class AplicacionBusiness {
             }
         }
         return nuevos;
+    }
+
+    public List<Aplicacion> getPaged(Integer page, Integer pageSize) throws BusinessException{
+        List<Aplicacion> applications = applicationDao.getPaged(page, pageSize);
+        return applications;
     }
 }

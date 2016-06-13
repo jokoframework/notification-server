@@ -1,5 +1,6 @@
 package py.com.sodep.notificationserver.rest;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -19,18 +20,25 @@ import py.com.sodep.notificationserver.db.entities.*;
 import py.com.sodep.notificationserver.business.AplicacionBusiness;
 import py.com.sodep.notificationserver.exceptions.handlers.BusinessException;
 
+import java.util.List;
+
 /**
  *
  * @author Vanessa
  */
 @Path("/aplicacion")
 @RequestScoped
-public class AplicacionService {
+public class AplicacionService extends BaseService{
 
     private static final Logger LOGGER = Logger.getLogger(AplicacionService.class);
 
     @Inject
     AplicacionBusiness appBussines;
+
+    @PostConstruct
+    private void init(){
+        this.baseBusiness = appBussines;
+    }
 
     @POST
     @Path("")
@@ -81,25 +89,36 @@ public class AplicacionService {
         return Response.ok(a).build();
     }
 
-    @GET
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationById(@PathParam("id") Long id) throws BusinessException {
-        LOGGER.info("Application/id " + id);
-        Aplicacion a = appBussines.getApplication(id);
-        return Response.ok(a).build();
+//    @GET
+//    @Path("/{id}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response getApplicationById(@PathParam("id") Long id) throws BusinessException {
+//        LOGGER.info("Application/id " + id);
+//        Aplicacion a = appBussines.getApplication(id);
+//        return Response.ok(a).build();
+//
+//    }
 
-    }
+//    @GET
+//    @Path("")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Response findAplicacion(@QueryParam(value = "nombre") String nombre,
+//                                   @QueryParam(value = "page") Integer page,
+//                                   @QueryParam(value = "pageSize") Integer pageSize) throws BusinessException {
+//        LOGGER.info("Application/nombre " + nombre + " pagina " + page);
+//        Response.ResponseBuilder builder = null;
+//        if(nombre != null){
+//            Aplicacion a = appBussines.findAplicacion(nombre);
+//            builder = Response.ok(a);
+//        }else{
+//            List<Aplicacion> apps = appBussines.getPaged(page, pageSize);
+//            builder = Response.ok(apps);
+//        }
+//
+//        return builder.build();
+//
+//    }
 
-    @GET
-    @Path("")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response findAplicacion(@QueryParam(value = "nombre") String nombre) throws BusinessException {
-        LOGGER.info("Application/nombre " + nombre);
-        Aplicacion a = appBussines.findAplicacion(nombre);
-        return Response.ok(a).build();
-
-    }
 
     @POST
     @Path("/{id}/android/habilitar")
@@ -114,6 +133,15 @@ public class AplicacionService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response habilitarAplicacionIos(@PathParam(value = "id") Long id) throws BusinessException {
         Aplicacion a = appBussines.habilitarAplicacionIos(id);
+        return Response.ok(a).build();
+    }
+
+    @POST
+    @Path("/{id}/habilitar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response habilitarAplicacion(@PathParam(value = "id") Long id) throws BusinessException {
+        Aplicacion a = appBussines.habilitarAplicacionIos(id);
+        appBussines.habilitarAplicacionAndroid(id);
         return Response.ok(a).build();
     }
 }

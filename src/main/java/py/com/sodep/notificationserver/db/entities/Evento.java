@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -40,10 +41,10 @@ public class Evento implements Serializable {
     private Aplicacion aplicacion;
 
     @Column(name = "send_to_sync")
-    private boolean sendToSync;
+    private Boolean sendToSync;
 
     @Column(name = "production_mode")
-    private boolean productionMode;
+    private Boolean productionMode;
     private String alert;
     private String prioridad;
     @Column(name = "estado_android")
@@ -51,6 +52,7 @@ public class Evento implements Serializable {
     @Column(name = "estado_ios")
     private String estadoIos;
 
+    @JsonIgnore
     @OneToMany(targetEntity = Payload.class,
             mappedBy = "evento", cascade = CascadeType.ALL)
     private List<Payload> payloads;
@@ -72,6 +74,9 @@ public class Evento implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ios_response_id")
     private IosResponse iosResponse;
+
+    @Column(name = "created_at")
+    private Date createdAt = new Date();
 
     public Evento() {
         //Default constructor
@@ -286,4 +291,11 @@ public class Evento implements Serializable {
         return "Evento{" + "id=" + id + ", aplicacion=" + aplicacion + ", sendToSync=" + sendToSync + ", productionMode=" + productionMode + ", alert=" + alert + ", prioridad=" + prioridad + ", estadoAndroid=" + estadoAndroid + ", estadoIos=" + estadoIos + ", payloads=" + payloads + ", androidDevices=" + androidDevices + ", iosDevices=" + iosDevices + ", androidResponse=" + androidResponse + ", iosResponse=" + iosResponse + '}';
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }
