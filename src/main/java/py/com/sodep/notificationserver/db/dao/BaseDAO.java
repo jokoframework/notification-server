@@ -144,41 +144,49 @@ public class BaseDAO<T> {
             pageSize = PAGE_SIZE;
         }
 
-        List<String> addedJoins = new ArrayList<String>();
-        getSession().beginTransaction();
-        Criteria criteria = getSession()
-                .createCriteria(entityClass, entityClass.getSimpleName());
+        try {
+            List<String> addedJoins = new ArrayList<String>();
+            getSession().beginTransaction();
+            Criteria criteria = getSession()
+                    .createCriteria(entityClass, entityClass.getSimpleName());
 
-        for (Filter f : filters) {
+            for (Filter f : filters) {
 
-            String currentAlias = entityClass.getSimpleName();
-            String[] splitted = f.getPath().split("\\.");
-            Class<?> currentClass = entityClass;
+                String currentAlias = entityClass.getSimpleName();
+                String[] splitted = f.getPath().split("\\.");
+                Class<?> currentClass = entityClass;
 
-            for (int i = 0; i < splitted.length; i++) {
-                if (i == (splitted.length - 1)) {
-                    //Llegamos al final del path, agregamos la condicion al criteria
-                    addCondition(criteria, splitted[i], currentAlias, currentClass, f);
-                } else {
-                    //Si no llegamos al final, tenemos que hacer un join
-                    currentClass = doJoin(criteria, splitted[i], currentAlias, currentClass, addedJoins);
+                for (int i = 0; i < splitted.length; i++) {
+                    if (i == (splitted.length - 1)) {
+                        //Llegamos al final del path, agregamos la condicion al criteria
+                        addCondition(criteria, splitted[i], currentAlias, currentClass, f);
+                    } else {
+                        //Si no llegamos al final, tenemos que hacer un join
+                        currentClass = doJoin(criteria, splitted[i], currentAlias, currentClass, addedJoins);
+                    }
+                    //Actualizamos el alias para la siguiente iteracion
+                    currentAlias = currentAlias + "_" + splitted[i];
                 }
-                //Actualizamos el alias para la siguiente iteracion
-                currentAlias = currentAlias + "_" + splitted[i];
+
             }
 
-        }
-
-        if(page != null){
-            if(page <= 0){
-                page = 1;
+            if (page != null) {
+                if (page <= 0) {
+                    page = 1;
+                }
+                criteria.setFirstResult((page - 1) * pageSize).setMaxResults(pageSize);
             }
-            criteria.setFirstResult((page - 1) * pageSize).setMaxResults(pageSize);
-        }
-        List<T> entities =  criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+            List<T> entities = criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
 
-        getSession().getTransaction().commit();
-        return entities;
+            getSession().getTransaction().commit();
+            return entities;
+        }catch(Exception e){
+            if (getSession().getTransaction() != null) {
+                LOGGER.error("Error al obtener la lista de entidades");
+                getSession().getTransaction().rollback();
+            }
+            throw e;
+        }
 
 
     }

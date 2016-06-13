@@ -17,7 +17,8 @@ public class Aplicacion implements Serializable {
     private static final long serialVersionUID = 6163667597446187934L;
 
     @Id
-    @GeneratedValue
+    @SequenceGenerator(name = "aplicacion_id_seq", sequenceName = "aplicacion_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "aplicacion_id_seq")
     @FormParam("id")
     @PartType("application/text")
     @Column(name = "aplicacion_id")
