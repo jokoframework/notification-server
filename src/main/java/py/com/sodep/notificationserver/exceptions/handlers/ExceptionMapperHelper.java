@@ -36,16 +36,18 @@ public class ExceptionMapperHelper {
     public Response.ResponseBuilder finishResponse(Response.ResponseBuilder response, int statusCode) {
         LOGGER.info("StatusCode: " + statusCode);
         LOGGER.info("Body request de salida: " + response.build().getEntity());
-        
+
         return response;
     }
 
     public Response.ResponseBuilder finishResponse(Response response) {
+        LOGGER.info("response: " + response);
         Response.ResponseBuilder builder = Response.fromResponse(response);
         return finishResponse(builder, response.getStatus());
     }
 
     public Response.ResponseBuilder finishResponse(Response.ResponseBuilder response, Response.Status status) {
+        LOGGER.info("status.getStatusCode(): " + status.getStatusCode());
         return finishResponse(response, status.getStatusCode());
     }
 
@@ -68,9 +70,6 @@ public class ExceptionMapperHelper {
         if (code == GlobalCodes.errors.APLICACION_NOT_FOUND.ordinal()) {
             return Status.BAD_REQUEST.getStatusCode();
         }
-        if (code == GlobalCodes.errors.APLICACION_BLOCKED.ordinal()) {
-            return Status.INTERNAL_SERVER_ERROR.getStatusCode();
-        }
-        return code;
+        return Status.INTERNAL_SERVER_ERROR.getStatusCode();
     }
 }

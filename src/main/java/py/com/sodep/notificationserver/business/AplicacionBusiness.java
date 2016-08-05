@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javapns.devices.Device;
 
 import javax.annotation.PostConstruct;
@@ -77,7 +79,7 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
                 a.setPayloadSize(4096);
             }
             a = applicationDao.create(a);
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
         }
         return a;
@@ -99,40 +101,46 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
     }
 
     public Aplicacion newAplicacionFileUpload(AplicacionFile b, Long id) throws BusinessException {
-        Aplicacion a;
-        if (id != null) {
-            a = applicationDao.findById(id);
-        } else {
-            a = b.getAplicacion();
-        }
-        a.setApiKeyDev(b.getApiKeyDev());
-        a.setApiKeyProd(b.getApiKeyProd());
-        a.setKeyFileDev(b.getKeyFileDev());
-        a.setKeyFileProd(b.getKeyFileProd());
-        a.setNombre(b.getNombre());
-        a.setEstadoAndroid(b.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : b.getEstadoAndroid());
-        a.setEstadoIos(b.getEstadoIos() == null ? GlobalCodes.HABILITADA : b.getEstadoIos());
 
-        String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
+        try {
+            Aplicacion a;
+            if (id != null) {
+                a = applicationDao.findById(id);
+            } else {
+                a = b.getAplicacion();
+            }
+            a.setApiKeyDev(b.getApiKeyDev());
+            a.setApiKeyProd(b.getApiKeyProd());
+            a.setKeyFileDev(b.getKeyFileDev());
+            a.setKeyFileProd(b.getKeyFileProd());
+            a.setNombre(b.getNombre());
+            a.setEstadoAndroid(b.getEstadoAndroid() == null ? GlobalCodes.HABILITADA : b.getEstadoAndroid());
+            a.setEstadoIos(b.getEstadoIos() == null ? GlobalCodes.HABILITADA : b.getEstadoIos());
 
-        if (b.getCertificadoDevFile() != null) {
-            String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
-            writeFile(fileNameDev, b.getCertificadoDevFile());
-            a.setCertificadoDev(fileNameDev);
-        }
-        if (b.getCertificadoProdFile() != null) {
-            String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
-            writeFile(fileNameProd, b.getCertificadoProdFile());
-            a.setCertificadoProd(fileNameProd);
-        }
-        if (a.isIos()) {
-            a.setPayloadSize(2048);
-        } else {
-            a.setPayloadSize(4096);
-        }
-        applicationDao.create(a);
 
-        return a;
+            String base = paramDao.getByName("PATH_CERTIFICADOS").getValor();
+
+            if (b.getCertificadoDevFile() != null) {
+                String fileNameDev = base + "/" + b.getNombre() + "-develop" + ".p12";
+                writeFile(fileNameDev, b.getCertificadoDevFile());
+                a.setCertificadoDev(fileNameDev);
+            }
+            if (b.getCertificadoProdFile() != null) {
+                String fileNameProd = base + "/" + b.getNombre() + "-production" + ".p12";
+                writeFile(fileNameProd, b.getCertificadoProdFile());
+                a.setCertificadoProd(fileNameProd);
+            }
+            if (a.isIos()) {
+                a.setPayloadSize(2048);
+            } else {
+                a.setPayloadSize(4096);
+            }
+            applicationDao.create(a);
+
+            return a;
+        } catch (HibernateException | SQLException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public void writeFile(String fileName, byte[] data) throws BusinessException {
@@ -150,7 +158,7 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
         }
     }
 
-    public Aplicacion getApplication(Long id) {
+    public Aplicacion getApplication(Long id) throws BusinessException {
         Object a = applicationDao.findById(id);
         return (Aplicacion) a;
     }
@@ -160,20 +168,29 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
         return (Aplicacion) a;
     }
 
-    public Aplicacion habilitarAplicacionAndroid(Long id) {
-        Aplicacion a = getApplication(id);
-        a.setEstadoAndroid(GlobalCodes.HABILITADA);
-        a.setError(null);
-        applicationDao.create(a);
-        return a;
+    public Aplicacion habilitarAplicacionAndroid(Long id) throws BusinessException {
+        try {
+            Aplicacion a = getApplication(id);
+            a.setEstadoAndroid(GlobalCodes.HABILITADA);
+            a.setError(null);
+            applicationDao.create(a);
+            return a;
+        } catch (HibernateException | SQLException ex) {
+            LOGGER.error(ex);
+        }
+        return null;
     }
 
-    public Aplicacion habilitarAplicacionIos(Long id) {
-        Aplicacion a = getApplication(id);
-        a.setEstadoIos(GlobalCodes.HABILITADA);
-        a.setError(null);
-        applicationDao.create(a);
-        return a;
+    public Aplicacion habilitarAplicacionIos(Long id) throws BusinessException {
+        try {
+            Aplicacion a = getApplication(id);
+            a.setEstadoIos(GlobalCodes.HABILITADA);
+            a.setError(null);
+            applicationDao.create(a);
+            return a;
+        } catch (HibernateException | SQLException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public Aplicacion eliminarAplicacion(Long id) throws BusinessException {
@@ -186,7 +203,7 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
         }
     }
 
-    public List<DeviceRegistration> getListaRegIdInvalido(Long id) {
+    public List<DeviceRegistration> getListaRegIdInvalido(Long id) throws BusinessException {
         Aplicacion a = getApplication(id);
         List<DeviceRegistration> nuevos = deviceDao.getPendientesAndroid(a);
         deviceDao.setEstado(GlobalCodes.CONSULTADO, nuevos);
@@ -201,7 +218,7 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
         List<DeviceRegistration> nuevos = new ArrayList<>();
         for (Device d : lista) {
             try {
-                nuevos.add(new DeviceRegistration(d.getToken(), null, GlobalCodes.NUEVO, "Inactivo", a, GlobalCodes.ELIMINAR,GlobalCodes.IOS));
+                nuevos.add(new DeviceRegistration(d.getToken(), null, GlobalCodes.NUEVO, "Inactivo", a, GlobalCodes.ELIMINAR, GlobalCodes.IOS));
             } catch (Exception e) {
                 LOGGER.error("Error al almacenar dispositivo inactivo IOS: " + e);
             }
@@ -209,8 +226,4 @@ public class AplicacionBusiness extends BaseBusiness<Aplicacion> {
         return nuevos;
     }
 
-    public List<Aplicacion> getPaged(Integer page, Integer pageSize) throws BusinessException{
-        List<Aplicacion> applications = applicationDao.getPaged(page, pageSize);
-        return applications;
-    }
 }

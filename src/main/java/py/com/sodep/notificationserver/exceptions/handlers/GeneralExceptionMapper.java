@@ -34,7 +34,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception> {
         Throwable cause = Throwables.getRootCause(exception);
         if (exception instanceof BusinessException) {
             return businessExceptionResponse(exception);
-        } else if (exception instanceof ConstraintViolationException) {
+        } else if (exception instanceof ConstraintViolationException || exception instanceof SQLException) {
             return constraintViolationResponse(exception);
         } else if (cause instanceof Failure) {
             return failureResponse(cause);

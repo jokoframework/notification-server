@@ -5,8 +5,10 @@
  */
 package py.com.sodep.notificationserver.timers;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
@@ -77,7 +79,11 @@ public class AndroidNotificationTimer extends TimerTask {
         } else {
             e.setEstadoAndroid(GlobalCodes.ERROR);
         }
-        dao.create(e);
+        try {
+            dao.create(e);
+        } catch (HibernateException | SQLException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+        }
     }
 
     public void suspenderNotificaciones(Evento e) {
@@ -85,7 +91,7 @@ public class AndroidNotificationTimer extends TimerTask {
             log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
             e.setEstadoAndroid(GlobalCodes.SUSPENDIDO);
             dao.create(e);
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);
         }
     }
@@ -95,7 +101,7 @@ public class AndroidNotificationTimer extends TimerTask {
         a.setEstadoAndroid(GlobalCodes.BLOQUEADA);
         try {
             appDao.create(a);
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             log.error("[ANDROID]Error al bloquear aplicacion: ", ex);
         }
     }

@@ -5,21 +5,22 @@
  */
 package py.com.sodep.notificationserver.db.dao;
 
+import org.apache.log4j.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
 import py.com.sodep.notificationserver.config.HibernateSessionLocal;
-import org.apache.log4j.Logger;
 import py.com.sodep.notificationserver.db.dao.util.Filter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @param <T>
@@ -41,33 +42,39 @@ public class BaseDAO<T> {
         return HibernateSessionLocal.getSessionFactory().getCurrentSession();
     }
 
-    public T create(T entity) throws HibernateException {
+    public void save(T entity) {
+        Transaction t = getSession().getTransaction();
         try {
-            getSession().beginTransaction();
-            getSession().saveOrUpdate(entity);
-            getSession().getTransaction().commit();
+            t.begin();
+            getSession().persist(entity);
+            t.commit();
         } catch (HibernateException e) {
-            if (getSession().getTransaction() != null) {
+            if (t != null) {
                 LOGGER.error("ROLLBACK: " + entity);
-                getSession().getTransaction().rollback();
+                t.rollback();
+            }
+            throw e;
+        }
+
+    }
+    
+    public T create(T entity) throws HibernateException, SQLException {
+        Transaction t = getSession().getTransaction();
+        try {
+            t.begin();
+            getSession().saveOrUpdate(entity);
+            t.commit();
+        } catch (HibernateException e) {
+            if (t != null) {
+                LOGGER.error("ROLLBACK: " + entity);
+                t.rollback();
+            }
+            if (e instanceof ConstraintViolationException){
+                throw ((ConstraintViolationException)e).getSQLException();
             }
             throw e;
         }
         return entity;
-    }
-
-    public void save(T entity) {
-        try {
-            getSession().beginTransaction();
-            getSession().persist(entity);
-            getSession().getTransaction().commit();
-        } catch (HibernateException e) {
-            if (getSession().getTransaction() != null) {
-                LOGGER.error("ROLLBACK: " + entity);
-                getSession().getTransaction().rollback();
-            }
-            throw e;
-        }
     }
 
     public T findById(long id) {
@@ -101,42 +108,19 @@ public class BaseDAO<T> {
     }
 
     public boolean delete(T entity) {
+        Transaction tx = getSession().beginTransaction();
         try {
             if (entity == null) {
                 return false;
             }
             getSession().delete(entity);
-            getSession().getTransaction().commit();
+            tx.commit();
             return true;
         } catch (HibernateException e) {
             LOGGER.error("ROLLBACK: " + entity);
-            getSession().getTransaction().rollback();
+            tx.rollback();
             throw e;
         }
-    }
-
-    public List<T> getPaged(Integer page, Integer pageSize) {
-        if (pageSize == null) {
-            pageSize = PAGE_SIZE;
-        }
-        if (page == null || page <= 0) {
-            page = 1;
-        }
-        try {
-            getSession().beginTransaction();
-            List<T> a = (List<T>) getSession()
-                    .createCriteria(entityClass)
-                    .setFirstResult((page - 1) * pageSize).setMaxResults(pageSize).list();
-            getSession().getTransaction().commit();
-            return a;
-        } catch (HibernateException e) {
-            if (getSession().getTransaction() != null) {
-                LOGGER.error("Error al obtener la lista de entidades paginada");
-                getSession().getTransaction().rollback();
-            }
-            throw e;
-        }
-
     }
 
     public List<T> getEntities(Integer page, Integer pageSize, List<Filter> filters) throws Exception {

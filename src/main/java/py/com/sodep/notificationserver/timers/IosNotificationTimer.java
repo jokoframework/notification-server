@@ -5,8 +5,10 @@
  */
 package py.com.sodep.notificationserver.timers;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.log4j.Logger;
@@ -53,11 +55,19 @@ public class IosNotificationTimer extends TimerTask {
                         bloquearAplicacion(e.getAplicacion(), ex.getError());
                     }
                     e.setEstadoIos(GlobalCodes.ERROR);
-                    dao.create(e);
+                    try {
+                        dao.create(e);
+                    } catch (HibernateException | SQLException ex1) {
+                        log.error(ex1);
+                    }
                 }
             } else {
                 log.info("La aplicacion " + e.getAplicacion().getNombre() + " deshabilitada");
-                suspenderNotificaciones(e);
+                try {
+                    suspenderNotificaciones(e);
+                } catch (BusinessException ex) {
+                    log.error(ex);
+                }
             }
         }
     }
@@ -67,7 +77,7 @@ public class IosNotificationTimer extends TimerTask {
         a.setEstadoIos(GlobalCodes.BLOQUEADA);
         try {
             appDao.create(a);
-        } catch (HibernateException ex) {
+        } catch (HibernateException | SQLException ex) {
             log.error("[ANDROID]Error al bloquear aplicacion: ", ex);
         }
     }
@@ -96,7 +106,11 @@ public class IosNotificationTimer extends TimerTask {
         }
 
         log.error("Actualizando evento: " + e.getEstadoIos());
-        dao.create(e);
+        try {
+            dao.create(e);
+        } catch (HibernateException | SQLException ex) {
+            log.error("[ANDROID]Error al actualizar evento: ", ex);
+        }
     }
 
     public boolean controlarProductionMode(Evento e) {
@@ -113,13 +127,13 @@ public class IosNotificationTimer extends TimerTask {
         return (a.getEstadoIos() != null && !a.getEstadoIos().equals(GlobalCodes.BLOQUEADA)) || a.getEstadoIos() == null;
     }
 
-    public void suspenderNotificaciones(Evento e) {
+    public void suspenderNotificaciones(Evento e) throws BusinessException {
         try {
             log.info("La aplicacion " + e.getAplicacion().getNombre() + " se encuentra BLOQUEADA, se suspenden las notificaciones.");
             e.setEstadoIos(GlobalCodes.SUSPENDIDO);
             dao.create(e);
-        } catch (HibernateException ex) {
-            log.error("[ANDROID][Evento: " + e.getId() + "]Error al suspender notificación: ", ex);
+        } catch (HibernateException | SQLException ex) {
+            throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
         }
     }
 }

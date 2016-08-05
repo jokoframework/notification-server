@@ -3,11 +3,14 @@ package py.com.sodep.notificationserver.business;
 import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.logging.Level;
 import javapns.json.JSONException;
 import javapns.notification.Payload;
 import javapns.notification.PushNotificationPayload;
 import javax.inject.Inject;
+import org.hibernate.HibernateException;
 import py.com.sodep.notificationserver.db.dao.AplicacionDao;
 import py.com.sodep.notificationserver.db.dao.DeviceRegistrationDao;
 import py.com.sodep.notificationserver.db.dao.EventoDao;
@@ -44,12 +47,16 @@ public class NotificationBusiness {
     public EventoResponse crearEvento(Evento e, String appName) throws BusinessException {
         Aplicacion a = appDao.getByName(appName);
         if (a != null) {
-            e.setAplicacion(a);
-            validate(e);
-            eventoDao.create(e);
-            EventoResponse er = new EventoResponse(e);
-            verificarNotificacionBloqueada(e);
-            return er;
+            try {
+                e.setAplicacion(a);
+                validate(e);
+                eventoDao.create(e);
+                EventoResponse er = new EventoResponse(e);
+                verificarNotificacionBloqueada(e);
+                return er;
+            } catch (HibernateException | SQLException ex) {
+                throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+            }
         } else {
             throw new BusinessException(GlobalCodes.errors.APLICACION_NOT_FOUND, "La aplicacion " + appName + " no existe.");
         }
@@ -124,22 +131,26 @@ public class NotificationBusiness {
 
     }
 
-    public void procesarErroresIos(Evento e, IosResponse res) {
+    public void procesarErroresIos(Evento e, IosResponse res) throws BusinessException {
         LOGGER.info("Procesando Errores");
         if (res.getFailure() > 0) {
             for (int i = 0; i < res.getResults().size(); i++) {
                 Result r = res.getResults().get(i);
                 LOGGER.info("Analizando resultado: " + r);
-                if (r.getOriginalRegistrationId()!=null){
-                    DeviceRegistration d = new DeviceRegistration(
-                            e.getAndroidDevicesList().get(i),
-                            r.getRegistrationId(),
-                            GlobalCodes.NUEVO,
-                            r.getError(),
-                            e.getAplicacion(),
-                            GlobalCodes.ELIMINAR,
-                            GlobalCodes.IOS);
-                    deviceDao.create(d);
+                if (r.getOriginalRegistrationId() != null) {
+                    try {
+                        DeviceRegistration d = new DeviceRegistration(
+                                e.getAndroidDevicesList().get(i),
+                                r.getRegistrationId(),
+                                GlobalCodes.NUEVO,
+                                r.getError(),
+                                e.getAplicacion(),
+                                GlobalCodes.ELIMINAR,
+                                GlobalCodes.IOS);
+                        deviceDao.create(d);
+                    } catch (HibernateException | SQLException ex) {
+                        throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+                    }
                 }
             }
         }
@@ -157,7 +168,7 @@ public class NotificationBusiness {
         return ar;
     }
 
-    public void procesarErroresAndroid(Evento evento, AndroidResponse ar) {
+    public void procesarErroresAndroid(Evento evento, AndroidResponse ar) throws BusinessException {
         if (ar.getFailure() > 0) {
             for (int i = 0; i < ar.getResults().size(); i++) {
                 Result r = ar.getResults().get(i);
@@ -165,22 +176,30 @@ public class NotificationBusiness {
                 if (r.getError() != null && (r.getError().equals(GlobalCodes.NotRegistered)
                         || r.getError().equals(GlobalCodes.InvalidRegistration)
                         || r.getError().equals(GlobalCodes.MissingRegistration))) {
-                    DeviceRegistration d = new DeviceRegistration(
-                            evento.getAndroidDevicesList().get(i),
-                            r.getRegistrationId(),
-                            GlobalCodes.NUEVO,
-                            r.getError(),
-                            evento.getAplicacion(),
-                            GlobalCodes.getAccion(r.getError()),
-                            GlobalCodes.ANDROID);
-                    deviceDao.create(d);
+                    try {
+                        DeviceRegistration d = new DeviceRegistration(
+                                evento.getAndroidDevicesList().get(i),
+                                r.getRegistrationId(),
+                                GlobalCodes.NUEVO,
+                                r.getError(),
+                                evento.getAplicacion(),
+                                GlobalCodes.getAccion(r.getError()),
+                                GlobalCodes.ANDROID);
+                        deviceDao.create(d);
+                    } catch (HibernateException | SQLException ex) {
+                        throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+                    }
                 }
                 if (r.getError() != null && r.getError().equals(GlobalCodes.InvalidPackageName)) {
-                    LOGGER.info("Se bloquea la aplicación: " + r.getError());
-                    Aplicacion a = evento.getAplicacion();
-                    a.setError(r.getError());
-                    a.setEstadoAndroid(GlobalCodes.BLOQUEADA);
-                    appDao.create(a);
+                    try {
+                        LOGGER.info("Se bloquea la aplicación: " + r.getError());
+                        Aplicacion a = evento.getAplicacion();
+                        a.setError(r.getError());
+                        a.setEstadoAndroid(GlobalCodes.BLOQUEADA);
+                        appDao.create(a);
+                    } catch (HibernateException | SQLException ex) {
+                        throw new BusinessException(GlobalCodes.errors.DB_ERROR, ex);
+                    }
                 }
             }
         }
