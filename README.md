@@ -3,13 +3,13 @@ El notification server es una aplicación multi tenant desarrollada en JEE que e
 ![Funcionamiento Notification Server](https://github.com/jokoframework/notification-server/blob/master/doc/readme-notification-server.png?raw=true "Funcionamiento")
 ## Configuraciones
 ### 1. Configurar maven settings 
-1.1 Descargar el archivo gohan-settings.xml en el directorio donde se encuentre la carpeta .m2
+1.1 Si utilizas un ambiente con Artifactory u otro manejador de dependencias para maven, debes descargar el archivo de configuración del maven (Ej: gohan-settings.xml) y colocarlo en el directorio donde se encuentre la carpeta .m2
 
-1.2 Ajustar los directorios que se encuentran en el archivo. 
+1.2 Ajustar los directorios que se encuentran en el archivo a tu ambiente de desarrollo. 
 
-1.3 Configurar en IDE para que apunte a este archivo
+1.3 Configurar en IDE para que apunte a este archivo de configuración.
 
-1.4 Instalar libreria APNS:
+1.4 Instalar librería APNS:
 ```
 mvn install:install-file -Dfile=JavaPNS_2.3_Beta_3.jar -DgroupId=com.apple -DartifactId=javaPNS -Dversion=2.3 -Dpackaging=jar
 ```
