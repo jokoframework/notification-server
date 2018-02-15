@@ -1,4 +1,7 @@
 # Notification Server
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c4046d5921cc4edf878392e7e4802b65)](https://app.codacy.com/app/alefq/notification-server?utm_source=github.com&utm_medium=referral&utm_content=jokoframework/notification-server&utm_campaign=badger)
+
 El notification server es una aplicación multi tenant desarrollada en JEE que expone un API REST para envío de notificaciones a dispositivos iOS vía APNS y Android vía GCM, liberada bajo Apache License 2.0.
 ![Funcionamiento Notification Server](https://github.com/jokoframework/notification-server/blob/master/doc/readme-notification-server.png?raw=true "Funcionamiento")
 ## Configuraciones
